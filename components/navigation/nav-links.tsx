@@ -37,13 +37,13 @@ export function NavLinks({ links }: { links: NavItemType[] }) {
     const slider = targetLi.querySelector(".text-slider");
     const cloneText = targetLi.querySelector(".text-clone");
 
-    // ✨ 1. Add back the `mask: "chars"` property for the clean reveal
     const split = new SplitText(cloneText, {
       type: "words, chars",
       mask: "chars",
     });
 
     const tl = gsap.timeline({
+      defaults: { ease: "power2.inOut", duration: 0.4 },
       onReverseComplete: () => {
         split.revert();
         timelineRefs.current[index] = null;
@@ -52,18 +52,14 @@ export function NavLinks({ links }: { links: NavItemType[] }) {
 
     tl.to(slider, {
       yPercent: -50,
-      duration: 0.3,
-      ease: "power2.inOut",
     }).from(
       split.chars,
       {
         yPercent: 100,
         autoAlpha: 0,
         stagger: { amount: 0.1 },
-        duration: 0.3,
-        ease: "power2.out",
       },
-      "-=0.3",
+      "-=0.4",
     );
 
     timelineRefs.current[index] = tl;
