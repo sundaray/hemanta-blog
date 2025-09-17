@@ -1,5 +1,5 @@
 import { MobileNav } from "@/components/navigation/mobile-nav";
-import { NavItem } from "@/components/navigation/nav-item";
+import { NavLinks } from "@/components/navigation/nav-links";
 import type { NavItem as NavItemType } from "@/types";
 import Link from "next/link";
 
@@ -33,13 +33,7 @@ export async function MainNav({ links }: MainNavProps) {
       </div>
 
       <nav className="hidden md:ml-6 md:flex">
-        <ul className="flex space-x-4">
-          {links.map((link) => (
-            <li key={link.title}>
-              <NavItem title={link.title} href={link.href} />
-            </li>
-          ))}
-        </ul>
+        <NavLinks links={links} />
       </nav>
     </div>
   );

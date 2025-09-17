@@ -8,12 +8,12 @@ export const metadata: Metadata = {
   description: "",
 };
 
-export default function RootLayout(props: LayoutProps<"/">) {
+export default function HomeLayout(props: LayoutProps<"/">) {
   return (
     <>
       <header>
         <MainNavWrapper>
-          <MainNav links={navbarLinks.home} />
+          <MainNav links={navbarLinks.main} />
         </MainNavWrapper>
       </header>
       <main className="flex-1 py-36">{props.children}</main>

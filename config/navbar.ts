@@ -1,11 +1,11 @@
 import type { NavItem } from "@/types";
 
 type NavbarConfig = {
-  home: NavItem[];
+  main: NavItem[];
 };
 
 export const navbarLinks: NavbarConfig = {
-  home: [
+  main: [
     { title: "Blog", href: "/blog" },
     { title: "Tags", href: "/tags" },
     { title: "Courses", href: "/courses" },
