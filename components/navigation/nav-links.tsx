@@ -14,33 +14,47 @@ import Link from "next/link";
 gsap.registerPlugin(useGSAP, SplitText);
 
 export function NavLinks({ links }: { links: NavItemType[] }) {
-  const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const pathname = usePathname();
-  const activeLinkHref = links.find((link) => link.href === pathname)?.href;
 
-  const container = useRef(null);
+  const ulContainer = useRef(null);
   const linkRefs = useRef<(HTMLLIElement | null)[]>([]);
   const timelineRefs = useRef<(gsap.core.Timeline | null)[]>([]);
 
-  // ✨ ADDITION: This hook sets the active underline when the page changes.
+  /**
+   * Syncs the underline state with the current route.
+   * Whenever `pathname` changes, this block sets the underline of the active link
+   * to fully visible (scaleX: 1) and collapses all others (scaleX: 0).
+   *
+   * Using `useGSAP` instead of `useEffect` ensures the updates are tied to
+   * the GSAP context for this component, so styles are reverted automatically
+   * if the component unmounts. The `scope` limits the effect to elements
+   * inside `ulContainer`.
+   */
   useGSAP(
     () => {
       linkRefs.current.forEach((li) => {
-        const underline = li?.querySelector(".gsap-underline");
-        if (underline) {
+        const gsapUnderline = li?.querySelector(".gsap-underline");
+        if (gsapUnderline) {
           if (li?.dataset.active === "true") {
-            gsap.set(underline, { scaleX: 1 });
+            gsap.set(gsapUnderline, { scaleX: 1 });
           } else {
-            gsap.set(underline, { scaleX: 0 });
+            gsap.set(gsapUnderline, { scaleX: 0 });
           }
         }
       });
     },
-    { scope: container, dependencies: [pathname, links] },
+    { scope: ulContainer, dependencies: [pathname] },
   );
 
-  const { contextSafe } = useGSAP({ scope: container });
+  const { contextSafe } = useGSAP({ scope: ulContainer });
 
+  /**
+   * This hover animation is triggered after mount (on user interaction),
+   * not during the initial render. Wrapping it in `contextSafe` ensures
+   * the GSAP context from `useGSAP` tracks it as part of this component.
+   * That way, if the component unmounts while the animation is active,
+   * GSAP will automatically clean it up, preventing memory leaks or visual glitches.
+   */
   const handleMouseEnter = contextSafe((index: number) => {
     const targetLi = linkRefs.current[index];
     if (!targetLi) return;
@@ -50,9 +64,8 @@ export function NavLinks({ links }: { links: NavItemType[] }) {
       return;
     }
 
-    const slider = targetLi.querySelector(".text-slider");
-    const cloneText = targetLi.querySelector(".text-clone");
-    // ✨ ADDITION: Use the new, non-conflicting class name
+    const slider = targetLi.querySelector(".gsap-text-slider");
+    const cloneText = targetLi.querySelector(".gsap-text-clone");
     const underline = targetLi.querySelector(".gsap-underline");
 
     const split = new SplitText(cloneText, {
@@ -99,22 +112,18 @@ export function NavLinks({ links }: { links: NavItemType[] }) {
   });
 
   return (
-    <motion.ul
-      ref={container}
-      className="flex space-x-4"
-      onMouseLeave={() => setHoveredLink(null)}
-    >
+    <motion.ul ref={ulContainer} className="flex items-center space-x-4">
       {links.map((link, index) => {
         const isActive = pathname === link.href;
         return (
           <motion.li
-            ref={(el) => (linkRefs.current[index] = el)}
+            ref={(el) => {
+              linkRefs.current[index] = el;
+            }}
             key={link.title}
             className="relative"
-            // ✨ ADDITION: data-active helps GSAP find the active link
             data-active={isActive}
             onMouseEnter={() => {
-              setHoveredLink(link.href);
               handleMouseEnter(index);
             }}
             onMouseLeave={() => handleMouseLeave(index)}
@@ -122,25 +131,22 @@ export function NavLinks({ links }: { links: NavItemType[] }) {
             <Link
               className={cn(
                 "relative block h-6 overflow-hidden transition-colors",
-                isActive && "text-foreground",
+                isActive ? "text-foreground" : "text-neutral-600",
               )}
               href={link.href}
             >
-              <div className="text-slider">
-                <span className="text-original grid h-full place-items-center [font-kerning:none]">
+              <div className="gsap-text-slider">
+                <span className="gsap-text-original grid h-full place-items-center [font-kerning:none]">
                   {link.title}
                 </span>
-                {/* ✨ ADDITION: Added missing classes for alignment and spacing */}
-                <span className="text-clone h-full [font-kerning:none]">
+                <span className="gsap-text-clone h-full [font-kerning:none]">
                   {link.title}
                 </span>
               </div>
             </Link>
-
-            {/* ✨ ADDITION: Replaced the conditional div with a permanent one */}
             <div
               className={cn(
-                "gsap-underline absolute bottom-0 left-0 h-[1.3px] w-full origin-left scale-x-0",
+                "gsap-underline absolute bottom-0 left-0 h-[1.25px] w-full origin-left scale-x-0",
                 isActive ? "bg-foreground" : "bg-muted-foreground",
               )}
             />
