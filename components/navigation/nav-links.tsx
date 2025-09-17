@@ -17,11 +17,27 @@ export function NavLinks({ links }: { links: NavItemType[] }) {
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const pathname = usePathname();
   const activeLinkHref = links.find((link) => link.href === pathname)?.href;
-  const underlineTarget = hoveredLink ?? activeLinkHref;
 
   const container = useRef(null);
   const linkRefs = useRef<(HTMLLIElement | null)[]>([]);
   const timelineRefs = useRef<(gsap.core.Timeline | null)[]>([]);
+
+  // ✨ ADDITION: This hook sets the active underline when the page changes.
+  useGSAP(
+    () => {
+      linkRefs.current.forEach((li) => {
+        const underline = li?.querySelector(".gsap-underline");
+        if (underline) {
+          if (li?.dataset.active === "true") {
+            gsap.set(underline, { scaleX: 1 });
+          } else {
+            gsap.set(underline, { scaleX: 0 });
+          }
+        }
+      });
+    },
+    { scope: container, dependencies: [pathname, links] },
+  );
 
   const { contextSafe } = useGSAP({ scope: container });
 
@@ -36,9 +52,11 @@ export function NavLinks({ links }: { links: NavItemType[] }) {
 
     const slider = targetLi.querySelector(".text-slider");
     const cloneText = targetLi.querySelector(".text-clone");
+    // ✨ ADDITION: Use the new, non-conflicting class name
+    const underline = targetLi.querySelector(".gsap-underline");
 
     const split = new SplitText(cloneText, {
-      type: "words, chars",
+      type: "chars",
       mask: "chars",
     });
 
@@ -52,15 +70,23 @@ export function NavLinks({ links }: { links: NavItemType[] }) {
 
     tl.to(slider, {
       yPercent: -50,
-    }).from(
-      split.chars,
-      {
-        yPercent: 100,
-        autoAlpha: 0,
-        stagger: { amount: 0.1 },
-      },
-      "-=0.4",
-    );
+    })
+      .from(
+        split.chars,
+        {
+          yPercent: 100,
+          autoAlpha: 0,
+          stagger: { amount: 0.05 },
+        },
+        "-=0.4",
+      )
+      .to(
+        underline,
+        {
+          scaleX: 1,
+        },
+        "<",
+      );
 
     timelineRefs.current[index] = tl;
   });
@@ -85,6 +111,8 @@ export function NavLinks({ links }: { links: NavItemType[] }) {
             ref={(el) => (linkRefs.current[index] = el)}
             key={link.title}
             className="relative"
+            // ✨ ADDITION: data-active helps GSAP find the active link
+            data-active={isActive}
             onMouseEnter={() => {
               setHoveredLink(link.href);
               handleMouseEnter(index);
@@ -102,24 +130,20 @@ export function NavLinks({ links }: { links: NavItemType[] }) {
                 <span className="text-original grid h-full place-items-center [font-kerning:none]">
                   {link.title}
                 </span>
+                {/* ✨ ADDITION: Added missing classes for alignment and spacing */}
                 <span className="text-clone h-full [font-kerning:none]">
                   {link.title}
                 </span>
               </div>
             </Link>
 
-            {link.href === underlineTarget && (
-              <motion.div
-                layoutId="underline"
-                className={cn(
-                  "absolute bottom-0 left-0 h-[1.3px] w-full",
-                  underlineTarget === activeLinkHref
-                    ? "bg-foreground"
-                    : "bg-muted-foreground",
-                )}
-                transition={{ ease: "easeOut", duration: 0.2 }}
-              />
-            )}
+            {/* ✨ ADDITION: Replaced the conditional div with a permanent one */}
+            <div
+              className={cn(
+                "gsap-underline absolute bottom-0 left-0 h-[1.3px] w-full origin-left scale-x-0",
+                isActive ? "bg-foreground" : "bg-muted-foreground",
+              )}
+            />
           </motion.li>
         );
       })}
