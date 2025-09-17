@@ -16,7 +16,7 @@ export default function RootLayout(props: LayoutProps<"/">) {
           <MainNav links={navbarLinks.home} />
         </MainNavWrapper>
       </header>
-      <main className="flex-1">{props.children}</main>
+      <main className="flex-1 py-36">{props.children}</main>
     </>
   );
 }
