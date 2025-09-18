@@ -16,6 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
   url: z
@@ -36,7 +37,7 @@ const formSchema = z.object({
 
 type OssProjectFormValues = z.infer<typeof formSchema>;
 
-export function AddOssProjectForm() {
+export function AddOssProjectForm({ className }: { className?: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Define the form using the useForm hook.
@@ -60,7 +61,10 @@ export function AddOssProjectForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className={cn("space-y-8", className)}
+      >
         <FormField
           control={form.control}
           name="url"

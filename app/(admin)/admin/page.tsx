@@ -9,7 +9,7 @@ export default function AdminPage() {
       <p className="mt-4 text-pretty text-neutral-600">
         Enter a GitHub repository URL to add it to your list.
       </p>
-      <AddOssProjectForm />
+      <AddOssProjectForm className="mt-12" />
     </div>
   );
 }
