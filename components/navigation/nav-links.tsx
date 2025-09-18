@@ -13,7 +13,13 @@ import Link from "next/link";
 
 gsap.registerPlugin(useGSAP, SplitText);
 
-export function NavLinks({ links }: { links: NavItemType[] }) {
+export function NavLinks({
+  links,
+  className,
+}: {
+  links: NavItemType[];
+  className?: string;
+}) {
   const pathname = usePathname();
 
   const ulContainer = useRef(null);
@@ -110,53 +116,55 @@ export function NavLinks({ links }: { links: NavItemType[] }) {
   });
 
   return (
-    <motion.ul
-      ref={ulContainer}
-      className="relative flex h-full items-center justify-between space-x-6 text-sm font-medium"
-    >
-      {links.map((link, index) => {
-        const isActive = pathname === link.href;
-        return (
-          <motion.li
-            ref={(el) => {
-              linkRefs.current[index] = el;
-            }}
-            key={link.title}
-            className="relative flex h-full items-center"
-            data-active={isActive}
-            onMouseEnter={() => {
-              handleMouseEnter(index);
-            }}
-            onMouseLeave={() => handleMouseLeave(index)}
-          >
-            <Link
-              className={cn(
-                "flex h-full items-center transition-colors",
-                isActive ? "text-foreground" : "text-neutral-600",
-              )}
-              href={link.href}
+    <nav className={cn(className)}>
+      <motion.ul
+        ref={ulContainer}
+        className="relative flex h-full items-center justify-between space-x-6 text-sm font-medium"
+      >
+        {links.map((link, index) => {
+          const isActive = pathname === link.href;
+          return (
+            <motion.li
+              ref={(el) => {
+                linkRefs.current[index] = el;
+              }}
+              key={link.title}
+              className="relative flex h-full items-center"
+              data-active={isActive}
+              onMouseEnter={() => {
+                handleMouseEnter(index);
+              }}
+              onMouseLeave={() => handleMouseLeave(index)}
             >
-              <div className="relative flex h-auto items-center overflow-hidden">
-                <span className="gsap-text-original [font-kerning:none]">
-                  {link.title}
-                </span>
-                <span
-                  className="gsap-text-clone absolute top-full left-0 translate-y-0 whitespace-nowrap [font-kerning:none]"
-                  aria-hidden="true"
-                >
-                  {link.title}
-                </span>
-              </div>
-            </Link>
-            <div
-              className={cn(
-                "gsap-underline pointer-events-none absolute bottom-0 left-0 h-[1.5px] w-full origin-left scale-x-0",
-                isActive ? "bg-sky-700" : "bg-sky-700",
-              )}
-            />
-          </motion.li>
-        );
-      })}
-    </motion.ul>
+              <Link
+                className={cn(
+                  "flex h-full items-center transition-colors",
+                  isActive ? "text-foreground" : "text-neutral-600",
+                )}
+                href={link.href}
+              >
+                <div className="relative flex h-auto items-center overflow-hidden">
+                  <span className="gsap-text-original [font-kerning:none]">
+                    {link.title}
+                  </span>
+                  <span
+                    className="gsap-text-clone absolute top-full left-0 translate-y-0 whitespace-nowrap [font-kerning:none]"
+                    aria-hidden="true"
+                  >
+                    {link.title}
+                  </span>
+                </div>
+              </Link>
+              <div
+                className={cn(
+                  "gsap-underline pointer-events-none absolute bottom-0 left-0 h-[1.5px] w-full origin-left scale-x-0",
+                  isActive ? "bg-sky-700" : "bg-sky-700",
+                )}
+              />
+            </motion.li>
+          );
+        })}
+      </motion.ul>
+    </nav>
   );
 }

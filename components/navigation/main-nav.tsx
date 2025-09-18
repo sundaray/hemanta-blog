@@ -32,9 +32,7 @@ export async function MainNav({ links }: MainNavProps) {
         </div>
       </div>
 
-      <nav className="hidden h-full md:ml-6 md:flex">
-        <NavLinks links={links} />
-      </nav>
+      <NavLinks links={links} className="hidden h-full md:ml-6 md:flex" />
     </div>
   );
 }

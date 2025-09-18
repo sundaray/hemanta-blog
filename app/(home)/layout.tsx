@@ -16,7 +16,7 @@ export default function HomeLayout(props: LayoutProps<"/">) {
           <MainNav links={navbarLinks.main} />
         </MainNavWrapper>
       </header>
-      <main className="flex-1 py-48">{props.children}</main>
+      <main className="flex-1 py-32">{props.children}</main>
     </>
   );
 }

@@ -1,24 +1,24 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import {useState} from "react"
-import {motion, AnimatePresence} from "motion/react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as React from "react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 type Ripple = {
-  key:number,
-  x: number, 
-  y: number
-}
+  key: number;
+  x: number;
+  y: number;
+};
 
 const buttonVariants = cva(
   "relative overflow-hidden inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-base font-semibold transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
     variants: {
-      variant: {  
+      variant: {
         default:
           "bg-primary text-primary-foreground shadow-xs hover:bg-primary/90",
         destructive:
@@ -42,8 +42,8 @@ const buttonVariants = cva(
       variant: "default",
       size: "default",
     },
-  }
-)
+  },
+);
 
 function Button({
   className,
@@ -54,29 +54,29 @@ function Button({
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
+    asChild?: boolean;
   }) {
-  const Comp = asChild ? Slot : "button"
+  const Comp = asChild ? Slot : "button";
 
-  const [ripples, setRipples] = useState<Ripple[]>([])
+  const [ripples, setRipples] = useState<Ripple[]>([]);
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    props.onClick?.(e)
+    props.onClick?.(e);
 
-    const buttonBoundingBox = e.currentTarget.getBoundingClientRect()
-    
+    const buttonBoundingBox = e.currentTarget.getBoundingClientRect();
+
     const newRipple = {
       key: Date.now(),
       x: e.clientX - buttonBoundingBox.left,
-      y: e.clientY - buttonBoundingBox.top
-    }
+      y: e.clientY - buttonBoundingBox.top,
+    };
 
-    setRipples(prev => [...prev, newRipple])
-  }
+    setRipples((prev) => [...prev, newRipple]);
+  };
 
   const handleAnimationComplete = (key: number) => {
-    setRipples(prev => prev.filter(ripple => ripple.key !== key))
-  }
+    setRipples((prev) => prev.filter((ripple) => ripple.key !== key));
+  };
 
   return (
     <Comp
@@ -101,8 +101,8 @@ function Button({
         ))}
       </AnimatePresence>
       {props.children}
-      </Comp>
-  )
+    </Comp>
+  );
 }
 
-export { Button, buttonVariants }
+export { Button, buttonVariants };
