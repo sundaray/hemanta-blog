@@ -64,7 +64,7 @@ export function NavLinks({ links }: { links: NavItemType[] }) {
       return;
     }
 
-    const slider = targetLi.querySelector(".gsap-text-slider");
+    const originalText = targetLi.querySelector(".gsap-text-original");
     const cloneText = targetLi.querySelector(".gsap-text-clone");
     const underline = targetLi.querySelector(".gsap-underline");
 
@@ -81,22 +81,20 @@ export function NavLinks({ links }: { links: NavItemType[] }) {
       },
     });
 
-    tl.to(slider, {
-      yPercent: -50,
-    })
+    tl
+      // 1. Animate the original text up and out of view
+      .to(originalText, { yPercent: -120 })
+      // 2. Animate the underline in at the same time
+      .to(underline, { scaleX: 1 }, "<")
+      // 3. Animate the clone text up into view, starting just before the original has finished
+      .to(cloneText, { yPercent: -100 }, "-=0.4")
+      // 4. Stagger-reveal the characters inside the clone as it moves
       .from(
         split.chars,
         {
-          yPercent: 100,
           autoAlpha: 0,
+          yPercent: 100,
           stagger: { amount: 0.05 },
-        },
-        "-=0.4",
-      )
-      .to(
-        underline,
-        {
-          scaleX: 1,
         },
         "<",
       );
@@ -112,7 +110,10 @@ export function NavLinks({ links }: { links: NavItemType[] }) {
   });
 
   return (
-    <motion.ul ref={ulContainer} className="flex items-center space-x-4">
+    <motion.ul
+      ref={ulContainer}
+      className="relative flex h-full items-center justify-between space-x-6 text-sm font-medium"
+    >
       {links.map((link, index) => {
         const isActive = pathname === link.href;
         return (
@@ -121,7 +122,7 @@ export function NavLinks({ links }: { links: NavItemType[] }) {
               linkRefs.current[index] = el;
             }}
             key={link.title}
-            className="relative"
+            className="relative flex h-full items-center"
             data-active={isActive}
             onMouseEnter={() => {
               handleMouseEnter(index);
@@ -130,24 +131,27 @@ export function NavLinks({ links }: { links: NavItemType[] }) {
           >
             <Link
               className={cn(
-                "relative block h-6 overflow-hidden transition-colors",
+                "flex h-full items-center transition-colors",
                 isActive ? "text-foreground" : "text-neutral-600",
               )}
               href={link.href}
             >
-              <div className="gsap-text-slider">
-                <span className="gsap-text-original grid h-full place-items-center [font-kerning:none]">
+              <div className="relative flex h-auto items-center overflow-hidden">
+                <span className="gsap-text-original [font-kerning:none]">
                   {link.title}
                 </span>
-                <span className="gsap-text-clone h-full [font-kerning:none]">
+                <span
+                  className="gsap-text-clone absolute top-full left-0 translate-y-0 whitespace-nowrap [font-kerning:none]"
+                  aria-hidden="true"
+                >
                   {link.title}
                 </span>
               </div>
             </Link>
             <div
               className={cn(
-                "gsap-underline absolute bottom-0 left-0 h-[1.25px] w-full origin-left scale-x-0",
-                isActive ? "bg-foreground" : "bg-muted-foreground",
+                "gsap-underline pointer-events-none absolute bottom-0 left-0 h-[1.5px] w-full origin-left scale-x-0",
+                isActive ? "bg-sky-700" : "bg-sky-700",
               )}
             />
           </motion.li>

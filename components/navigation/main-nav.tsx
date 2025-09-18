@@ -9,12 +9,12 @@ type MainNavProps = {
 
 export async function MainNav({ links }: MainNavProps) {
   return (
-    <div className="flex h-20 w-full items-center">
+    <div className="flex h-16 w-full items-center border-b px-4">
       <div className="flex items-center space-x-3">
         <Link
           href="/"
           aria-label="Go to homepage"
-          className="hidden items-center text-lg font-bold tracking-tight md:flex"
+          className="hidden h-full items-center text-lg font-bold tracking-tight md:flex"
         >
           Hemanta Sundaray
         </Link>
@@ -22,7 +22,7 @@ export async function MainNav({ links }: MainNavProps) {
         <Link
           href="/"
           aria-label="Go to homepage"
-          className="link-focus inline-flex items-center font-bold tracking-tight md:hidden"
+          className="flex items-center font-bold tracking-tight md:hidden"
         >
           TP
         </Link>
@@ -32,7 +32,7 @@ export async function MainNav({ links }: MainNavProps) {
         </div>
       </div>
 
-      <nav className="hidden md:ml-6 md:flex">
+      <nav className="hidden h-full md:ml-6 md:flex">
         <NavLinks links={links} />
       </nav>
     </div>

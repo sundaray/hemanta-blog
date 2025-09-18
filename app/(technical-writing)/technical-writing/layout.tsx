@@ -18,7 +18,7 @@ export default function TechnicalWritingLayout(
           <MainNav links={navbarLinks.main} />
         </MainNavWrapper>
       </header>
-      <main className="flex-1 py-36">{props.children}</main>
+      <main className="flex-1 py-32">{props.children}</main>
     </>
   );
 }
