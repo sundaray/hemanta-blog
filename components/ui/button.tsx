@@ -12,6 +12,7 @@ type Ripple = {
   key: number;
   x: number;
   y: number;
+  size: number;
 };
 
 const buttonVariants = cva(
@@ -63,12 +64,23 @@ function Button({
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     props.onClick?.(e);
 
-    const buttonBoundingBox = e.currentTarget.getBoundingClientRect();
+    const button = e.currentTarget;
+    const { width, height, left, top } = button.getBoundingClientRect();
+    const clickX = e.clientX - left;
+    const clickY = e.clientY - top;
+
+    const furthestX = clickX > width / 2 ? 0 : width;
+    const furthestY = clickY > height / 2 ? 0 : height;
+    const radius = Math.sqrt(
+      (furthestX - clickX) ** 2 + (furthestY - clickY) ** 2,
+    );
+    const diameter = radius * 2;
 
     const newRipple = {
       key: Date.now(),
-      x: e.clientX - buttonBoundingBox.left,
-      y: e.clientY - buttonBoundingBox.top,
+      x: clickX,
+      y: clickY,
+      size: diameter,
     };
 
     setRipples((prev) => [...prev, newRipple]);
@@ -87,15 +99,15 @@ function Button({
       onClick={handleClick}
     >
       <AnimatePresence>
-        {ripples.map(({ key, x, y }) => (
+        {ripples.map(({ key, x, y, size }) => (
           <motion.div
             key={key}
             className="absolute rounded-full bg-current/20"
             style={{ left: x, top: y, x: "-50%", y: "-50%" }}
             initial={{ width: 0, height: 0, opacity: 0.5 }}
-            animate={{ width: 400, height: 400, opacity: 0 }}
+            animate={{ width: size, height: size, opacity: 0.5 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
             onAnimationComplete={() => handleAnimationComplete(key)}
           />
         ))}
