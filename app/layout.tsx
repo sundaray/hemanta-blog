@@ -22,7 +22,7 @@ export default function RootLayout(props: LayoutProps<"/">) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} mx-auto flex min-h-screen max-w-7xl flex-col px-4 antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
       >
         <NextTopLoader showSpinner={false} color="#0ea5e9" shadow={false} />
         {props.children}

@@ -11,19 +11,21 @@ export const metadata: Metadata = {
 
 export default function AdminLayout(props: LayoutProps<"/admin">) {
   return (
-    <SidebarProvider>
+    <>
       <header>
         <MainNav links={navbarLinks.main} />
       </header>
-      <div className="mx-auto flex w-full max-w-7xl">
-        <aside className="sticky top-24 flex gap-2 self-start">
-          <AdminSidebar />
-          <SidebarTrigger />
-        </aside>
-        <main className="relative flex-1 py-32">
-          <div className="mx-auto w-full max-w-2xl px-4">{props.children}</div>
-        </main>
+      <div className="mx-auto flex w-full max-w-7xl px-4 md:px-8">
+        <SidebarProvider>
+          <aside className="sticky top-16 self-start">
+            <AdminSidebar />
+          </aside>
+          <main className="relative flex-1 px-4 py-32 md:px-8">
+            <SidebarTrigger className="absolute top-18 left-2" />
+            <div className="mx-auto w-full max-w-xl">{props.children}</div>
+          </main>
+        </SidebarProvider>
       </div>
-    </SidebarProvider>
+    </>
   );
 }
