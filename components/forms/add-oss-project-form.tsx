@@ -7,7 +7,8 @@ import { useActionState } from "react";
 import { z } from "zod";
 import { addOssProject } from "@/lib/actions";
 import { FormError } from "@/components/forms/form-error";
-
+import { FormSuccess } from "@/components/forms/form-success";
+import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -43,17 +44,23 @@ export function AddOssProjectForm({ className }: { className?: string }) {
   });
 
   useEffect(() => {
+    // Handle server-side field errors
     if (state?.errors?.url?.length) {
       form.setError("url", {
         type: "server",
         message: state.errors.url[0],
       });
     }
+    // On success, reset the form
+    if (state.ok) {
+      form.reset();
+    }
   }, [state]);
 
   return (
     <Form {...form}>
       <form action={formAction} className={cn("space-y-8", className)}>
+        <FormSuccess message={!isPending ? state.formSuccess : undefined} />
         <FormError message={!isPending ? state.formError : undefined} />
         <FormField
           control={form.control}
@@ -72,7 +79,14 @@ export function AddOssProjectForm({ className }: { className?: string }) {
           )}
         />
         <Button type="submit" disabled={isPending}>
-          {isPending ? "Adding..." : "Add Project"}
+          {isPending ? (
+            <>
+              <Icons.spinner className="size-4 animate-spin" />
+              Adding...
+            </>
+          ) : (
+            "Add Project"
+          )}
         </Button>
       </form>
     </Form>

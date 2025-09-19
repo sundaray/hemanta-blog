@@ -40,6 +40,7 @@ type FormErrors<T extends z.ZodTypeAny> = Partial<
 
 export type AddOssProjectState = {
   ok: boolean;
-  errors?: FormErrors<typeof AddOssProjectFormSchema> | undefined;
-  formError?: string | undefined;
+  errors?: FormErrors<typeof AddOssProjectFormSchema>;
+  formError?: string;
+  formSuccess?: string;
 };

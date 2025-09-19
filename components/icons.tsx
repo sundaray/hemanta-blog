@@ -1,4 +1,6 @@
 import {
+  CheckCircle,
+  AlertTriangle,
   Plus,
   Users,
   ArrowLeft,
@@ -30,6 +32,8 @@ import {
 } from "lucide-react";
 
 export const Icons = {
+  checkCircle: CheckCircle,
+  alertTriangle: AlertTriangle,
   plus: Plus,
   users: Users,
   arrowLeft: ArrowLeft,
