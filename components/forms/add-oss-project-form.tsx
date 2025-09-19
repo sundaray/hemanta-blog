@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { useActionState } from "react";
 import { z } from "zod";
 import { addOssProject } from "@/lib/actions";
+import { FormError } from "@/components/forms/form-error";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,7 +25,11 @@ import { AddOssProjectState } from "@/types";
 type OssProjectFormValues = z.infer<typeof AddOssProjectFormSchema>;
 
 export function AddOssProjectForm({ className }: { className?: string }) {
-  const initialState: AddOssProjectState = { errors: {} };
+  const initialState: AddOssProjectState = {
+    ok: false,
+    formError: undefined,
+    errors: {},
+  };
   const [state, formAction, isPending] = useActionState(
     addOssProject,
     initialState,
@@ -44,11 +49,12 @@ export function AddOssProjectForm({ className }: { className?: string }) {
         message: state.errors.url[0],
       });
     }
-  }, [state, form.setError]);
+  }, [state]);
 
   return (
     <Form {...form}>
       <form action={formAction} className={cn("space-y-8", className)}>
+        <FormError message={state.formError} />
         <FormField
           control={form.control}
           name="url"
