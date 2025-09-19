@@ -1,15 +1,16 @@
 "use client";
 
+import { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useActionState } from "react";
 import { z } from "zod";
-import { useState } from "react";
+import { addOssProject } from "@/lib/actions";
 
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -17,54 +18,37 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { AddOssProjectFormSchema } from "@/lib/schema";
+import { AddOssProjectState } from "@/types";
 
-const formSchema = z.object({
-  url: z
-    .string()
-    .min(1, { error: "GitHub Repository URL is required." })
-    .refine(
-      (value) => {
-        try {
-          const url = new URL(value);
-          return url.protocol === "https:" && url.hostname === "github.com";
-        } catch {
-          return false;
-        }
-      },
-      { error: "Please enter a valid GitHub repository URL." },
-    ),
-});
-
-type OssProjectFormValues = z.infer<typeof formSchema>;
+type OssProjectFormValues = z.infer<typeof AddOssProjectFormSchema>;
 
 export function AddOssProjectForm({ className }: { className?: string }) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const initialState: AddOssProjectState = { errors: {} };
+  const [state, formAction, isPending] = useActionState(
+    addOssProject,
+    initialState,
+  );
 
-  // Define the form using the useForm hook.
   const form = useForm<OssProjectFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(AddOssProjectFormSchema),
     defaultValues: {
       url: "",
     },
   });
 
-  async function onSubmit(values: OssProjectFormValues) {
-    setIsSubmitting(true);
-
-    console.log("GitHub URL submitted:", values);
-
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    setIsSubmitting(false);
-    form.reset();
-  }
+  useEffect(() => {
+    if (state?.errors?.url?.length) {
+      form.setError("url", {
+        type: "server",
+        message: state.errors.url[0],
+      });
+    }
+  }, [state, form.setError]);
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className={cn("space-y-8", className)}
-      >
+      <form action={formAction} className={cn("space-y-8", className)}>
         <FormField
           control={form.control}
           name="url"
@@ -81,8 +65,8 @@ export function AddOssProjectForm({ className }: { className?: string }) {
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Adding..." : "Add Project"}
+        <Button type="submit" disabled={isPending}>
+          {isPending ? "Adding..." : "Add Project"}
         </Button>
       </form>
     </Form>

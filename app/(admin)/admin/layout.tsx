@@ -17,7 +17,7 @@ export default function AdminLayout(props: LayoutProps<"/admin">) {
       </header>
       <div className="mx-auto flex w-full max-w-7xl px-4 md:px-8">
         <SidebarProvider>
-          <aside className="sticky top-16 self-start">
+          <aside className="sticky top-[var(--main-nav-height)] self-start">
             <AdminSidebar />
           </aside>
           <main className="relative flex-1 px-4 py-32 md:px-8">

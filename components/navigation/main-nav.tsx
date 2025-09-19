@@ -9,7 +9,7 @@ type MainNavProps = {
 
 export async function MainNav({ links }: MainNavProps) {
   return (
-    <div className="fixed inset-x-0 top-0 z-20 mx-auto flex h-16 w-full max-w-7xl items-center border-b bg-background px-4">
+    <div className="fixed inset-x-0 top-0 z-20 mx-auto flex h-[var(--main-nav-height)] w-full max-w-7xl items-center border-b bg-background px-4">
       <div className="flex items-center space-x-3">
         <Link
           href="/"

@@ -1,5 +1,8 @@
+import { z } from "zod";
 import type { Route } from "next";
 import type { LucideIcon } from "lucide-react";
+import type { FieldError } from "react-hook-form";
+import { AddOssProjectFormSchema } from "@/lib/schema";
 
 export interface Frontmatter {
   title: string;
@@ -18,4 +21,23 @@ export type NavItem = {
 
 export type AdminNavItem = NavItem & {
   icon: LucideIcon;
+};
+
+export type GitHubRepoData = {
+  html_url: string;
+  description: string | null;
+  stargazers_count: number;
+  forks_count: number;
+  open_issues_count: number;
+  watchers_count: number;
+  language: string | null;
+  topics: string[];
+};
+
+type FormErrors<T extends z.ZodTypeAny> = Partial<
+  Record<keyof z.infer<T>, string[]>
+>;
+
+export type AddOssProjectState = {
+  errors: FormErrors<typeof AddOssProjectFormSchema>;
 };
