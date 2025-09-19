@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { MainNav } from "@/components/navigation/main-nav";
-import { MainNavWrapper } from "@/components/navigation/main-nav-wrapper";
 import { navbarLinks } from "@/config/navbar";
 
 export const metadata: Metadata = {
@@ -14,11 +13,9 @@ export default function TechnicalWritingLayout(
   return (
     <>
       <header>
-        <MainNavWrapper>
-          <MainNav links={navbarLinks.main} />
-        </MainNavWrapper>
+        <MainNav links={navbarLinks.main} />
       </header>
-      <main className="flex-1 py-32">{props.children}</main>
+      <main className="flex-1 py-24">{props.children}</main>
     </>
   );
 }

@@ -1,4 +1,6 @@
 import {
+  Plus,
+  Users,
   ArrowLeft,
   ArrowRight,
   ArrowUpRight,
@@ -28,6 +30,8 @@ import {
 } from "lucide-react";
 
 export const Icons = {
+  plus: Plus,
+  users: Users,
   arrowLeft: ArrowLeft,
   arrowRight: ArrowRight,
   arrowUpRight: ArrowUpRight,

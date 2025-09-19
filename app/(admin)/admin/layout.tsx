@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { MainNav } from "@/components/navigation/main-nav";
-import { MainNavWrapper } from "@/components/navigation/main-nav-wrapper";
+import { AdminSidebar } from "@/components/admin-sidebar";
+import {
+  SidebarProvider,
+  SidebarTrigger,
+  SidebarInset,
+} from "@/components/ui/sidebar";
 import { navbarLinks } from "@/config/navbar";
 
 export const metadata: Metadata = {
@@ -10,15 +15,19 @@ export const metadata: Metadata = {
 
 export default function AdminLayout(props: LayoutProps<"/admin">) {
   return (
-    <>
+    <SidebarProvider>
       <header>
-        <MainNavWrapper>
-          <MainNav links={navbarLinks.main} />
-        </MainNavWrapper>
+        <MainNav links={navbarLinks.main} />
       </header>
-      <main className="mx-auto max-w-7xl flex-1 px-4 py-32">
-        {props.children}
-      </main>
-    </>
+      <div className="mx-auto flex w-full max-w-7xl">
+        <aside className="sticky top-24 flex gap-2 self-start">
+          <AdminSidebar />
+          <SidebarTrigger className="" />
+        </aside>
+        <main className="relative flex-1 py-32">
+          <div className="mx-auto w-full max-w-2xl px-4">{props.children}</div>
+        </main>
+      </div>
+    </SidebarProvider>
   );
 }

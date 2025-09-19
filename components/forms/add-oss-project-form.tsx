@@ -81,7 +81,7 @@ export function AddOssProjectForm({ className }: { className?: string }) {
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={isSubmitting} className="w-full">
+        <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? "Adding..." : "Add Project"}
         </Button>
       </form>
