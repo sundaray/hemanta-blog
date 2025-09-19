@@ -54,7 +54,7 @@ export function AddOssProjectForm({ className }: { className?: string }) {
   return (
     <Form {...form}>
       <form action={formAction} className={cn("space-y-8", className)}>
-        <FormError message={state.formError} />
+        <FormError message={!isPending ? state.formError : undefined} />
         <FormField
           control={form.control}
           name="url"
