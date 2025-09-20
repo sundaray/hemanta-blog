@@ -33,7 +33,7 @@ export function fetchRepoDetails(
         new GithubApiError({
           operation: "fetchRepoDetails",
           message: `Failed to fetch GitHub repo details. Please try again.`,
-          cause: res.statusText,
+          cause: res,
         }),
       );
     }

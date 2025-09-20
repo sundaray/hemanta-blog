@@ -1,5 +1,6 @@
 "use client";
 
+import { useSpinDelay } from "spin-delay";
 import { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -57,6 +58,11 @@ export function AddOssProjectForm({ className }: { className?: string }) {
     }
   }, [state]);
 
+  const showSpinner = useSpinDelay(isPending, {
+    delay: 200, // wait 200ms before showing spinner
+    minDuration: 400, // once shown, keep spinner visible at least 400ms
+  });
+
   return (
     <Form {...form}>
       <form action={formAction} className={cn("space-y-8", className)}>
@@ -79,10 +85,10 @@ export function AddOssProjectForm({ className }: { className?: string }) {
           )}
         />
         <Button type="submit" disabled={isPending}>
-          {isPending ? (
+          {showSpinner ? (
             <>
               <Icons.spinner className="size-4 animate-spin" />
-              Adding...
+              Add Project
             </>
           ) : (
             "Add Project"

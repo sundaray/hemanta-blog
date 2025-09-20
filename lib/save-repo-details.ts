@@ -6,9 +6,11 @@ import type { GitHubRepoData } from "@/types";
 
 export function saveRepoDetails(
   repoData: GitHubRepoData,
+  repoName: string,
 ): ResultAsync<GitHubRepoData, DatabaseError> {
   // Map the API data keys to database column names
   const valuesToInsert = {
+    name: repoName,
     url: repoData.html_url,
     description: repoData.description,
     stars: repoData.stargazers_count,

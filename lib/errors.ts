@@ -10,6 +10,7 @@ export class AppError extends Error {
 
   constructor({ operation, message, cause }: AppErrorOptions) {
     super(message, { cause });
+    this.cause = cause;
     this.operation = operation;
     this.name = new.target.name;
   }
@@ -19,3 +20,4 @@ export class NetworkError extends AppError {}
 export class GithubApiError extends AppError {}
 export class ParsingError extends AppError {}
 export class DatabaseError extends AppError {}
+export class GitHubUrlParsingError extends AppError {}

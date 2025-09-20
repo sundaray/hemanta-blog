@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { AddOssProjectFormSchema } from "@/lib/schema";
 import type { AddOssProjectState } from "@/types";
+import { parseGitHubUrl } from "@/lib/parse-github-url";
 import { fetchRepoDetails } from "@/lib/fetch-repo-details";
 import { saveRepoDetails } from "@/lib/save-repo-details";
 
@@ -25,19 +26,28 @@ export async function addOssProject(
     };
   }
 
-  const path = new URL(validatedFormData.data.url).pathname.split("/");
-  const owner = path[1];
-  const repo = path[2];
+  const parsedUrlResult = parseGitHubUrl(validatedFormData.data.url);
+
+  if (parsedUrlResult.isErr()) {
+    return {
+      ok: false,
+      formError: parsedUrlResult.error.message,
+    };
+  }
+
+  const { repoOwner, repoName } = parsedUrlResult.value;
 
   // Fetch repo details and save repo details
-  const result = await fetchRepoDetails(owner, repo).andThen(saveRepoDetails);
+  const result = await fetchRepoDetails(repoOwner, repoName).andThen(
+    (repoData) => saveRepoDetails(repoData, repoName),
+  );
 
   return result.match(
     (data) => {
       console.log("addOssProject() success: ", data);
       return {
         ok: true,
-        formSuccess: `Successfully added the repository: ${repo}`,
+        formSuccess: `Successfully added the repository: ${repoName}`,
       };
     },
     (error) => {
