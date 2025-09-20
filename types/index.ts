@@ -28,8 +28,8 @@ export type GitHubRepoData = {
   description: string | null;
   stargazers_count: number;
   forks_count: number;
+  subscribers_count: number;
   open_issues_count: number;
-  watchers_count: number;
   language: string | null;
   topics: string[];
   homepage: string | null;

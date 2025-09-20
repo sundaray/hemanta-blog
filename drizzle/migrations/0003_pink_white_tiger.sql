@@ -1,0 +1,1 @@
+ALTER TABLE "oss_projects" ADD COLUMN "subscribers_count" integer;

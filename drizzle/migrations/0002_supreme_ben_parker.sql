@@ -1,0 +1,1 @@
+ALTER TABLE "oss_projects" DROP COLUMN "watchers_count";

@@ -29,6 +29,8 @@ import {
   Tags,
   User,
   X,
+  GitFork,
+  Globe,
 } from "lucide-react";
 
 export const Icons = {
@@ -61,6 +63,8 @@ export const Icons = {
   toc: TableOfContents,
   user: User,
   x: X,
+  gitFork: GitFork,
+  globe: Globe,
   google: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden="true"
