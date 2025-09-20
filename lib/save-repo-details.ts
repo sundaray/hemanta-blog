@@ -19,10 +19,14 @@ export function saveRepoDetails(
     openIssues: repoData.open_issues_count,
     language: repoData.language,
     topics: repoData.topics,
+    homepage: repoData.homepage,
   };
 
   return ResultAsync.fromPromise(
-    db.insert(ossProjects).values(valuesToInsert),
+    db
+      .insert(ossProjects)
+      .values(valuesToInsert)
+      .onConflictDoUpdate({ target: ossProjects.url, set: valuesToInsert }),
     (error) =>
       new DatabaseError({
         operation: "saveRepoDetails",

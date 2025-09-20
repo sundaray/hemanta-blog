@@ -32,6 +32,7 @@ export type GitHubRepoData = {
   watchers_count: number;
   language: string | null;
   topics: string[];
+  homepage: string | null;
 };
 
 type FormErrors<T extends z.ZodTypeAny> = Partial<

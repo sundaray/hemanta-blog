@@ -2,6 +2,7 @@ import { pgTable, uuid, text, integer, timestamp } from "drizzle-orm/pg-core";
 
 export const ossProjects = pgTable("oss_projects", {
   id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
   url: text("url").notNull().unique(),
   description: text("description"),
   stars: integer("stargazers_count").notNull(),
@@ -10,6 +11,7 @@ export const ossProjects = pgTable("oss_projects", {
   openIssues: integer("open_issues_count").notNull(),
   language: text("language"),
   topics: text("topics").array(),
+  homepage: text("homepage"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
