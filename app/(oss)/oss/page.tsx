@@ -1,5 +1,6 @@
 import { getOssProjects } from "@/lib/get-oss-projects";
 import { OssProjectCard } from "@/components/oss-project-card";
+import { OssProjectSearch } from "@/components/oss-project-search";
 import { Icons } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
@@ -27,12 +28,14 @@ export default async function OssPage() {
         <h1 className="text-4xl font-semibold tracking-tight">
           Open Source Software
         </h1>
-        <p className="mx-auto mt-4 max-w-3xl text-lg text-pretty text-neutral-700">
+        <p className="mx-auto mt-4 max-w-3xl text-lg text-pretty text-neutral-600">
           A list of open-source projects I use or find interesting. Most are
           related to full-stack web development, with a focus on my current tech
           stack: TypeScript, React, and PostgreSQL.
         </p>
       </div>
+
+      <OssProjectSearch />
 
       <div
         className={cn(
