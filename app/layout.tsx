@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
+import { RouterProvider } from "@/components/router-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -25,7 +26,7 @@ export default function RootLayout(props: LayoutProps<"/">) {
         className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
       >
         <NextTopLoader showSpinner={false} color="#0ea5e9" shadow={false} />
-        {props.children}
+        <RouterProvider>{props.children}</RouterProvider>
       </body>
     </html>
   );

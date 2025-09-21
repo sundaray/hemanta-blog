@@ -62,6 +62,10 @@ export function NavLinks({
    * GSAP will automatically clean it up, preventing memory leaks or visual glitches.
    */
   const handleMouseEnter = contextSafe((index: number) => {
+    if (window.matchMedia("(pointer: coarse)").matches) {
+      return;
+    }
+
     const targetLi = linkRefs.current[index];
     if (!targetLi) return;
 
@@ -158,7 +162,7 @@ export function NavLinks({
               <div
                 className={cn(
                   "gsap-underline pointer-events-none absolute bottom-0 left-0 h-[1.5px] w-full origin-left scale-x-0",
-                  isActive ? "bg-sky-700" : "bg-sky-700",
+                  isActive ? "bg-sky-600" : "bg-sky-600",
                 )}
               />
             </motion.li>

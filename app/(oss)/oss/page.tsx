@@ -27,15 +27,16 @@ export default async function OssPage() {
         <h1 className="text-4xl font-semibold tracking-tight">
           Open Source Software
         </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-pretty text-neutral-600">
-          A collection of open-source projects I find interesting or have
-          contributed to.
+        <p className="mx-auto mt-4 max-w-3xl text-lg text-pretty text-neutral-700">
+          A list of open-source projects I use or find interesting. Most are
+          related to full-stack web development, with a focus on my current tech
+          stack: TypeScript, React, and PostgreSQL.
         </p>
       </div>
 
       <div
         className={cn(
-          "my-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3",
+          "my-12 grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
         )}
       >
         {projects.map((project) => (

@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Icons } from "@/components/icons";
 import { Separator } from "@/components/ui/separator";
@@ -14,7 +16,7 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
     // 🔹 The card is now a relative container for the overlay link
     <div
       className={cn(
-        "group relative flex flex-col rounded-lg border bg-card p-4 text-card-foreground shadow-sm transition-all hover:shadow-md",
+        "group relative flex flex-col rounded-lg border bg-card p-4 text-card-foreground shadow-sm transition-all hover:scale-102 hover:shadow-lg",
         className,
       )}
     >
@@ -27,7 +29,7 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
 
       {/* The visible content starts here */}
       <div className="flex items-start justify-between gap-2">
-        <h3 className="text-xl font-semibold tracking-tight group-hover:underline">
+        <h3 className="text-xl font-semibold tracking-tight text-pretty group-hover:underline">
           {project.name}
         </h3>
         {project.homepage && (
@@ -36,9 +38,13 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
             href={project.homepage}
             target="_blank"
             rel="noopener noreferrer"
-            className="relative z-20 text-muted-foreground hover:text-foreground"
+            className={cn(
+              "relative z-20 text-muted-foreground hover:text-foreground",
+              "-m-2 p-2",
+              "rounded-full transition-colors hover:bg-accent",
+            )}
             aria-label="Visit project website"
-            onClick={(e) => e.stopPropagation()} // Prevents the main card link from firing
+            onClick={(e) => e.stopPropagation()}
           >
             <Icons.globe className="size-4 shrink-0" />
           </a>
@@ -53,11 +59,11 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
           label="Watching"
           value={project.subscribers}
         />
-        <StatItem
+        {/* <StatItem
           icon={Icons.alertTriangle}
           label="Open Issues"
           value={project.openIssues}
-        />
+        /> */}
       </div>
 
       <Separator className="my-4" />

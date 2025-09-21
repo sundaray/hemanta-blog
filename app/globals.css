@@ -120,4 +120,16 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  h1 {
+    @apply text-4xl font-semibold tracking-tight text-foreground;
+  }
+
+  h2 {
+    @apply text-2xl font-semibold tracking-tight text-foreground;
+  }
+
+  h3 {
+    @apply text-xl font-semibold tracking-tight text-foreground;
+  }
 }
