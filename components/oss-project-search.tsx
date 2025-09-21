@@ -2,21 +2,12 @@
 
 import { Icons } from "@/components/icons";
 import { Input } from "@/components/ui/input";
-// import { blogSearchParams } from "@/lib/blog-search-params";
 import { cn } from "@/lib/utils";
-// import { useQueryState } from "nuqs";
 import * as React from "react";
 import { useDebouncedCallback } from "use-debounce";
 
 export function OssProjectSearch({ className }: { className?: string }) {
-  //   const [search, setSearch] = useQueryState("search", blogSearchParams.search);
-  //   const startTransition = React.useTransition()[1];
-
-  const handleSearch = useDebouncedCallback((term: string) => {
-    // startTransition(() => {
-    //   setSearch(term);
-    // });
-  }, 300);
+  const handleSearch = useDebouncedCallback((term: string) => {}, 300);
 
   return (
     <div className={cn("relative", className)}>

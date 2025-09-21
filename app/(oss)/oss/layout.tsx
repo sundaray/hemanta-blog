@@ -13,7 +13,7 @@ export default function OssLayout(props: LayoutProps<"/oss">) {
       <header>
         <MainNav links={navbarLinks.main} />
       </header>
-      <main className="flex-1 py-32">{props.children}</main>
+      <main className="flex-1 py-40">{props.children}</main>
     </>
   );
 }

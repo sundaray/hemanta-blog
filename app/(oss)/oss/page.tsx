@@ -24,30 +24,34 @@ export default async function OssPage() {
   const projects = result.value;
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="text-center">
         <h1>Open Source Software</h1>
-        <p className="mx-auto mt-4 max-w-3xl text-lg text-pretty text-neutral-600">
+        <p className="mx-auto mt-8 max-w-3xl text-lg text-pretty text-neutral-600">
           A collection of open-source projects I use or find interesting. Most
           are related to full-stack web development, with a focus on my current
           tech stack: TypeScript, React, and PostgreSQL.
         </p>
       </div>
 
-      <div className="mt-12 lg:grid lg:grid-cols-4 lg:gap-8">
+      <div className="mt-24 lg:grid lg:grid-cols-4 lg:gap-8">
         <OssProjectsSidebar
           projects={projects}
           className="hidden lg:sticky lg:top-24 lg:block lg:self-start"
         />
 
-        <div
-          className={cn(
-            "grid grid-cols-1 gap-8 sm:grid-cols-2 lg:col-span-3 lg:grid-cols-3",
-          )}
-        >
-          {projects.map((project) => (
-            <OssProjectCard key={project.id} project={project} />
-          ))}
+        <div className="lg:col-span-3">
+          <OssProjectSearch className="mb-8" />
+
+          <div
+            className={cn(
+              "grid grid-cols-1 gap-8 sm:grid-cols-2 lg:col-span-3 lg:grid-cols-3",
+            )}
+          >
+            {projects.map((project) => (
+              <OssProjectCard key={project.id} project={project} />
+            ))}
+          </div>
         </div>
       </div>
     </div>
