@@ -10,12 +10,14 @@ type ArrowLinkProps = {
   href: Route;
   children: React.ReactNode;
   className?: string;
+  direction?: "left" | "right"; // 🔹 Add direction prop
 };
 
 export function ArrowLink({
   children,
   className,
   href,
+  direction = "right", // 🔹 Default to 'right'
   ...props
 }: ArrowLinkProps) {
   const classes = cn(
@@ -24,24 +26,40 @@ export function ArrowLink({
     className,
   );
 
-  return (
-    <Link className={classes} {...props} href={href}>
-      <span>{children}</span>
-
+  // 🔹 A small component to render the correct icon and animation
+  const Arrow = () => {
+    const Icon = direction === "left" ? Icons.chevronLeft : Icons.chevronRight;
+    return (
       <div className="relative size-5">
-        <Icons.chevronRight
+        <Icon
           className={cn(
-            "absolute top-0 left-0 size-5 scale-100 transition-all duration-400 ease-out group-hover:translate-x-2 group-hover:scale-95 group-hover:opacity-0",
+            "absolute top-0 left-0 size-5 scale-100 transition-all duration-400 ease-out",
             "text-sky-700 dark:text-sky-400",
+            direction === "right"
+              ? "group-hover:translate-x-2 group-hover:scale-95 group-hover:opacity-0"
+              : "group-hover:-translate-x-2 group-hover:scale-95 group-hover:opacity-0",
           )}
         />
-        <Icons.chevronRight
+        <Icon
           className={cn(
-            "absolute top-0 left-0 size-5 -translate-x-2 scale-95 opacity-0 transition-all duration-400 ease-out group-hover:translate-x-0 group-hover:scale-100 group-hover:opacity-100",
+            "absolute top-0 left-0 size-5 scale-95 opacity-0 transition-all duration-400 ease-out",
             "text-sky-700 dark:text-sky-400",
+            direction === "right"
+              ? "-translate-x-2 group-hover:translate-x-0 group-hover:scale-100 group-hover:opacity-100"
+              : "translate-x-2 group-hover:translate-x-0 group-hover:scale-100 group-hover:opacity-100",
           )}
         />
       </div>
+    );
+  };
+
+  return (
+    <Link className={classes} {...props} href={href}>
+      {/* 🔹 Conditionally render the arrow before the text */}
+      {direction === "left" && <Arrow />}
+      <span>{children}</span>
+      {/* 🔹 Or after the text (default) */}
+      {direction === "right" && <Arrow />}
     </Link>
   );
 }

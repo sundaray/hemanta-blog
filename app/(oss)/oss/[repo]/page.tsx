@@ -46,15 +46,17 @@ export default async function OssProjectDetailsPage(
   }
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:py-16">
+    <div className="container mx-auto max-w-3xl px-4 sm:px-6">
+      <ArrowLink href="/oss" direction="left" className="mb-8 -ml-4">
+        Back to all projects
+      </ArrowLink>
+
       <article className="flex flex-col gap-y-8">
         {/* Header */}
         <div className="flex flex-col gap-y-4">
           <h1>{project.name}</h1>
           {project.description && (
-            <p className="text-lg text-muted-foreground">
-              {project.description}
-            </p>
+            <p className="text-lg text-neutral-700">{project.description}</p>
           )}
         </div>
 
