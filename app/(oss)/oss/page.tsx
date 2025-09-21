@@ -1,6 +1,7 @@
 import { getOssProjects } from "@/lib/get-oss-projects";
 import { OssProjectCard } from "@/components/oss-project-card";
 import { OssProjectSearch } from "@/components/oss-project-search";
+import { OssProjectsSidebar } from "@/components/oss-projects-sidebar";
 import { Icons } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
@@ -25,26 +26,29 @@ export default async function OssPage() {
   return (
     <div className="container mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       <div className="text-center">
-        <h1 className="text-4xl font-semibold tracking-tight">
-          Open Source Software
-        </h1>
+        <h1>Open Source Software</h1>
         <p className="mx-auto mt-4 max-w-3xl text-lg text-pretty text-neutral-600">
-          A list of open-source projects I use or find interesting. Most are
-          related to full-stack web development, with a focus on my current tech
-          stack: TypeScript, React, and PostgreSQL.
+          A collection of open-source projects I use or find interesting. Most
+          are related to full-stack web development, with a focus on my current
+          tech stack: TypeScript, React, and PostgreSQL.
         </p>
       </div>
 
-      <OssProjectSearch />
+      <div className="mt-12 lg:grid lg:grid-cols-4 lg:gap-8">
+        <OssProjectsSidebar
+          projects={projects}
+          className="hidden lg:sticky lg:top-24 lg:block lg:self-start"
+        />
 
-      <div
-        className={cn(
-          "my-12 grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
-        )}
-      >
-        {projects.map((project) => (
-          <OssProjectCard key={project.id} project={project} />
-        ))}
+        <div
+          className={cn(
+            "grid grid-cols-1 gap-8 sm:grid-cols-2 lg:col-span-3 lg:grid-cols-3",
+          )}
+        >
+          {projects.map((project) => (
+            <OssProjectCard key={project.id} project={project} />
+          ))}
+        </div>
       </div>
     </div>
   );
