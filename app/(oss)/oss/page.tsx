@@ -34,24 +34,22 @@ export default async function OssPage() {
         </p>
       </div>
 
+      <OssProjectSearch className="my-16" />
+
       <div className="mt-24 lg:grid lg:grid-cols-4 lg:gap-8">
         <OssProjectsSidebar
           projects={projects}
           className="hidden lg:sticky lg:top-24 lg:block lg:self-start"
         />
 
-        <div className="lg:col-span-3">
-          <OssProjectSearch className="mb-8" />
-
-          <div
-            className={cn(
-              "grid grid-cols-1 gap-8 sm:grid-cols-2 lg:col-span-3 lg:grid-cols-3",
-            )}
-          >
-            {projects.map((project) => (
-              <OssProjectCard key={project.id} project={project} />
-            ))}
-          </div>
+        <div
+          className={cn(
+            "grid grid-cols-1 gap-8 sm:grid-cols-2 lg:col-span-3 lg:grid-cols-3",
+          )}
+        >
+          {projects.map((project) => (
+            <OssProjectCard key={project.id} project={project} />
+          ))}
         </div>
       </div>
     </div>

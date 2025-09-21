@@ -16,7 +16,7 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
     // 🔹 The card is now a relative container for the overlay link
     <div
       className={cn(
-        "group relative flex flex-col rounded-lg border bg-card p-4 text-card-foreground shadow-sm transition-all hover:scale-102 hover:shadow-lg",
+        "group relative flex flex-col rounded-lg border bg-card p-4 text-card-foreground shadow-sm transition-all hover:shadow-lg",
         className,
       )}
     >
@@ -29,7 +29,7 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
 
       {/* The visible content starts here */}
       <div className="flex items-start justify-between gap-2">
-        <h3 className="text-xl font-semibold tracking-tight text-pretty group-hover:underline">
+        <h3 className="text-xl font-semibold tracking-tight text-pretty group-hover:text-sky-700">
           {project.name}
         </h3>
         {project.homepage && (
