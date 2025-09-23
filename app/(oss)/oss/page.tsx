@@ -1,7 +1,6 @@
 import { getOssProjects } from "@/lib/get-oss-projects";
 import { OssProjectSearch } from "@/components/oss-project-search";
 import { Icons } from "@/components/icons";
-import { cn } from "@/lib/utils";
 import { ossProjectsSearchParamsCache } from "@/lib/oss-projects-search-params";
 import { OssProjectsContent } from "@/components/oss-projects-content";
 import { getOssProjectFilterOptions } from "@/lib/get-oss-project-filters-options";
@@ -18,8 +17,8 @@ export default async function OssPage({
   // 🔹 Fetch filter options and filtered projects in parallel
   const [filterOptions, projectsResult] = await Promise.all([
     getOssProjectFilterOptions({
-      topicQuery: filters["query-topic"],
-      languageQuery: filters["query-language"],
+      topicQuery: filters["topic-query"],
+      languageQuery: filters["language-query"],
     }),
     getOssProjects(filters),
   ]);

@@ -6,8 +6,8 @@ import {
 
 export const ossProjectsSearchParams = {
   query: parseAsString.withDefault(""),
-  "query-topic": parseAsString.withDefault(""),
-  "query-language": parseAsString.withDefault(""),
+  "topic-query": parseAsString.withDefault(""),
+  "language-query": parseAsString.withDefault(""),
   topic: parseAsArrayOf(parseAsString).withDefault([]),
   language: parseAsArrayOf(parseAsString).withDefault([]),
 };

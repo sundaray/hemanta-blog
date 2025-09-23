@@ -1,35 +1,52 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition, useCallback } from "react";
 import { motion } from "motion/react";
-import { useDebouncedCallback } from "use-debounce";
 import { Icons } from "@/components/icons";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-import { useOssProjectsSidebarFilter } from "@/hooks/use-oss-projects-sidebar-filter";
+import { useQueryState, parseAsArrayOf, parseAsString, debounce } from "nuqs";
 
 type OssProjectsSidebarProps = {
   uniqueTopics: string[];
   uniqueLanguages: string[];
   className?: string;
+  startTopicsToggleTransition: (callback: () => void) => void;
+  startLanguagesToggleTransition: (callback: () => void) => void;
 };
 
 export function OssProjectsSidebar({
   uniqueTopics,
   uniqueLanguages,
   className,
+  startTopicsToggleTransition,
+  startLanguagesToggleTransition,
 }: OssProjectsSidebarProps) {
+  const [isTopicsSearchLoading, startTopicsSearchTransition] = useTransition();
+  const [isLanguagesSearchLoading, startLanguagesSearchTransition] =
+    useTransition();
+
   return (
     <search>
       <aside className={cn(className, "divide-y-1 divide-solid divide-input")}>
         <h3 className="pb-4">Filter OSS Projects</h3>
-        <FilterSection title="Topics" items={uniqueTopics} filterKey="topic" />
+        <FilterSection
+          title="Topics"
+          items={uniqueTopics}
+          filterKey="topic"
+          startSearchTransition={startTopicsSearchTransition}
+          isSearchLoading={isTopicsSearchLoading}
+          startToggleTransition={startTopicsToggleTransition}
+        />
         <FilterSection
           title="Languages"
           items={uniqueLanguages}
           filterKey="language"
+          startSearchTransition={startLanguagesSearchTransition}
+          isSearchLoading={isLanguagesSearchLoading}
+          startToggleTransition={startLanguagesToggleTransition}
         />
       </aside>
     </search>
@@ -40,40 +57,84 @@ function FilterSection({
   title,
   items,
   filterKey,
+  startSearchTransition,
+  isSearchLoading,
+  startToggleTransition,
 }: {
   title: string;
   items: string[];
   filterKey: "topic" | "language";
+  startSearchTransition: (callback: () => void) => void;
+  isSearchLoading: boolean;
+  startToggleTransition: (callback: () => void) => void;
 }) {
-  const { sidebarFilters, setSidebarFilters, isSidebarPending } =
-    useOssProjectsSidebarFilter();
   const [isOpen, setIsOpen] = useState(false);
 
-  // 🔹 Define the query key for this section's search input
-  const queryKey = `query-${filterKey}` as "query-topic" | "query-language";
+  const searchQueryKey =
+    filterKey === "topic" ? "topic-query" : "language-query";
 
-  // 🔹 Get the current search term directly from the URL state
-  const searchTerm = sidebarFilters[queryKey];
+  const [searchTerm, setSearchTerm] = useQueryState(
+    searchQueryKey,
+    parseAsString
+      .withDefault("")
+      .withOptions({ startTransition: startSearchTransition, shallow: false }),
+  );
 
-  // 🔹 Debounced function to update the URL search param
-  const handleSearch = useDebouncedCallback((term: string) => {
-    setSidebarFilters({ [queryKey]: term });
-  }, 250);
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setSearchTerm(value, {
+        limitUrlUpdates: value === "" ? undefined : debounce(300),
+      });
+    },
+    [setSearchTerm],
+  );
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Escape") {
-      handleSearch("");
-    }
-  };
+  const handleSearchKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      const target = e.target as HTMLInputElement;
+      if (e.key === "Enter") {
+        setSearchTerm(target.value);
+      } else if (e.key === "Escape") {
+        setSearchTerm(null);
+      }
+    },
+    [setSearchTerm],
+  );
+
+  const clearSearch = useCallback(() => {
+    setSearchTerm(null);
+  }, [setSearchTerm]);
+
+  const [filterValues, setFilterValues] =
+    filterKey === "topic"
+      ? useQueryState(
+          "topic",
+          parseAsArrayOf(parseAsString).withDefault([]).withOptions({
+            startTransition: startToggleTransition,
+            shallow: false,
+          }),
+        )
+      : useQueryState(
+          "language",
+          parseAsArrayOf(parseAsString).withDefault([]).withOptions({
+            startTransition: startToggleTransition,
+            shallow: false,
+          }),
+        );
 
   const onCheckedChange = (isChecked: boolean, item: string) => {
-    const selectedItems = sidebarFilters[filterKey];
-    const newSelection = isChecked
-      ? [...selectedItems, item]
-      : selectedItems.filter((i) => i !== item);
-    setSidebarFilters({
-      [filterKey]: newSelection.length > 0 ? newSelection : null,
-    });
+    if (isChecked) {
+      setFilterValues((currentFilters) =>
+        currentFilters.includes(item)
+          ? currentFilters
+          : [...currentFilters, item],
+      );
+    } else {
+      setFilterValues((currentFilters) =>
+        currentFilters.filter((filter) => filter !== item),
+      );
+    }
   };
 
   return (
@@ -92,27 +153,23 @@ function FilterSection({
       </button>
       <>
         {isOpen && (
-          <div className="space-y-2 py-4">
+          <div className="space-y-2">
             <div className="grid grid-cols-1 items-center">
               <div className="pointer-events-none col-start-1 row-start-1 w-fit pl-3">
-                {isSidebarPending ? (
-                  <Icons.spinner className="size-4 animate-spin text-muted-foreground" />
-                ) : (
-                  <Icons.search className="size-4 text-muted-foreground" />
-                )}
+                <Icons.search className="size-4 text-muted-foreground" />
               </div>
               <Input
                 type="search"
                 placeholder={`Search ${title.toLowerCase()}…`}
-                defaultValue={sidebarFilters[queryKey]}
+                value={searchTerm}
                 className={cn("col-start-1 row-start-1 pl-9")}
-                onChange={(e) => handleSearch(e.target.value)}
-                onKeyDown={handleKeyDown}
+                onChange={handleSearchChange}
+                onKeyDown={handleSearchKeyDown}
               />
               {searchTerm && (
                 <div className="pointer-events-none col-start-1 row-start-1 flex items-center justify-end pr-3">
                   <button
-                    onClick={() => handleSearch("")}
+                    onClick={clearSearch}
                     className="pointer-events-auto cursor-pointer rounded border bg-background px-1.5 py-0.5 text-xs text-muted-foreground transition-colors"
                     aria-label="Clear search"
                   >
@@ -121,26 +178,41 @@ function FilterSection({
                 </div>
               )}
             </div>
-            <ScrollArea className="h-60">
-              <div className="flex flex-col">
-                {items.length > 0 ? (
-                  items.map((item) => (
-                    <FilterItem
-                      key={item}
-                      label={item}
-                      isChecked={sidebarFilters[filterKey].includes(item)}
-                      onCheckedChange={(isChecked: boolean) =>
-                        onCheckedChange(isChecked, item)
-                      }
-                    />
-                  ))
-                ) : (
-                  <p className="p-4 text-center text-sm text-muted-foreground">
-                    No {title.toLowerCase()} found.
-                  </p>
+            <div className="relative">
+              {isSearchLoading && (
+                <div
+                  className="absolute top-[10px] left-1/2 z-10 -translate-x-1/2"
+                  aria-hidden="true"
+                >
+                  <Icons.spinner className="size-6 animate-spin text-sky-700" />
+                </div>
+              )}
+              <ScrollArea
+                className={cn(
+                  "h-60",
+                  isSearchLoading ? "opacity-50" : "opacity-100",
                 )}
-              </div>
-            </ScrollArea>
+              >
+                <div className="flex flex-col">
+                  {items.length > 0 ? (
+                    items.map((item) => (
+                      <FilterItem
+                        key={item}
+                        label={item}
+                        isChecked={filterValues.includes(item)}
+                        onCheckedChange={(isChecked: boolean) =>
+                          onCheckedChange(isChecked, item)
+                        }
+                      />
+                    ))
+                  ) : (
+                    <p className="mt-[10px] text-center text-sm text-muted-foreground">
+                      No {title.toLowerCase()} found.
+                    </p>
+                  )}
+                </div>
+              </ScrollArea>
+            </div>
           </div>
         )}
       </>

@@ -16,7 +16,6 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
     <div
       className={cn(
         "relative flex flex-col rounded-lg border bg-card p-4 text-card-foreground shadow-sm transition-all hover:shadow-lg",
-        "group-data-[pending]:pointer-events-none group-data-[pending]:opacity-50",
         className,
       )}
     >
