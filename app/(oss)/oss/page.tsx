@@ -4,6 +4,7 @@ import { OssProjectSearch } from "@/components/oss-project-search";
 import { OssProjectsSidebar } from "@/components/oss-projects-sidebar";
 import { Icons } from "@/components/icons";
 import { cn } from "@/lib/utils";
+import { OssProjectsContent } from "@/components/oss-projects-content";
 
 export default async function OssPage() {
   const result = await getOssProjects();
@@ -36,22 +37,7 @@ export default async function OssPage() {
 
       <OssProjectSearch className="my-16" />
 
-      <div className="mt-24 lg:grid lg:grid-cols-4 lg:gap-8">
-        <OssProjectsSidebar
-          projects={projects}
-          className="hidden lg:sticky lg:top-24 lg:block lg:self-start"
-        />
-
-        <div
-          className={cn(
-            "grid grid-cols-1 gap-8 sm:grid-cols-2 lg:col-span-3 lg:grid-cols-3",
-          )}
-        >
-          {projects.map((project) => (
-            <OssProjectCard key={project.id} project={project} />
-          ))}
-        </div>
-      </div>
+      <OssProjectsContent projects={projects} />
     </div>
   );
 }

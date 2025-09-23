@@ -107,7 +107,7 @@ function Button({
             initial={{ width: 0, height: 0, opacity: 0.5 }}
             animate={{ width: size, height: size, opacity: 0.5 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
             onAnimationComplete={() => handleAnimationComplete(key)}
           />
         ))}

@@ -55,14 +55,9 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
           label="Watching"
           value={project.subscribers}
         />
-        {/* <StatItem
-          icon={Icons.alertTriangle}
-          label="Open Issues"
-          value={project.openIssues}
-        /> */}
       </div>
 
-      <Separator className="my-4" />
+      <Separator className="my-4 bg-input" />
 
       <div className="mt-auto flex items-center justify-between text-xs">
         <div className="flex items-center gap-2">
