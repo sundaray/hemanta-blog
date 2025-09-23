@@ -13,27 +13,23 @@ type OssProjectCardProps = {
 
 export function OssProjectCard({ project, className }: OssProjectCardProps) {
   return (
-    // 🔹 The card is now a relative container for the overlay link
     <div
       className={cn(
         "group relative flex flex-col rounded-lg border bg-card p-4 text-card-foreground shadow-sm transition-all hover:shadow-lg",
         className,
       )}
     >
-      {/* 🔹 This invisible link makes the entire card clickable */}
       <Link
-        href={`/oss/${project.name}`} // Placeholder for future details page
+        href={`/oss/${project.name}`}
         className="absolute inset-0 z-10"
         aria-label={`View details for ${project.name}`}
       />
 
-      {/* The visible content starts here */}
       <div className="flex items-start justify-between gap-2">
         <h3 className="text-xl font-semibold tracking-tight text-pretty group-hover:text-sky-700">
           {project.name}
         </h3>
         {project.homepage && (
-          // 🔹 This link needs a higher z-index to be clickable over the main link
           <a
             href={project.homepage}
             target="_blank"

@@ -6,6 +6,7 @@ import { Icons } from "@/components/icons";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 import type { SelectOssProject } from "@/db/schema";
 
 type OssProjectsSidebarProps = {
@@ -13,12 +14,10 @@ type OssProjectsSidebarProps = {
   className?: string;
 };
 
-// 🔹 Main sidebar component
 export function OssProjectsSidebar({
   projects,
   className,
 }: OssProjectsSidebarProps) {
-  // 🔹 useMemo ensures we only compute these lists once
   const uniqueTopics = useMemo(() => {
     const allTopics = projects.flatMap((p) => p.topics ?? []);
     return Array.from(new Set(allTopics)).sort();
@@ -33,16 +32,26 @@ export function OssProjectsSidebar({
   }, [projects]);
 
   return (
-    <aside className={cn("divide-y divide-input", className)}>
-      <h3 className="pb-4">Filter OSS Projects</h3>
-      <FilterSection title="Topics" items={uniqueTopics} />
-      <FilterSection title="Languages" items={uniqueLanguages} />
-    </aside>
+    <search>
+      <aside className={cn("divide-y divide-input", className)}>
+        <h3 className="pb-4">Filter OSS Projects</h3>
+        <FilterSection title="Topics" items={uniqueTopics} />
+        <FilterSection title="Languages" items={uniqueLanguages} />
+      </aside>
+    </search>
   );
 }
 
 function FilterSection({ title, items }: { title: string; items: string[] }) {
   const [isOpen, setIsOpen] = useState(false);
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredItems = useMemo(() => {
+    return items.filter((item) =>
+      item.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+  }, [items, searchTerm]);
 
   return (
     <div>
@@ -60,20 +69,34 @@ function FilterSection({ title, items }: { title: string; items: string[] }) {
       </button>
       <>
         {isOpen && (
-          <ScrollArea className="h-60">
-            <div className="flex flex-col">
-              {items.map((item) => (
-                <FilterItem key={item} label={item} />
-              ))}
-            </div>
-          </ScrollArea>
+          <div className="space-y-2">
+            <Input
+              type="search"
+              placeholder={`Search ${title.toLowerCase()}…`}
+              className="h-9"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <ScrollArea className="h-60">
+              <div className="flex flex-col">
+                {filteredItems.length > 0 ? (
+                  filteredItems.map((item) => (
+                    <FilterItem key={item} label={item} />
+                  ))
+                ) : (
+                  <p className="p-4 text-center text-sm text-muted-foreground">
+                    No {title.toLowerCase()} found.
+                  </p>
+                )}
+              </div>
+            </ScrollArea>
+          </div>
         )}
       </>
     </div>
   );
 }
 
-// 🔹 A single filter item with a checkbox
 function FilterItem({ label }: { label: string }) {
   const onCheckedChange = (isChecked: boolean) => {
     console.log(`Filter changed: ${label}, isChecked: ${isChecked}`);
