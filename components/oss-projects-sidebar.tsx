@@ -12,7 +12,16 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-import { useQueryState, parseAsArrayOf, parseAsString, debounce } from "nuqs";
+import {
+  useQueryState,
+  useQueryStates,
+  parseAsArrayOf,
+  parseAsString,
+  debounce,
+} from "nuqs";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ossProjectsSearchParams } from "@/lib/oss-projects-search-params";
 
 type OssProjectsSidebarProps = {
   uniqueTopics: string[];
@@ -20,6 +29,10 @@ type OssProjectsSidebarProps = {
   className?: string;
   startTopicsToggleTransition: TransitionStartFunction;
   startLanguagesToggleTransition: TransitionStartFunction;
+  isClearing: boolean;
+  startClearTransition: TransitionStartFunction;
+  isTopicsLoading: boolean;
+  isLanguagesLoading: boolean;
 };
 
 export function OssProjectsSidebar({
@@ -28,15 +41,68 @@ export function OssProjectsSidebar({
   className,
   startTopicsToggleTransition,
   startLanguagesToggleTransition,
+  isClearing,
+  startClearTransition,
+  isTopicsLoading,
+  isLanguagesLoading,
 }: OssProjectsSidebarProps) {
   const [isTopicsSearchLoading, startTopicsSearchTransition] = useTransition();
   const [isLanguagesSearchLoading, startLanguagesSearchTransition] =
     useTransition();
 
+  const [topicFilters, setTopicFilters] = useQueryState(
+    "topic",
+    parseAsArrayOf(parseAsString).withDefault([]),
+  );
+
+  const [languageFilters, setLanguageFilters] = useQueryState(
+    "language",
+    parseAsArrayOf(parseAsString).withDefault([]),
+  );
+
+  const [topicQuery, setTopicQuery] = useQueryState(
+    "topic-query",
+    parseAsString.withDefault(""),
+  );
+
+  const [languageQuery, setLanguageQuery] = useQueryState(
+    "language-query",
+    parseAsString.withDefault(""),
+  );
+  const handleClearFilters = () => {
+    startClearTransition(() => {
+      setTopicFilters(null);
+      setLanguageFilters(null);
+      setTopicQuery(null);
+      setLanguageQuery(null);
+    });
+  };
+  const isAnyFilterActive =
+    topicFilters.length > 0 ||
+    languageFilters.length > 0 ||
+    Boolean(topicQuery) ||
+    Boolean(languageQuery);
+
+  const shouldShowClearButton = isAnyFilterActive;
+
   return (
     <search>
       <aside className={cn(className, "divide-y-1 divide-solid divide-input")}>
-        <h3 className="pb-4">Filter OSS Projects</h3>
+        <div className="flex items-center justify-between pb-4">
+          <h4>Filter OSS Projects</h4>
+          {shouldShowClearButton && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClearFilters}
+              disabled={isClearing}
+              className="cursor-pointer text-sm text-muted-foreground"
+            >
+              <Icons.circleX className="size-4" />
+              Clear
+            </Button>
+          )}
+        </div>
         <FilterSection
           title="Topics"
           items={uniqueTopics}
@@ -142,6 +208,8 @@ function FilterSection({
     }
   };
 
+  const activeFilterCount = filterValues.length;
+
   return (
     <div>
       <button
@@ -155,6 +223,11 @@ function FilterSection({
           <Icons.chevronRight className="size-5" />
         </motion.div>
         <span className="text-sm font-medium">{title}</span>
+        {activeFilterCount > 0 && (
+          <Badge variant="outline" className="ml-auto tabular-nums">
+            {activeFilterCount}
+          </Badge>
+        )}
       </button>
       <>
         {isOpen && (

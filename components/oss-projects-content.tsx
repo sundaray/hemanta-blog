@@ -22,6 +22,7 @@ export function OssProjectsContent({
 }: OssContentProps) {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
+  const [isClearing, startClearTransition] = useTransition();
   const [isSearchLoading, startSearchTransition] = useTransition();
   const [isTopicsToggleLoading, startTopicsToggleTransition] = useTransition();
   const [isLanguagesToggleLoading, startLanguagesToggleTransition] =
@@ -31,7 +32,7 @@ export function OssProjectsContent({
     isTopicsToggleLoading || isLanguagesToggleLoading,
   );
 
-  const isGridLoading = isSearchLoading || isAnyToggleLoading;
+  const isGridLoading = isSearchLoading || isAnyToggleLoading || isClearing;
 
   const toggleSidebar = () => {
     setIsSidebarVisible((prev) => !prev);
@@ -43,10 +44,7 @@ export function OssProjectsContent({
         className="my-16"
         startTransition={startSearchTransition}
       />
-      <div
-        className="group lg:grid lg:grid-cols-4 lg:gap-8"
-        data-toggle-loading={isAnyToggleLoading ? "true" : undefined}
-      >
+      <div className="group lg:grid lg:grid-cols-4 lg:gap-8">
         {isSidebarVisible && (
           <OssProjectsSidebar
             uniqueTopics={uniqueTopics}
@@ -54,6 +52,8 @@ export function OssProjectsContent({
             className="hidden lg:sticky lg:top-24 lg:block lg:self-start"
             startTopicsToggleTransition={startTopicsToggleTransition}
             startLanguagesToggleTransition={startLanguagesToggleTransition}
+            isClearing={isClearing}
+            startClearTransition={startClearTransition}
           />
         )}
 

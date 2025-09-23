@@ -1,4 +1,5 @@
 import {
+  CircleX,
   Filter,
   FilterX,
   CheckCircle,
@@ -36,6 +37,7 @@ import {
 } from "lucide-react";
 
 export const Icons = {
+  circleX: CircleX,
   filter: Filter,
   filterX: FilterX,
   checkCircle: CheckCircle,

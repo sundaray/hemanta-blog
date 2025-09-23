@@ -14,13 +14,13 @@ export function OssProjectsSearchResultsHeader({
   className,
 }: OssProjectsSearchResultsHeaderProps) {
   return (
-    <div className={cn("flex items-center justify-between pb-3", className)}>
-      <h3>OSS Projects</h3>
+    <div className={cn("flex items-center justify-between", className)}>
+      <h4>OSS Projects</h4>
       <Button
         variant="ghost"
         size="sm"
         onClick={onToggleSidebar}
-        className="cursor-pointer text-sm"
+        className="cursor-pointer text-sm text-muted-foreground"
       >
         {isSidebarVisible ? (
           <>
