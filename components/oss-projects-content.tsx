@@ -20,15 +20,12 @@ export function OssProjectsContent({ projects }: OssContentProps) {
 
   return (
     <div className="lg:grid lg:grid-cols-4 lg:gap-8">
-      {/* Sidebar: Conditionally rendered */}
       {isSidebarVisible && (
         <OssProjectsSidebar
           projects={projects}
           className="hidden lg:sticky lg:top-24 lg:block lg:self-start"
         />
       )}
-
-      {/* Main Content Area: Expands to fill space */}
       <div className={cn(isSidebarVisible ? "lg:col-span-3" : "lg:col-span-4")}>
         <OssProjectsSearchResultsHeader
           isSidebarVisible={isSidebarVisible}

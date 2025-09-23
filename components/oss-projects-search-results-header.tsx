@@ -14,13 +14,8 @@ export function OssProjectsSearchResultsHeader({
   className,
 }: OssProjectsSearchResultsHeaderProps) {
   return (
-    <div
-      className={cn(
-        "flex items-center justify-between border-b border-input pb-3",
-        className,
-      )}
-    >
-      <h3>Search Results</h3>
+    <div className={cn("flex items-center justify-between pb-3", className)}>
+      <h3>OSS Projects</h3>
       <Button
         variant="ghost"
         size="sm"
@@ -29,12 +24,12 @@ export function OssProjectsSearchResultsHeader({
       >
         {isSidebarVisible ? (
           <>
-            <Icons.filterX className="size-4" />
+            <Icons.filterX className="size-4 text-muted-foreground" />
             Hide Filters
           </>
         ) : (
           <>
-            <Icons.filter className="size-4" />
+            <Icons.filter className="size-4 text-muted-foreground" />
             Show Filters
           </>
         )}
