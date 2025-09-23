@@ -15,8 +15,8 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
   return (
     <div
       className={cn(
-        "group relative flex flex-col rounded-lg border bg-card p-4 text-card-foreground shadow-sm transition-all hover:shadow-lg",
-        "group-has-[[data-pending]]:pointer-events-none group-has-[[data-pending]]:opacity-50",
+        "relative flex flex-col rounded-lg border bg-card p-4 text-card-foreground shadow-sm transition-all hover:shadow-lg",
+        "group-data-[pending]:pointer-events-none group-data-[pending]:opacity-50",
         className,
       )}
     >
@@ -27,7 +27,7 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
       />
 
       <div className="flex items-start justify-between gap-2">
-        <h3 className="text-xl font-semibold tracking-tight text-pretty group-hover:text-sky-700">
+        <h3 className="text-xl font-semibold tracking-tight text-pretty">
           {project.name}
         </h3>
         {project.homepage && (

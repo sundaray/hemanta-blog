@@ -6,8 +6,6 @@ import type { SelectOssProject } from "@/db/schema";
 import { OssProjectsSidebar } from "@/components/oss-projects-sidebar";
 import { OssProjectCard } from "@/components/oss-project-card";
 import { OssProjectsSearchResultsHeader } from "@/components/oss-projects-search-results-header";
-import { useOssProjectsFilter } from "@/hooks/use-oss-projects-filter";
-import { Icons } from "@/components/icons";
 
 type OssContentProps = {
   projects: SelectOssProject[];
@@ -27,7 +25,7 @@ export function OssProjectsContent({
   };
 
   return (
-    <div className="lg:grid lg:grid-cols-4 lg:gap-8">
+    <div className="group lg:grid lg:grid-cols-4 lg:gap-8">
       {isSidebarVisible && (
         <OssProjectsSidebar
           uniqueTopics={uniqueTopics}
@@ -42,7 +40,7 @@ export function OssProjectsContent({
         />
         <div
           className={cn(
-            "mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2",
+            "relative mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2",
             isSidebarVisible ? "lg:grid-cols-3" : "lg:grid-cols-4",
           )}
         >

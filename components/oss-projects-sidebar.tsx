@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-import { useOssProjectsFilter } from "@/hooks/use-oss-projects-filter";
+import { useOssProjectsSidebarFilter } from "@/hooks/use-oss-projects-sidebar-filter";
 
 type OssProjectsSidebarProps = {
   uniqueTopics: string[];
@@ -45,18 +45,19 @@ function FilterSection({
   items: string[];
   filterKey: "topic" | "language";
 }) {
-  const { filters, setFilters, isPending } = useOssProjectsFilter();
+  const { sidebarFilters, setSidebarFilters, isSidebarPending } =
+    useOssProjectsSidebarFilter();
   const [isOpen, setIsOpen] = useState(false);
 
   // 🔹 Define the query key for this section's search input
   const queryKey = `query-${filterKey}` as "query-topic" | "query-language";
 
   // 🔹 Get the current search term directly from the URL state
-  const searchTerm = filters[queryKey];
+  const searchTerm = sidebarFilters[queryKey];
 
   // 🔹 Debounced function to update the URL search param
   const handleSearch = useDebouncedCallback((term: string) => {
-    setFilters({ [queryKey]: term });
+    setSidebarFilters({ [queryKey]: term });
   }, 250);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -66,11 +67,13 @@ function FilterSection({
   };
 
   const onCheckedChange = (isChecked: boolean, item: string) => {
-    const selectedItems = filters[filterKey];
+    const selectedItems = sidebarFilters[filterKey];
     const newSelection = isChecked
       ? [...selectedItems, item]
       : selectedItems.filter((i) => i !== item);
-    setFilters({ [filterKey]: newSelection.length > 0 ? newSelection : null });
+    setSidebarFilters({
+      [filterKey]: newSelection.length > 0 ? newSelection : null,
+    });
   };
 
   return (
@@ -92,7 +95,7 @@ function FilterSection({
           <div className="space-y-2 py-4">
             <div className="grid grid-cols-1 items-center">
               <div className="pointer-events-none col-start-1 row-start-1 w-fit pl-3">
-                {isPending ? (
+                {isSidebarPending ? (
                   <Icons.spinner className="size-4 animate-spin text-muted-foreground" />
                 ) : (
                   <Icons.search className="size-4 text-muted-foreground" />
@@ -101,7 +104,7 @@ function FilterSection({
               <Input
                 type="search"
                 placeholder={`Search ${title.toLowerCase()}…`}
-                defaultValue={filters[queryKey] ?? ""}
+                defaultValue={sidebarFilters[queryKey]}
                 className={cn("col-start-1 row-start-1 pl-9")}
                 onChange={(e) => handleSearch(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -125,8 +128,7 @@ function FilterSection({
                     <FilterItem
                       key={item}
                       label={item}
-                      isPending={isPending}
-                      isChecked={filters[filterKey].includes(item)}
+                      isChecked={sidebarFilters[filterKey].includes(item)}
                       onCheckedChange={(isChecked: boolean) =>
                         onCheckedChange(isChecked, item)
                       }
@@ -150,20 +152,16 @@ function FilterItem({
   label,
   isChecked,
   onCheckedChange,
-  isPending,
 }: {
   label: string;
   isChecked: boolean;
   onCheckedChange: (isChecked: boolean) => void;
-  isPending: boolean;
 }) {
   return (
     <label
       className={cn(
         "flex cursor-pointer items-center gap-x-3 rounded-md px-2 py-1.5",
         "transition-colors hover:bg-accent",
-        "transition-opacity",
-        isPending && "pointer-events-none opacity-50",
       )}
     >
       <Checkbox

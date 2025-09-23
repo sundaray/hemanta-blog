@@ -3,10 +3,9 @@ import { db } from "@/db";
 import { ossProjects, type SelectOssProject } from "@/db/schema";
 import { DatabaseError } from "./errors";
 import { and, ilike, arrayOverlaps, SQL, desc, inArray } from "drizzle-orm";
-import type { OssProjectsFilters } from "@/lib//oss-projects-search-params";
 
 export function getOssProjects(
-  filters: OssProjectsFilters,
+  filters,
 ): ResultAsync<SelectOssProject[], DatabaseError> {
   const conditions: (SQL | undefined)[] = [];
 

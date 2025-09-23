@@ -41,7 +41,7 @@ export default async function OssPage({
   const { uniqueTopics, uniqueLanguages } = filterOptions;
 
   return (
-    <div className="group container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="text-center">
         <h1>Open Source Software</h1>
         <p className="mx-auto mt-8 max-w-3xl text-lg text-pretty text-neutral-600">
