@@ -53,6 +53,12 @@ function FilterSection({ title, items }: { title: string; items: string[] }) {
     );
   }, [items, searchTerm]);
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Escape") {
+      setSearchTerm("");
+    }
+  };
+
   return (
     <div>
       <button
@@ -70,13 +76,30 @@ function FilterSection({ title, items }: { title: string; items: string[] }) {
       <>
         {isOpen && (
           <div className="space-y-2">
-            <Input
-              type="search"
-              placeholder={`Search ${title.toLowerCase()}…`}
-              className="h-9"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <div className="grid grid-cols-1 items-center">
+              <div className="pointer-events-none col-start-1 row-start-1 w-fit pl-3">
+                <Icons.search className="size-4 text-muted-foreground" />
+              </div>
+              <Input
+                type="search"
+                placeholder={`Search ${title.toLowerCase()}…`}
+                className={cn("col-start-1 row-start-1 pl-9")}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={handleKeyDown}
+              />
+              {searchTerm && (
+                <div className="pointer-events-none col-start-1 row-start-1 flex items-center justify-end pr-3">
+                  <button
+                    onClick={() => setSearchTerm("")}
+                    className="pointer-events-auto cursor-pointer rounded border bg-background px-1.5 py-0.5 text-xs text-muted-foreground transition-colors"
+                    aria-label="Clear search"
+                  >
+                    esc
+                  </button>
+                </div>
+              )}
+            </div>
             <ScrollArea className="h-60">
               <div className="flex flex-col">
                 {filteredItems.length > 0 ? (

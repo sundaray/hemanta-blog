@@ -133,3 +133,8 @@
     @apply text-xl font-semibold tracking-tight text-foreground;
   }
 }
+
+input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
