@@ -6,6 +6,8 @@ import type { SelectOssProject } from "@/db/schema";
 import { OssProjectsSidebar } from "@/components/oss-projects-sidebar";
 import { OssProjectCard } from "@/components/oss-project-card";
 import { OssProjectsSearchResultsHeader } from "@/components/oss-projects-search-results-header";
+import { useOssProjectsFilter } from "@/hooks/use-oss-projects-filter";
+import { Icons } from "@/components/icons";
 
 type OssContentProps = {
   projects: SelectOssProject[];

@@ -45,7 +45,7 @@ function FilterSection({
   items: string[];
   filterKey: "topic" | "language";
 }) {
-  const { filters, setFilters } = useOssProjectsFilter();
+  const { filters, setFilters, isPending } = useOssProjectsFilter();
   const [isOpen, setIsOpen] = useState(false);
 
   // 🔹 Define the query key for this section's search input
@@ -74,9 +74,9 @@ function FilterSection({
   };
 
   return (
-    <div className="py-4">
+    <div>
       <button
-        className="flex w-full items-center gap-x-2 text-left"
+        className="flex w-full items-center gap-x-2 py-4 text-left"
         onClick={() => setIsOpen(!isOpen)}
       >
         <motion.div
@@ -92,7 +92,11 @@ function FilterSection({
           <div className="space-y-2 py-4">
             <div className="grid grid-cols-1 items-center">
               <div className="pointer-events-none col-start-1 row-start-1 w-fit pl-3">
-                <Icons.search className="size-4 text-muted-foreground" />
+                {isPending ? (
+                  <Icons.spinner className="size-4 animate-spin text-muted-foreground" />
+                ) : (
+                  <Icons.search className="size-4 text-muted-foreground" />
+                )}
               </div>
               <Input
                 type="search"
@@ -121,6 +125,7 @@ function FilterSection({
                     <FilterItem
                       key={item}
                       label={item}
+                      isPending={isPending}
                       isChecked={filters[filterKey].includes(item)}
                       onCheckedChange={(isChecked: boolean) =>
                         onCheckedChange(isChecked, item)
@@ -145,16 +150,20 @@ function FilterItem({
   label,
   isChecked,
   onCheckedChange,
+  isPending,
 }: {
   label: string;
   isChecked: boolean;
   onCheckedChange: (isChecked: boolean) => void;
+  isPending: boolean;
 }) {
   return (
     <label
       className={cn(
         "flex cursor-pointer items-center gap-x-3 rounded-md px-2 py-1.5",
         "transition-colors hover:bg-accent",
+        "transition-opacity",
+        isPending && "pointer-events-none opacity-50",
       )}
     >
       <Checkbox

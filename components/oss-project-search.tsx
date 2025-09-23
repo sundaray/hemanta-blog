@@ -16,7 +16,10 @@ export function OssProjectSearch({ className }: { className?: string }) {
 
   return (
     <search className={cn("relative", className)}>
-      <div className="grid w-full grid-cols-1 items-center">
+      <div
+        className="grid w-full grid-cols-1 items-center"
+        data-pending={isPending ? "" : undefined}
+      >
         <Input
           type="search"
           defaultValue={filters.query}
