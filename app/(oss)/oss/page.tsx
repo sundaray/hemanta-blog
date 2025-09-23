@@ -50,8 +50,6 @@ export default async function OssPage({
         </p>
       </div>
 
-      <OssProjectSearch className="my-16" />
-
       <OssProjectsContent
         projects={projects}
         uniqueTopics={uniqueTopics}

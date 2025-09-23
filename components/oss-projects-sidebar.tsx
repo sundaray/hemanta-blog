@@ -1,6 +1,11 @@
 "use client";
 
-import { useState, useTransition, useCallback } from "react";
+import {
+  useState,
+  useTransition,
+  useCallback,
+  type TransitionStartFunction,
+} from "react";
 import { motion } from "motion/react";
 import { Icons } from "@/components/icons";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -13,8 +18,8 @@ type OssProjectsSidebarProps = {
   uniqueTopics: string[];
   uniqueLanguages: string[];
   className?: string;
-  startTopicsToggleTransition: (callback: () => void) => void;
-  startLanguagesToggleTransition: (callback: () => void) => void;
+  startTopicsToggleTransition: TransitionStartFunction;
+  startLanguagesToggleTransition: TransitionStartFunction;
 };
 
 export function OssProjectsSidebar({
