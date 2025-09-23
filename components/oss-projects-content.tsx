@@ -9,9 +9,15 @@ import { OssProjectsSearchResultsHeader } from "@/components/oss-projects-search
 
 type OssContentProps = {
   projects: SelectOssProject[];
+  uniqueTopics: string[];
+  uniqueLanguages: string[];
 };
 
-export function OssProjectsContent({ projects }: OssContentProps) {
+export function OssProjectsContent({
+  projects,
+  uniqueTopics,
+  uniqueLanguages,
+}: OssContentProps) {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
   const toggleSidebar = () => {
@@ -22,7 +28,8 @@ export function OssProjectsContent({ projects }: OssContentProps) {
     <div className="lg:grid lg:grid-cols-4 lg:gap-8">
       {isSidebarVisible && (
         <OssProjectsSidebar
-          projects={projects}
+          uniqueTopics={uniqueTopics}
+          uniqueLanguages={uniqueLanguages}
           className="hidden lg:sticky lg:top-24 lg:block lg:self-start"
         />
       )}

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
 import { RouterProvider } from "@/components/router-provider";
 import "./globals.css";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,7 +27,9 @@ export default function RootLayout(props: LayoutProps<"/">) {
         className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
       >
         <NextTopLoader showSpinner={false} color="#0ea5e9" shadow={false} />
-        <RouterProvider>{props.children}</RouterProvider>
+        <RouterProvider>
+          <NuqsAdapter>{props.children}</NuqsAdapter>
+        </RouterProvider>
       </body>
     </html>
   );

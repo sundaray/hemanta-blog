@@ -1,15 +1,30 @@
 import { getOssProjects } from "@/lib/get-oss-projects";
-import { OssProjectCard } from "@/components/oss-project-card";
 import { OssProjectSearch } from "@/components/oss-project-search";
-import { OssProjectsSidebar } from "@/components/oss-projects-sidebar";
 import { Icons } from "@/components/icons";
 import { cn } from "@/lib/utils";
+import { ossProjectsSearchParamsCache } from "@/lib/oss-projects-search-params";
 import { OssProjectsContent } from "@/components/oss-projects-content";
+import { getOssProjectFilterOptions } from "@/lib/get-oss-project-filters-options";
+import type { SearchParams } from "nuqs/server";
 
-export default async function OssPage() {
-  const result = await getOssProjects();
+export default async function OssPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  // 🔹 Parse filters from URL search params
+  const filters = await ossProjectsSearchParamsCache.parse(searchParams);
 
-  if (result.isErr()) {
+  // 🔹 Fetch filter options and filtered projects in parallel
+  const [filterOptions, projectsResult] = await Promise.all([
+    getOssProjectFilterOptions({
+      topicQuery: filters["query-topic"],
+      languageQuery: filters["query-language"],
+    }),
+    getOssProjects(filters),
+  ]);
+
+  if (projectsResult.isErr()) {
     return (
       <div className="container mx-auto flex items-center justify-center">
         <div className="flex items-center gap-x-2">
@@ -22,7 +37,8 @@ export default async function OssPage() {
     );
   }
 
-  const projects = result.value;
+  const projects = projectsResult.value;
+  const { uniqueTopics, uniqueLanguages } = filterOptions;
 
   return (
     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -37,7 +53,11 @@ export default async function OssPage() {
 
       <OssProjectSearch className="my-16" />
 
-      <OssProjectsContent projects={projects} />
+      <OssProjectsContent
+        projects={projects}
+        uniqueTopics={uniqueTopics}
+        uniqueLanguages={uniqueLanguages}
+      />
     </div>
   );
 }

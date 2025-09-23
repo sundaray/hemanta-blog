@@ -1,68 +1,82 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { motion } from "motion/react";
+import { useDebouncedCallback } from "use-debounce";
 import { Icons } from "@/components/icons";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-import type { SelectOssProject } from "@/db/schema";
+import { useOssProjectsFilter } from "@/hooks/use-oss-projects-filter";
 
 type OssProjectsSidebarProps = {
-  projects: SelectOssProject[];
+  uniqueTopics: string[];
+  uniqueLanguages: string[];
   className?: string;
 };
 
 export function OssProjectsSidebar({
-  projects,
+  uniqueTopics,
+  uniqueLanguages,
   className,
 }: OssProjectsSidebarProps) {
-  const uniqueTopics = useMemo(() => {
-    const allTopics = projects.flatMap((p) => p.topics ?? []);
-    return Array.from(new Set(allTopics)).sort();
-  }, [projects]);
-
-  const uniqueLanguages = useMemo(() => {
-    const allLanguages = projects
-      .map((p) => p.language)
-      .filter((l): l is string => l != null && l !== "");
-
-    return Array.from(new Set(allLanguages)).sort();
-  }, [projects]);
-
   return (
     <search>
-      <aside className={cn("divide-y divide-input", className)}>
+      <aside className={cn(className, "divide-y-1 divide-solid divide-input")}>
         <h3 className="pb-4">Filter OSS Projects</h3>
-        <FilterSection title="Topics" items={uniqueTopics} />
-        <FilterSection title="Languages" items={uniqueLanguages} />
+        <FilterSection title="Topics" items={uniqueTopics} filterKey="topic" />
+        <FilterSection
+          title="Languages"
+          items={uniqueLanguages}
+          filterKey="language"
+        />
       </aside>
     </search>
   );
 }
 
-function FilterSection({ title, items }: { title: string; items: string[] }) {
+function FilterSection({
+  title,
+  items,
+  filterKey,
+}: {
+  title: string;
+  items: string[];
+  filterKey: "topic" | "language";
+}) {
+  const { filters, setFilters } = useOssProjectsFilter();
   const [isOpen, setIsOpen] = useState(false);
 
-  const [searchTerm, setSearchTerm] = useState("");
+  // 🔹 Define the query key for this section's search input
+  const queryKey = `query-${filterKey}` as "query-topic" | "query-language";
 
-  const filteredItems = useMemo(() => {
-    return items.filter((item) =>
-      item.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-  }, [items, searchTerm]);
+  // 🔹 Get the current search term directly from the URL state
+  const searchTerm = filters[queryKey];
+
+  // 🔹 Debounced function to update the URL search param
+  const handleSearch = useDebouncedCallback((term: string) => {
+    setFilters({ [queryKey]: term });
+  }, 250);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Escape") {
-      setSearchTerm("");
+      handleSearch("");
     }
   };
 
+  const onCheckedChange = (isChecked: boolean, item: string) => {
+    const selectedItems = filters[filterKey];
+    const newSelection = isChecked
+      ? [...selectedItems, item]
+      : selectedItems.filter((i) => i !== item);
+    setFilters({ [filterKey]: newSelection.length > 0 ? newSelection : null });
+  };
+
   return (
-    <div>
+    <div className="py-4">
       <button
-        className="flex w-full items-center gap-x-2 py-4 text-left"
+        className="flex w-full items-center gap-x-2 text-left"
         onClick={() => setIsOpen(!isOpen)}
       >
         <motion.div
@@ -75,7 +89,7 @@ function FilterSection({ title, items }: { title: string; items: string[] }) {
       </button>
       <>
         {isOpen && (
-          <div className="space-y-2">
+          <div className="space-y-2 py-4">
             <div className="grid grid-cols-1 items-center">
               <div className="pointer-events-none col-start-1 row-start-1 w-fit pl-3">
                 <Icons.search className="size-4 text-muted-foreground" />
@@ -83,15 +97,15 @@ function FilterSection({ title, items }: { title: string; items: string[] }) {
               <Input
                 type="search"
                 placeholder={`Search ${title.toLowerCase()}…`}
+                defaultValue={filters[queryKey] ?? ""}
                 className={cn("col-start-1 row-start-1 pl-9")}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => handleSearch(e.target.value)}
                 onKeyDown={handleKeyDown}
               />
               {searchTerm && (
                 <div className="pointer-events-none col-start-1 row-start-1 flex items-center justify-end pr-3">
                   <button
-                    onClick={() => setSearchTerm("")}
+                    onClick={() => handleSearch("")}
                     className="pointer-events-auto cursor-pointer rounded border bg-background px-1.5 py-0.5 text-xs text-muted-foreground transition-colors"
                     aria-label="Clear search"
                   >
@@ -102,9 +116,16 @@ function FilterSection({ title, items }: { title: string; items: string[] }) {
             </div>
             <ScrollArea className="h-60">
               <div className="flex flex-col">
-                {filteredItems.length > 0 ? (
-                  filteredItems.map((item) => (
-                    <FilterItem key={item} label={item} />
+                {items.length > 0 ? (
+                  items.map((item) => (
+                    <FilterItem
+                      key={item}
+                      label={item}
+                      isChecked={filters[filterKey].includes(item)}
+                      onCheckedChange={(isChecked: boolean) =>
+                        onCheckedChange(isChecked, item)
+                      }
+                    />
                   ))
                 ) : (
                   <p className="p-4 text-center text-sm text-muted-foreground">
@@ -120,11 +141,15 @@ function FilterSection({ title, items }: { title: string; items: string[] }) {
   );
 }
 
-function FilterItem({ label }: { label: string }) {
-  const onCheckedChange = (isChecked: boolean) => {
-    console.log(`Filter changed: ${label}, isChecked: ${isChecked}`);
-  };
-
+function FilterItem({
+  label,
+  isChecked,
+  onCheckedChange,
+}: {
+  label: string;
+  isChecked: boolean;
+  onCheckedChange: (isChecked: boolean) => void;
+}) {
   return (
     <label
       className={cn(
@@ -133,7 +158,8 @@ function FilterItem({ label }: { label: string }) {
       )}
     >
       <Checkbox
-        onCheckedChange={onCheckedChange}
+        checked={isChecked}
+        onCheckedChange={(checked) => onCheckedChange(checked as boolean)}
         className={cn(
           "data-[state=checked]:border-sky-700 data-[state=checked]:bg-sky-700 data-[state=checked]:text-white",
         )}
