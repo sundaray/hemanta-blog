@@ -14,6 +14,7 @@ import { calculatePaginationRange } from "@/lib/pagination";
 import { cn } from "@/lib/utils";
 import { useQueryStates } from "nuqs";
 import { useMemo, type TransitionStartFunction } from "react";
+import { AnimatedArrowIcon } from "@/components/animated-arrow-icon";
 
 const SIBLING_COUNT = 2;
 
@@ -55,8 +56,8 @@ export function OssProjectsPagination({
 
   return (
     <Pagination className={cn("mt-16", className)}>
-      <PaginationContent>
-        <PaginationItem>
+      <PaginationContent className="w-full">
+        <PaginationItem className="mr-auto">
           <PaginationPrevious
             aria-disabled={isFirstPage}
             tabIndex={isFirstPage ? -1 : undefined}
@@ -91,7 +92,7 @@ export function OssProjectsPagination({
           );
         })}
 
-        <PaginationItem>
+        <PaginationItem className="ml-auto">
           <PaginationNext
             aria-disabled={isLastPage}
             tabIndex={isLastPage ? -1 : undefined}
