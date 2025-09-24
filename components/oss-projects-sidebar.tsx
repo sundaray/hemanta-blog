@@ -13,6 +13,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { useQueryState, parseAsArrayOf, parseAsString, debounce } from "nuqs";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 type OssProjectsSidebarProps = {
   uniqueTopics: string[];
@@ -33,10 +35,50 @@ export function OssProjectsSidebar({
   const [isLanguagesSearchLoading, startLanguagesSearchTransition] =
     useTransition();
 
+  // 🔹 State for topic filters
+  const [topicValues, setTopicValues] = useQueryState(
+    "topic",
+    parseAsArrayOf(parseAsString).withDefault([]).withOptions({
+      startTransition: startTopicsToggleTransition,
+      shallow: false,
+    }),
+  );
+
+  // 🔹 State for language filters
+  const [languageValues, setLanguageValues] = useQueryState(
+    "language",
+    parseAsArrayOf(parseAsString).withDefault([]).withOptions({
+      startTransition: startLanguagesToggleTransition,
+      shallow: false,
+    }),
+  );
+
+  // 🔹 Determine if any filters are active to conditionally show the button
+  const hasActiveFilters = topicValues.length > 0 || languageValues.length > 0;
+
+  // 🔹 Clear all active filters
+  const handleClearAllFilters = useCallback(() => {
+    setTopicValues(null);
+    setLanguageValues(null);
+  }, [setTopicValues, setLanguageValues]);
+
   return (
     <search>
       <aside className={cn(className, "divide-y-1 divide-solid divide-input")}>
-        <h3 className="pb-4">Filter OSS Projects</h3>
+        <div className="flex h-10 items-center justify-between">
+          <h4>Filter OSS Projects</h4>
+          {hasActiveFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClearAllFilters}
+              className="text-sm text-muted-foreground"
+            >
+              <Icons.circleX className="size-4" />
+              Clear
+            </Button>
+          )}
+        </div>{" "}
         <FilterSection
           title="Topics"
           items={uniqueTopics}
@@ -44,6 +86,8 @@ export function OssProjectsSidebar({
           startSearchTransition={startTopicsSearchTransition}
           isSearchLoading={isTopicsSearchLoading}
           startToggleTransition={startTopicsToggleTransition}
+          filterValues={topicValues}
+          setFilterValues={setTopicValues}
         />
         <FilterSection
           title="Languages"
@@ -52,6 +96,8 @@ export function OssProjectsSidebar({
           startSearchTransition={startLanguagesSearchTransition}
           isSearchLoading={isLanguagesSearchLoading}
           startToggleTransition={startLanguagesToggleTransition}
+          filterValues={languageValues}
+          setFilterValues={setLanguageValues}
         />
       </aside>
     </search>
@@ -65,15 +111,22 @@ function FilterSection({
   startSearchTransition,
   isSearchLoading,
   startToggleTransition,
+  filterValues,
+  setFilterValues,
 }: {
   title: string;
   items: string[];
   filterKey: "topic" | "language";
-  startSearchTransition: (callback: () => void) => void;
+  startSearchTransition: TransitionStartFunction;
   isSearchLoading: boolean;
-  startToggleTransition: (callback: () => void) => void;
+  startToggleTransition: TransitionStartFunction;
+  filterValues: string[];
+  setFilterValues: (
+    value: string[] | null | ((prev: string[]) => string[] | null),
+  ) => Promise<URLSearchParams>;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const selectedFiltersCount = filterValues.length;
 
   const searchQueryKey =
     filterKey === "topic" ? "topic-query" : "language-query";
@@ -111,23 +164,6 @@ function FilterSection({
     setSearchTerm(null);
   }, [setSearchTerm]);
 
-  const [filterValues, setFilterValues] =
-    filterKey === "topic"
-      ? useQueryState(
-          "topic",
-          parseAsArrayOf(parseAsString).withDefault([]).withOptions({
-            startTransition: startToggleTransition,
-            shallow: false,
-          }),
-        )
-      : useQueryState(
-          "language",
-          parseAsArrayOf(parseAsString).withDefault([]).withOptions({
-            startTransition: startToggleTransition,
-            shallow: false,
-          }),
-        );
-
   const onCheckedChange = (isChecked: boolean, item: string) => {
     if (isChecked) {
       setFilterValues((currentFilters) =>
@@ -155,6 +191,11 @@ function FilterSection({
           <Icons.chevronRight className="size-5" />
         </motion.div>
         <span className="text-sm font-medium">{title}</span>
+        {selectedFiltersCount > 0 && (
+          <Badge variant="outline" className="ml-auto tabular-nums">
+            {selectedFiltersCount}
+          </Badge>
+        )}
       </button>
       <>
         {isOpen && (
