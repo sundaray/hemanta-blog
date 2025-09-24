@@ -12,7 +12,13 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-import { useQueryState, parseAsArrayOf, parseAsString, debounce } from "nuqs";
+import {
+  useQueryStates,
+  parseAsArrayOf,
+  parseAsString,
+  parseAsInteger,
+  debounce,
+} from "nuqs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -38,31 +44,38 @@ export function OssProjectsSidebar({
     useTransition();
 
   // 🔹 State for topic filters
-  const [topicValues, setTopicValues] = useQueryState(
-    "topic",
-    parseAsArrayOf(parseAsString).withDefault([]).withOptions({
+  const [topicState, setTopicState] = useQueryStates(
+    {
+      topic: parseAsArrayOf(parseAsString).withDefault([]),
+      page: parseAsInteger.withDefault(1),
+    },
+    {
       startTransition: startTopicsToggleTransition,
       shallow: false,
-    }),
+    },
   );
 
   // 🔹 State for language filters
-  const [languageValues, setLanguageValues] = useQueryState(
-    "language",
-    parseAsArrayOf(parseAsString).withDefault([]).withOptions({
+  const [languageState, setLanguageState] = useQueryStates(
+    {
+      language: parseAsArrayOf(parseAsString).withDefault([]),
+      page: parseAsInteger.withDefault(1),
+    },
+    {
       startTransition: startLanguagesToggleTransition,
       shallow: false,
-    }),
+    },
   );
 
   // 🔹 Determine if any filters are active to conditionally show the button
-  const hasActiveFilters = topicValues.length > 0 || languageValues.length > 0;
+  const hasActiveFilters =
+    topicState.topic.length > 0 || languageState.language.length > 0;
 
   // 🔹 Clear all active filters
   const handleClearAllFilters = useCallback(() => {
-    setTopicValues(null);
-    setLanguageValues(null);
-  }, [setTopicValues, setLanguageValues]);
+    setTopicState({ topic: null, page: null });
+    setLanguageState({ language: null, page: null });
+  }, [setTopicState, setLanguageState]);
 
   return (
     <search>
@@ -88,9 +101,8 @@ export function OssProjectsSidebar({
           filterKey="topic"
           startSearchTransition={startTopicsSearchTransition}
           isSearchLoading={isTopicsSearchLoading}
-          startToggleTransition={startTopicsToggleTransition}
-          filterValues={topicValues}
-          setFilterValues={setTopicValues}
+          values={topicState}
+          setValues={setTopicState}
         />
         <FilterSection
           title="Languages"
@@ -98,14 +110,33 @@ export function OssProjectsSidebar({
           filterKey="language"
           startSearchTransition={startLanguagesSearchTransition}
           isSearchLoading={isLanguagesSearchLoading}
-          startToggleTransition={startLanguagesToggleTransition}
-          filterValues={languageValues}
-          setFilterValues={setLanguageValues}
+          values={languageState}
+          setValues={setLanguageState}
         />
       </aside>
     </search>
   );
 }
+
+type FilterSectionProps = {
+  title: string;
+  items: string[];
+  filterKey: "topic" | "language";
+  startSearchTransition: TransitionStartFunction;
+  isSearchLoading: boolean;
+  values: {
+    topic?: string[];
+    language?: string[];
+    page: number;
+  };
+  setValues: (
+    values: Partial<{
+      topic: string[] | null;
+      language: string[] | null;
+      page: number | null;
+    }>,
+  ) => Promise<URLSearchParams>;
+};
 
 function FilterSection({
   title,
@@ -113,72 +144,58 @@ function FilterSection({
   filterKey,
   startSearchTransition,
   isSearchLoading,
-  startToggleTransition,
-  filterValues,
-  setFilterValues,
-}: {
-  title: string;
-  items: string[];
-  filterKey: "topic" | "language";
-  startSearchTransition: TransitionStartFunction;
-  isSearchLoading: boolean;
-  startToggleTransition: TransitionStartFunction;
-  filterValues: string[];
-  setFilterValues: (
-    value: string[] | null | ((prev: string[]) => string[] | null),
-  ) => Promise<URLSearchParams>;
-}) {
+  values,
+  setValues,
+}: FilterSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const filterValues = values[filterKey] ?? [];
   const selectedFiltersCount = filterValues.length;
 
   const searchQueryKey =
     filterKey === "topic" ? "topic-query" : "language-query";
 
-  const [searchTerm, setSearchTerm] = useQueryState(
-    searchQueryKey,
-    parseAsString
-      .withDefault("")
-      .withOptions({ startTransition: startSearchTransition, shallow: false }),
+  const [search, setSearch] = useQueryStates(
+    {
+      [searchQueryKey]: parseAsString.withDefault(""),
+      page: parseAsInteger.withDefault(1),
+    },
+    { startTransition: startSearchTransition, shallow: false },
   );
+  const searchTerm = search[searchQueryKey] ?? "";
 
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
-      setSearchTerm(value, {
-        limitUrlUpdates: value === "" ? undefined : debounce(300),
-      });
+      setSearch(
+        { [searchQueryKey]: value, page: null },
+        { limitUrlUpdates: value === "" ? undefined : debounce(300) },
+      );
     },
-    [setSearchTerm],
+    [setSearch, searchQueryKey],
   );
 
   const handleSearchKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       const target = e.target as HTMLInputElement;
       if (e.key === "Enter") {
-        setSearchTerm(target.value);
+        setSearch({ [searchQueryKey]: target.value, page: null });
       } else if (e.key === "Escape") {
-        setSearchTerm(null);
+        setSearch({ [searchQueryKey]: null, page: null });
       }
     },
-    [setSearchTerm],
+    [setSearch, searchQueryKey],
   );
 
   const clearSearch = useCallback(() => {
-    setSearchTerm(null);
-  }, [setSearchTerm]);
+    setSearch({ [searchQueryKey]: null, page: null });
+  }, [setSearch, searchQueryKey]);
 
   const onCheckedChange = (isChecked: boolean, item: string) => {
-    if (isChecked) {
-      setFilterValues((currentFilters) =>
-        currentFilters.includes(item)
-          ? currentFilters
-          : [...currentFilters, item],
-      );
-    } else {
-      setFilterValues((currentFilters) =>
-        currentFilters.filter((filter) => filter !== item),
-      );
-    }
+    const newValues = isChecked
+      ? [...filterValues, item]
+      : filterValues.filter((filter) => filter !== item);
+
+    setValues({ [filterKey]: newValues, page: null });
   };
 
   return (
