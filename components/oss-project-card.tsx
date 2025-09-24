@@ -15,7 +15,7 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
   return (
     <div
       className={cn(
-        "relative flex flex-col rounded-lg border bg-card p-4 text-card-foreground shadow-sm transition-all hover:shadow-lg",
+        "group relative flex flex-col rounded-lg border bg-card p-4 text-card-foreground shadow-sm transition-all hover:shadow-lg",
         className,
       )}
     >
@@ -26,7 +26,12 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
       />
 
       <div className="flex items-start justify-between gap-2">
-        <h3 className="text-xl font-semibold tracking-tight text-pretty">
+        <h3
+          className={cn(
+            "text-pretty",
+            "transition-colors group-hover:text-sky-700",
+          )}
+        >
           {project.name}
         </h3>
         {project.homepage && (

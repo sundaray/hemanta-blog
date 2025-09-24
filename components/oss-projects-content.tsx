@@ -58,10 +58,7 @@ export function OssProjectsContent({
         totalCount={totalProjects}
       />
 
-      <div
-        className="group lg:flex lg:gap-8"
-        data-toggle-loading={isAnyToggleLoading ? "true" : undefined}
-      >
+      <div className="lg:flex lg:gap-8">
         {isSidebarVisible && (
           <OssProjectsSidebar
             uniqueTopics={uniqueTopics}

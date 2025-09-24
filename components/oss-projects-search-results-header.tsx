@@ -29,7 +29,7 @@ export function OssProjectsSearchResultsHeader({
         variant="ghost"
         size="sm"
         onClick={onToggleSidebar}
-        className="cursor-pointer text-sm text-muted-foreground"
+        className="text-sm text-muted-foreground"
       >
         {isSidebarVisible ? (
           <>
