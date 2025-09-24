@@ -20,7 +20,7 @@ export function OssProjectsSearchResultsHeader({
   return (
     <div className={cn("flex h-10 items-center justify-between", className)}>
       <div className="flex items-baseline gap-x-2">
-        <h3>OSS Projects</h3>
+        <h4>OSS Projects</h4>
         <span className="text-base font-medium text-muted-foreground tabular-nums">
           ({currentCount} of {totalCount})
         </span>

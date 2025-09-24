@@ -19,7 +19,7 @@ export function OssProjectSearch({
       query: parseAsString.withDefault(""),
       page: parseAsInteger.withDefault(1),
     },
-    { startTransition, shallow: false },
+    { startTransition, shallow: false, history: "push" },
   );
 
   const clearSearch = useCallback(() => {

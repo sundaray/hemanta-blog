@@ -52,6 +52,7 @@ export function OssProjectsSidebar({
     {
       startTransition: startTopicsToggleTransition,
       shallow: false,
+      history: "push",
     },
   );
 
@@ -64,6 +65,7 @@ export function OssProjectsSidebar({
     {
       startTransition: startLanguagesToggleTransition,
       shallow: false,
+      history: "push",
     },
   );
 
@@ -81,14 +83,13 @@ export function OssProjectsSidebar({
     <search>
       <aside className={cn(className, "divide-y-1 divide-solid divide-input")}>
         <div className="flex h-12 items-center justify-between">
-          <h3>Filter OSS Projects</h3>
+          <h4>Filter OSS Projects</h4>
           {hasActiveFilters && (
             <Button
               variant="ghost"
               size="sm"
               onClick={handleClearAllFilters}
               className="text-sm text-muted-foreground"
-              disabled={isClearing}
             >
               <Icons.circleX className="size-4" />
               Clear
@@ -103,6 +104,7 @@ export function OssProjectsSidebar({
           isSearchLoading={isTopicsSearchLoading}
           values={topicState}
           setValues={setTopicState}
+          defaultOpen={true}
         />
         <FilterSection
           title="Languages"
@@ -136,6 +138,7 @@ type FilterSectionProps = {
       page: number | null;
     }>,
   ) => Promise<URLSearchParams>;
+  defaultOpen?: boolean;
 };
 
 function FilterSection({
@@ -146,8 +149,9 @@ function FilterSection({
   isSearchLoading,
   values,
   setValues,
+  defaultOpen,
 }: FilterSectionProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(defaultOpen);
   const filterValues = values[filterKey] ?? [];
   const selectedFiltersCount = filterValues.length;
 
@@ -159,7 +163,7 @@ function FilterSection({
       [searchQueryKey]: parseAsString.withDefault(""),
       page: parseAsInteger.withDefault(1),
     },
-    { startTransition: startSearchTransition, shallow: false },
+    { startTransition: startSearchTransition, shallow: false, history: "push" },
   );
   const searchTerm = search[searchQueryKey] ?? "";
 
