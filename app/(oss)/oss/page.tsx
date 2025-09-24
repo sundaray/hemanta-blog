@@ -1,10 +1,12 @@
-import { getOssProjects } from "@/lib/get-oss-projects";
+import { getOssProjects, getOssProjectsCount } from "@/lib/get-oss-projects";
 import { OssProjectSearch } from "@/components/oss-project-search";
 import { Icons } from "@/components/icons";
 import { ossProjectsSearchParamsCache } from "@/lib/oss-projects-search-params";
 import { OssProjectsContent } from "@/components/oss-projects-content";
 import { getOssProjectFilterOptions } from "@/lib/get-oss-project-filters-options";
 import type { SearchParams } from "nuqs/server";
+
+const PROJECTS_PER_PAGE = 36;
 
 export default async function OssPage({
   searchParams,
@@ -15,15 +17,17 @@ export default async function OssPage({
   const filters = await ossProjectsSearchParamsCache.parse(searchParams);
 
   // 🔹 Fetch filter options and filtered projects in parallel
-  const [filterOptions, projectsResult] = await Promise.all([
-    getOssProjectFilterOptions({
-      topicQuery: filters["topic-query"],
-      languageQuery: filters["language-query"],
-    }),
-    getOssProjects(filters),
-  ]);
+  const [filterOptions, projectsResult, totalProjectsResult] =
+    await Promise.all([
+      getOssProjectFilterOptions({
+        topicQuery: filters["topic-query"],
+        languageQuery: filters["language-query"],
+      }),
+      getOssProjects(filters),
+      getOssProjectsCount(filters),
+    ]);
 
-  if (projectsResult.isErr()) {
+  if (projectsResult.isErr() || totalProjectsResult.isErr()) {
     return (
       <div className="container mx-auto flex items-center justify-center">
         <div className="flex items-center gap-x-2">
@@ -37,6 +41,8 @@ export default async function OssPage({
   }
 
   const projects = projectsResult.value;
+  const totalProjects = totalProjectsResult.value;
+  const totalPages = Math.ceil(totalProjects / PROJECTS_PER_PAGE);
   const { uniqueTopics, uniqueLanguages } = filterOptions;
 
   return (
@@ -54,6 +60,8 @@ export default async function OssPage({
         projects={projects}
         uniqueTopics={uniqueTopics}
         uniqueLanguages={uniqueLanguages}
+        totalPages={totalPages}
+        totalProjects={totalProjects}
       />
     </div>
   );

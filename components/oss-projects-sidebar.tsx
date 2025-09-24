@@ -22,6 +22,7 @@ type OssProjectsSidebarProps = {
   className?: string;
   startTopicsToggleTransition: TransitionStartFunction;
   startLanguagesToggleTransition: TransitionStartFunction;
+  isClearing?: boolean;
 };
 
 export function OssProjectsSidebar({
@@ -30,6 +31,7 @@ export function OssProjectsSidebar({
   className,
   startTopicsToggleTransition,
   startLanguagesToggleTransition,
+  isClearing,
 }: OssProjectsSidebarProps) {
   const [isTopicsSearchLoading, startTopicsSearchTransition] = useTransition();
   const [isLanguagesSearchLoading, startLanguagesSearchTransition] =
@@ -65,14 +67,15 @@ export function OssProjectsSidebar({
   return (
     <search>
       <aside className={cn(className, "divide-y-1 divide-solid divide-input")}>
-        <div className="flex h-10 items-center justify-between">
-          <h4>Filter OSS Projects</h4>
+        <div className="flex h-12 items-center justify-between">
+          <h3>Filter OSS Projects</h3>
           {hasActiveFilters && (
             <Button
               variant="ghost"
               size="sm"
               onClick={handleClearAllFilters}
               className="text-sm text-muted-foreground"
+              disabled={isClearing}
             >
               <Icons.circleX className="size-4" />
               Clear
@@ -181,7 +184,7 @@ function FilterSection({
   return (
     <div>
       <button
-        className="flex w-full items-center gap-x-2 py-4 text-left"
+        className="flex h-12 w-full items-center gap-x-2 text-left"
         onClick={() => setIsOpen(!isOpen)}
       >
         <motion.div
@@ -236,10 +239,12 @@ function FilterSection({
               <ScrollArea
                 className={cn(
                   "h-60",
-                  isSearchLoading ? "opacity-50" : "opacity-100",
+                  isSearchLoading
+                    ? "pointer-events-none opacity-50"
+                    : "opacity-100",
                 )}
               >
-                <div className="flex flex-col">
+                <div className="flex flex-col pr-4">
                   {items.length > 0 ? (
                     items.map((item) => (
                       <FilterItem

@@ -2,6 +2,7 @@ import {
   createSearchParamsCache,
   parseAsString,
   parseAsArrayOf,
+  parseAsInteger,
 } from "nuqs/server";
 
 export const ossProjectsSearchParams = {
@@ -10,6 +11,7 @@ export const ossProjectsSearchParams = {
   "language-query": parseAsString.withDefault(""),
   topic: parseAsArrayOf(parseAsString).withDefault([]),
   language: parseAsArrayOf(parseAsString).withDefault([]),
+  page: parseAsInteger.withDefault(1),
 };
 
 export const ossProjectsSearchParamsCache = createSearchParamsCache(

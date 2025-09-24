@@ -8,17 +8,22 @@ import { OssProjectCard } from "@/components/oss-project-card";
 import { OssProjectsSearchResultsHeader } from "@/components/oss-projects-search-results-header";
 import { Icons } from "@/components/icons";
 import { OssProjectSearch } from "@/components/oss-project-search";
+import { OssProjectsPagination } from "@/components/oss-projects-pagination";
 
 type OssContentProps = {
   projects: SelectOssProject[];
   uniqueTopics: string[];
   uniqueLanguages: string[];
+  totalPages: number;
+  totalProjects: number;
 };
 
 export function OssProjectsContent({
   projects,
   uniqueTopics,
   uniqueLanguages,
+  totalPages,
+  totalProjects,
 }: OssContentProps) {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
@@ -26,12 +31,13 @@ export function OssProjectsContent({
   const [isTopicsToggleLoading, startTopicsToggleTransition] = useTransition();
   const [isLanguagesToggleLoading, startLanguagesToggleTransition] =
     useTransition();
+  const [isPaginating, startPaginationTransition] = useTransition();
 
   const isAnyToggleLoading = Boolean(
     isTopicsToggleLoading || isLanguagesToggleLoading,
   );
 
-  const isGridLoading = isSearchLoading || isAnyToggleLoading;
+  const isGridLoading = isSearchLoading || isAnyToggleLoading || isPaginating;
 
   const toggleSidebar = () => {
     setIsSidebarVisible((prev) => !prev);
@@ -43,29 +49,32 @@ export function OssProjectsContent({
         className="my-16"
         startTransition={startSearchTransition}
       />
+
+      <OssProjectsSearchResultsHeader
+        isSidebarVisible={isSidebarVisible}
+        onToggleSidebar={toggleSidebar}
+        className="mb-8"
+        currentCount={projects.length}
+        totalCount={totalProjects}
+      />
+
       <div
-        className="group lg:grid lg:grid-cols-4 lg:gap-8"
+        className="group lg:flex lg:gap-8"
         data-toggle-loading={isAnyToggleLoading ? "true" : undefined}
       >
         {isSidebarVisible && (
           <OssProjectsSidebar
             uniqueTopics={uniqueTopics}
             uniqueLanguages={uniqueLanguages}
-            className="hidden lg:sticky lg:top-24 lg:block lg:self-start"
+            className="hidden w-64 lg:sticky lg:top-24 lg:block lg:self-start"
             startTopicsToggleTransition={startTopicsToggleTransition}
             startLanguagesToggleTransition={startLanguagesToggleTransition}
+            isClearing={isAnyToggleLoading}
           />
         )}
 
-        <div
-          className={cn(isSidebarVisible ? "lg:col-span-3" : "lg:col-span-4")}
-        >
-          <OssProjectsSearchResultsHeader
-            isSidebarVisible={isSidebarVisible}
-            onToggleSidebar={toggleSidebar}
-          />
-
-          <div className="relative mt-8">
+        <div className="flex-1">
+          <div className="relative">
             {isGridLoading && (
               <div
                 className="absolute top-[20px] left-1/2 z-30 -translate-x-1/2"
@@ -77,7 +86,7 @@ export function OssProjectsContent({
 
             <div
               className={cn(
-                "mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2",
+                "grid grid-cols-1 gap-8 sm:grid-cols-2",
                 isSidebarVisible ? "lg:grid-cols-3" : "lg:grid-cols-4",
                 isGridLoading
                   ? "pointer-events-none opacity-30"
@@ -99,6 +108,11 @@ export function OssProjectsContent({
                 </div>
               )}
             </div>
+
+            <OssProjectsPagination
+              totalPages={totalPages}
+              startTransition={startPaginationTransition}
+            />
           </div>
         </div>
       </div>

@@ -6,30 +6,39 @@ type OssProjectsSearchResultsHeaderProps = {
   isSidebarVisible: boolean;
   onToggleSidebar: () => void;
   className?: string;
+  currentCount: number;
+  totalCount: number;
 };
 
 export function OssProjectsSearchResultsHeader({
   isSidebarVisible,
   onToggleSidebar,
   className,
+  currentCount,
+  totalCount,
 }: OssProjectsSearchResultsHeaderProps) {
   return (
     <div className={cn("flex h-10 items-center justify-between", className)}>
-      <h4>OSS Projects</h4>
+      <div className="flex items-baseline gap-x-2">
+        <h3>OSS Projects</h3>
+        <span className="text-base font-medium text-muted-foreground tabular-nums">
+          ({currentCount} of {totalCount})
+        </span>
+      </div>{" "}
       <Button
         variant="ghost"
         size="sm"
         onClick={onToggleSidebar}
-        className="cursor-pointer text-sm"
+        className="cursor-pointer text-sm text-muted-foreground"
       >
         {isSidebarVisible ? (
           <>
-            <Icons.filterX className="size-4 text-muted-foreground" />
+            <Icons.filterX className="size-4" />
             Hide Filters
           </>
         ) : (
           <>
-            <Icons.filter className="size-4 text-muted-foreground" />
+            <Icons.filter className="size-4" />
             Show Filters
           </>
         )}
