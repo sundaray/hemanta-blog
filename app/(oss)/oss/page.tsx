@@ -4,7 +4,6 @@ import { searchParamsCache } from "@/lib/search-params";
 import { OssProjectsContent } from "@/components/oss-projects-content";
 import { getOssProjectFilterOptions } from "@/lib/get-oss-project-filters-options";
 import type { SearchParams } from "nuqs/server";
-import Link from "next/link";
 import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb";
 
 const PROJECTS_PER_PAGE = 36;
@@ -18,7 +17,7 @@ export default async function OssPage({
   const filters = await searchParamsCache.parse(searchParams);
 
   // 🔹 Fetch filter options and filtered projects in parallel
-  const [filterOptions, projectsResult, totalProjectsResult] =
+  const [filterOptionsResult, projectsResult, totalProjectsResult] =
     await Promise.all([
       getOssProjectFilterOptions({
         topicQuery: filters["topic-query"],
@@ -28,7 +27,11 @@ export default async function OssPage({
       getOssProjectsCount(filters),
     ]);
 
-  if (projectsResult.isErr() || totalProjectsResult.isErr()) {
+  if (
+    filterOptionsResult.isErr() ||
+    projectsResult.isErr() ||
+    totalProjectsResult.isErr()
+  ) {
     return (
       <div className="container mx-auto flex items-center justify-center">
         <div className="flex items-center gap-x-2">
@@ -44,7 +47,7 @@ export default async function OssPage({
   const projects = projectsResult.value;
   const totalProjects = totalProjectsResult.value;
   const totalPages = Math.ceil(totalProjects / PROJECTS_PER_PAGE);
-  const { uniqueTopics, uniqueLanguages } = filterOptions;
+  const { uniqueTopics, uniqueLanguages } = filterOptionsResult.value;
 
   return (
     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
