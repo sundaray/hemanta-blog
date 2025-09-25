@@ -5,7 +5,6 @@ import {
   useTransition,
   useCallback,
   type TransitionStartFunction,
-  ChangeEvent,
   useEffect,
   KeyboardEvent,
 } from "react";
@@ -15,7 +14,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-import { useQueryStates, parseAsArrayOf, parseAsString, debounce } from "nuqs";
+import { useQueryStates, debounce } from "nuqs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { searchParams } from "@/lib/search-params";
