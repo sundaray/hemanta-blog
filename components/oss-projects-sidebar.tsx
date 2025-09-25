@@ -266,12 +266,13 @@ function FilterSection({
               <ScrollArea
                 className={cn(
                   "h-60",
+                  "[&_[data-slot=scroll-area-viewport]]:[mask-image:linear-gradient(to_bottom,transparent,black_5%,black_95%,transparent)]",
                   isSearchLoading
                     ? "pointer-events-none opacity-50"
                     : "opacity-100",
                 )}
               >
-                <div className="flex flex-col pr-4">
+                <div className={"flex flex-col pr-4"}>
                   {items.length > 0 ? (
                     items.map((item) => (
                       <FilterItem
