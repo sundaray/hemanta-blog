@@ -161,7 +161,7 @@ export function NavLinks({
               </Link>
               <div
                 className={cn(
-                  "gsap-underline pointer-events-none absolute bottom-0 left-0 h-[1.5px] w-full origin-left scale-x-0",
+                  "gsap-underline pointer-events-none absolute bottom-5 left-0 h-[1.5px] w-full origin-left scale-x-0",
                   isActive ? "bg-sky-600" : "bg-sky-600",
                 )}
               />

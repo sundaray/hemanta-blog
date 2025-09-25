@@ -1,7 +1,6 @@
 import { getOssProjects, getOssProjectsCount } from "@/lib/get-oss-projects";
-import { OssProjectSearch } from "@/components/oss-project-search";
 import { Icons } from "@/components/icons";
-import { ossProjectsSearchParamsCache } from "@/lib/search-params";
+import { searchParamsCache } from "@/lib/search-params";
 import { OssProjectsContent } from "@/components/oss-projects-content";
 import { getOssProjectFilterOptions } from "@/lib/get-oss-project-filters-options";
 import type { SearchParams } from "nuqs/server";
@@ -14,7 +13,7 @@ export default async function OssPage({
   searchParams: SearchParams;
 }) {
   // 🔹 Parse filters from URL search params
-  const filters = await ossProjectsSearchParamsCache.parse(searchParams);
+  const filters = await searchParamsCache.parse(searchParams);
 
   // 🔹 Fetch filter options and filtered projects in parallel
   const [filterOptions, projectsResult, totalProjectsResult] =
@@ -47,7 +46,7 @@ export default async function OssPage({
 
   return (
     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div className="border text-center">
+      <div className="text-center">
         <h1>Open Source Software</h1>
         <p className="mx-auto mt-8 max-w-3xl text-lg text-pretty text-neutral-600">
           A collection of open-source projects I use or find interesting. Most

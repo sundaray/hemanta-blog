@@ -11,11 +11,11 @@ import {
   inArray,
   count,
 } from "drizzle-orm";
-import type { OssProjectsFilters } from "@/lib/search-params";
+import type { OssProjectsSearchParams } from "@/lib/search-params";
 
 // 🔹 Helper function to build the query conditions
 function buildConditions(
-  filters: Omit<OssProjectsFilters, "page">,
+  filters: Omit<OssProjectsSearchParams, "page">,
 ): (SQL | undefined)[] {
   const conditions: (SQL | undefined)[] = [];
 
@@ -34,7 +34,7 @@ function buildConditions(
 
 // 🔹 Get the total count of filtered projects
 export function getOssProjectsCount(
-  filters: Omit<OssProjectsFilters, "page">,
+  filters: Omit<OssProjectsSearchParams, "page">,
 ): ResultAsync<number, DatabaseError> {
   const conditions = buildConditions(filters);
   const whereClause = and(
@@ -57,7 +57,7 @@ export function getOssProjectsCount(
 }
 
 export function getOssProjects(
-  filters: OssProjectsFilters,
+  filters: OssProjectsSearchParams,
 ): ResultAsync<SelectOssProject[], DatabaseError> {
   const pageSize = 36;
   const conditions = buildConditions(filters);

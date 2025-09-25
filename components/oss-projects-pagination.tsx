@@ -9,7 +9,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { ossProjectsSearchParams } from "@/lib/search-params";
+import { searchParams } from "@/lib/search-params";
 import { calculatePaginationRange } from "@/lib/pagination";
 import { cn } from "@/lib/utils";
 import { useQueryStates } from "nuqs";
@@ -28,7 +28,7 @@ export function OssProjectsPagination({
   className,
   startTransition,
 }: OssProjectsPaginationProps) {
-  const [filters, setFilters] = useQueryStates(ossProjectsSearchParams, {
+  const [filters, setFilters] = useQueryStates(searchParams, {
     startTransition,
     shallow: false,
     scroll: true,

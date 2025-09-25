@@ -88,8 +88,6 @@ export default async function OssProjectDetailsPage(
           </a>
         </div>
 
-        <Separator />
-
         {/* Topics Section */}
         <div>
           <h2 className="mb-4 text-2xl">Topics</h2>

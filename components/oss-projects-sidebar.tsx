@@ -21,6 +21,7 @@ import {
 } from "nuqs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { OssProjectsSearchParams } from "@/lib/search-params";
 
 type OssProjectsSidebarProps = {
   uniqueTopics: string[];
@@ -126,11 +127,8 @@ type FilterSectionProps = {
   filterKey: "topic" | "language";
   startSearchTransition: TransitionStartFunction;
   isSearchLoading: boolean;
-  values: {
-    topic?: string[];
-    language?: string[];
-    page: number;
-  };
+  values: Pick<OssProjectsSearchParams, "page"> &
+    Partial<Pick<OssProjectsSearchParams, "topic" | "language">>;
   setValues: (
     values: Partial<{
       topic: string[] | null;

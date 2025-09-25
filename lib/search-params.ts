@@ -5,7 +5,7 @@ import {
   parseAsInteger,
 } from "nuqs/server";
 
-export const ossProjectsSearchParams = {
+export const searchParams = {
   query: parseAsString.withDefault(""),
   "topic-query": parseAsString.withDefault(""),
   "language-query": parseAsString.withDefault(""),
@@ -14,10 +14,19 @@ export const ossProjectsSearchParams = {
   page: parseAsInteger.withDefault(1),
 };
 
-export const ossProjectsSearchParamsCache = createSearchParamsCache(
-  ossProjectsSearchParams,
-);
+export const searchParamsCache = createSearchParamsCache(searchParams);
 
-export type OssProjectsFilters = Awaited<
-  ReturnType<typeof ossProjectsSearchParamsCache.parse>
+export type OssProjectsSearchParams = Awaited<
+  ReturnType<typeof searchParamsCache.parse>
 >;
+
+export type option4 = Pick<OssProjectsSearchParams, "page"> &
+  Partial<Pick<OssProjectsSearchParams, "topic" | "language">>;
+
+export type option = Partial<
+  Pick<OssProjectsSearchParams, "page" | "topic" | "language">
+>;
+
+export type option2<T> = { [K in keyof T]: T[K] | null };
+
+export type option3 = option2<option>;

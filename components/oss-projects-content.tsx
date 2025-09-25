@@ -46,7 +46,7 @@ export function OssProjectsContent({
   return (
     <>
       <OssProjectSearch
-        className="my-16"
+        className="mt-24 mb-8"
         startTransition={startSearchTransition}
       />
 
