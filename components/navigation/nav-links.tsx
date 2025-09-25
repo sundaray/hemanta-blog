@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 import { usePathname } from "next/navigation";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import type { NavItem as NavItemType } from "@/types";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";

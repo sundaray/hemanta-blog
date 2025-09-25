@@ -76,7 +76,8 @@ export function AddOssProjectForm({ className }: { className?: string }) {
               <FormLabel>GitHub Repository URL</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="https://github.com/shadcn-ui/ui"
+                  className="h-10"
+                  placeholder="https://github.com/yamadashy/repomix"
                   {...field}
                 />
               </FormControl>
