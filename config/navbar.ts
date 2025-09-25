@@ -9,7 +9,6 @@ type NavbarConfig = {
 export const navbarLinks: NavbarConfig = {
   main: [
     { title: "Blog", href: "/blog" },
-    { title: "Tags", href: "/tags" },
     { title: "Courses", href: "/courses" },
     { title: "OSS", href: "/oss" },
     { title: "Projects", href: "/projects" },

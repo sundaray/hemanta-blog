@@ -10,18 +10,25 @@ import {
   desc,
   inArray,
   count,
+  or,
 } from "drizzle-orm";
 import type { OssProjectsSearchParams } from "@/lib/search-params";
 
-// 🔹 Helper function to build the query conditions
+// 🔹 Build the query conditions
 function buildConditions(
   filters: Omit<OssProjectsSearchParams, "page">,
 ): (SQL | undefined)[] {
   const conditions: (SQL | undefined)[] = [];
 
   if (filters.query) {
-    conditions.push(ilike(ossProjects.name, `%${filters.query}%`));
+    conditions.push(
+      or(
+        ilike(ossProjects.name, `%${filters.query}%`),
+        ilike(ossProjects.description, `%${filters.query}%`),
+      ),
+    );
   }
+
   if (filters.topic.length > 0) {
     conditions.push(arrayOverlaps(ossProjects.topics, filters.topic));
   }

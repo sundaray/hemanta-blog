@@ -31,6 +31,9 @@ export function DynamicBreadcrumb({ className }: DynamicBreadcrumbProps) {
   const pathname = usePathname();
   const segments = pathname.split("/").filter(Boolean);
 
+  // 🔹 Check if the path matches the structure of an OSS detail page
+  const isOssDetailPage = segments[0] === "oss" && segments.length === 2;
+
   return (
     <Breadcrumb className={cn(className)}>
       <BreadcrumbList>
@@ -54,7 +57,7 @@ export function DynamicBreadcrumb({ className }: DynamicBreadcrumbProps) {
               <BreadcrumbItem>
                 {isLast ? (
                   <BreadcrumbPage className="font-medium text-foreground">
-                    {unslugify(segment)}
+                    {isOssDetailPage ? segment : unslugify(segment)}
                   </BreadcrumbPage>
                 ) : (
                   <BreadcrumbLink asChild>

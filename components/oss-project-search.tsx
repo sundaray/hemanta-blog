@@ -41,7 +41,7 @@ export function OssProjectSearch({
         <Input
           type="search"
           value={values.query}
-          placeholder="Search oss projects by name…"
+          placeholder="Search projects by name or description…"
           className="col-start-1 row-start-1 h-12 rounded-full bg-background pl-10"
           onChange={(e) =>
             setValues(
