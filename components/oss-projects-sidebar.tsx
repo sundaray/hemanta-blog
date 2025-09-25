@@ -231,17 +231,17 @@ function FilterSection({
         {isOpen && (
           <div className="space-y-2">
             <div className="grid grid-cols-1 items-center">
-              <div className="pointer-events-none col-start-1 row-start-1 w-fit pl-3">
-                <Icons.search className="size-4 text-muted-foreground" />
-              </div>
               <Input
                 type="search"
                 placeholder={`Search ${title.toLowerCase()}…`}
                 value={searchTerm}
-                className={cn("col-start-1 row-start-1 pl-9")}
+                className={cn("col-start-1 row-start-1 pl-8")}
                 onChange={handleSearchChange}
                 onKeyDown={handleSearchKeyDown}
               />
+              <div className="pointer-events-none col-start-1 row-start-1 w-fit pl-3">
+                <Icons.search className="size-4 text-muted-foreground" />
+              </div>
               {searchTerm && (
                 <div className="pointer-events-none col-start-1 row-start-1 flex items-center justify-end pr-3">
                   <button
