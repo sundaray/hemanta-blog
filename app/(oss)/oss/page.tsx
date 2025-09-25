@@ -1,7 +1,7 @@
 import { getOssProjects, getOssProjectsCount } from "@/lib/get-oss-projects";
 import { OssProjectSearch } from "@/components/oss-project-search";
 import { Icons } from "@/components/icons";
-import { ossProjectsSearchParamsCache } from "@/lib/oss-projects-search-params";
+import { ossProjectsSearchParamsCache } from "@/lib/search-params";
 import { OssProjectsContent } from "@/components/oss-projects-content";
 import { getOssProjectFilterOptions } from "@/lib/get-oss-project-filters-options";
 import type { SearchParams } from "nuqs/server";

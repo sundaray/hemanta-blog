@@ -11,7 +11,7 @@ import {
   inArray,
   count,
 } from "drizzle-orm";
-import type { OssProjectsFilters } from "@/lib//oss-projects-search-params";
+import type { OssProjectsFilters } from "@/lib/search-params";
 
 // 🔹 Helper function to build the query conditions
 function buildConditions(

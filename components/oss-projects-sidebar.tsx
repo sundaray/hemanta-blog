@@ -82,7 +82,7 @@ export function OssProjectsSidebar({
   return (
     <search>
       <aside className={cn(className, "divide-y-1 divide-solid divide-input")}>
-        <div className="flex h-12 items-center justify-between">
+        <div className="flex h-10 items-start justify-between">
           <h4>Filter OSS Projects</h4>
           {hasActiveFilters && (
             <Button
@@ -95,7 +95,7 @@ export function OssProjectsSidebar({
               Clear
             </Button>
           )}
-        </div>{" "}
+        </div>
         <FilterSection
           title="Topics"
           items={uniqueTopics}
@@ -140,6 +140,18 @@ type FilterSectionProps = {
   ) => Promise<URLSearchParams>;
   defaultOpen?: boolean;
 };
+
+// -----------------------------------------------
+//
+//
+//
+//
+//  FilterSection
+//
+//
+//
+//
+// -----------------------------------------------
 
 function FilterSection({
   title,
@@ -291,6 +303,18 @@ function FilterSection({
     </div>
   );
 }
+
+// -----------------------------------------------
+//
+//
+//
+//
+//  FilterItem
+//
+//
+//
+//
+// -----------------------------------------------
 
 function FilterItem({
   label,

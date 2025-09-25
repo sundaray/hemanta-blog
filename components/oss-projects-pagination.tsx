@@ -9,12 +9,11 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { ossProjectsSearchParams } from "@/lib/oss-projects-search-params";
+import { ossProjectsSearchParams } from "@/lib/search-params";
 import { calculatePaginationRange } from "@/lib/pagination";
 import { cn } from "@/lib/utils";
 import { useQueryStates } from "nuqs";
 import { useMemo, type TransitionStartFunction } from "react";
-import { AnimatedArrowIcon } from "@/components/animated-arrow-icon";
 
 const SIBLING_COUNT = 2;
 
