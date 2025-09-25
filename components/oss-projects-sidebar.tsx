@@ -69,12 +69,17 @@ export function OssProjectsSidebar({
     filters["language-query"] !== "";
 
   const handleClearAllFilters = useCallback(() => {
-    // ✍️ Instantly clear the UI...
+    const mainGridFiltersWereActive =
+      uiSelectedTopics.length > 0 || uiSelectedLangs.length > 0;
+    const topicQueryWasActive = filters["topic-query"] !== "";
+    const langQueryWasActive = filters["language-query"] !== "";
+
+    // Instantly clear the UI for checkboxes
     setUiSelectedTopics([]);
     setUiSelectedLangs([]);
 
-    // ✍️ ...then start a transition to update the URL and refetch data in the background.
-    startTopicsToggleTransition(() => {
+    // Define the state update action
+    const clearAction = () => {
       setFilters({
         topic: null,
         language: null,
@@ -82,8 +87,26 @@ export function OssProjectsSidebar({
         "language-query": null,
         page: null,
       });
-    });
-  }, [setFilters, startTopicsToggleTransition]);
+    };
+
+    if (mainGridFiltersWereActive) {
+      startTopicsToggleTransition(clearAction);
+    }
+    if (topicQueryWasActive) {
+      startTopicQueryTransition(clearAction);
+    }
+    if (langQueryWasActive) {
+      startLanguageQueryTransition(clearAction);
+    }
+  }, [
+    uiSelectedTopics.length,
+    uiSelectedLangs.length,
+    filters,
+    setFilters,
+    startTopicsToggleTransition,
+    startTopicQueryTransition,
+    startLanguageQueryTransition,
+  ]);
 
   const handleSelectionChange = (
     key: "topic" | "language",
