@@ -66,7 +66,6 @@ export function OssProjectsContent({
             className="hidden w-64 lg:sticky lg:top-24 lg:block lg:self-start"
             startTopicsToggleTransition={startTopicsToggleTransition}
             startLanguagesToggleTransition={startLanguagesToggleTransition}
-            isClearing={isAnyToggleLoading}
           />
         )}
 

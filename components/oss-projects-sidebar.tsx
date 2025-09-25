@@ -5,6 +5,9 @@ import {
   useTransition,
   useCallback,
   type TransitionStartFunction,
+  ChangeEvent,
+  useEffect,
+  KeyboardEvent,
 } from "react";
 import { motion } from "motion/react";
 import { Icons } from "@/components/icons";
@@ -12,20 +15,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-import {
-  useQueryStates,
-  parseAsArrayOf,
-  parseAsString,
-  parseAsInteger,
-  debounce,
-} from "nuqs";
+import { useQueryStates, parseAsArrayOf, parseAsString, debounce } from "nuqs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  type OssProjectsSearchParams,
-  type FilterSectionState,
-  type NullableFilterUpdatePayload,
-} from "@/lib/search-params";
+import { searchParams } from "@/lib/search-params";
 
 type OssProjectsSidebarProps = {
   uniqueTopics: string[];
@@ -33,9 +26,11 @@ type OssProjectsSidebarProps = {
   className?: string;
   startTopicsToggleTransition: TransitionStartFunction;
   startLanguagesToggleTransition: TransitionStartFunction;
-  isClearing?: boolean;
 };
 
+// ======================================================================
+// Parent Sidebar Component
+// ======================================================================
 export function OssProjectsSidebar({
   uniqueTopics,
   uniqueLanguages,
@@ -43,45 +38,101 @@ export function OssProjectsSidebar({
   startTopicsToggleTransition,
   startLanguagesToggleTransition,
 }: OssProjectsSidebarProps) {
-  const [isTopicsSearchLoading, startTopicsSearchTransition] = useTransition();
-  const [isLanguagesSearchLoading, startLanguagesSearchTransition] =
+  // 🔹 Transitions for the spinners inside each filter section's search
+  const [isTopicQueryLoading, startTopicQueryTransition] = useTransition();
+  const [isLanguageQueryLoading, startLanguageQueryTransition] =
     useTransition();
 
-  // 🔹 State for topic filters
-  const [topicState, setTopicState] = useQueryStates(
-    {
-      topic: parseAsArrayOf(parseAsString).withDefault([]),
-      page: parseAsInteger.withDefault(1),
-    },
-    {
-      startTransition: startTopicsToggleTransition,
-      shallow: false,
-      history: "push",
-    },
-  );
+  // 🔹 The "source of truth" state that is synced with the URL
+  const [filters, setFilters] = useQueryStates(searchParams, {
+    shallow: false,
+    history: "push",
+  });
 
-  // 🔹 State for language filters
-  const [languageState, setLanguageState] = useQueryStates(
-    {
-      language: parseAsArrayOf(parseAsString).withDefault([]),
-      page: parseAsInteger.withDefault(1),
-    },
-    {
-      startTransition: startLanguagesToggleTransition,
-      shallow: false,
-      history: "push",
-    },
-  );
+  // ✍️ Local "UI state" for checkboxes to provide INSTANT visual feedback.
+  const [uiSelectedTopics, setUiSelectedTopics] = useState(filters.topic);
+  const [uiSelectedLangs, setUiSelectedLangs] = useState(filters.language);
 
-  // 🔹 Determine if any filters are active to conditionally show the Clear button
+  // ✍️ Effects to keep the instant UI state in sync with the URL state (e.g., for back/forward navigation).
+  useEffect(() => {
+    setUiSelectedTopics(filters.topic);
+  }, [filters.topic]);
+
+  useEffect(() => {
+    setUiSelectedLangs(filters.language);
+  }, [filters.language]);
+
+  // ✍️ The "Clear" button's visibility is now based on the instant UI state.
   const hasActiveFilters =
-    topicState.topic.length > 0 || languageState.language.length > 0;
+    uiSelectedTopics.length > 0 ||
+    uiSelectedLangs.length > 0 ||
+    filters["topic-query"] !== "" ||
+    filters["language-query"] !== "";
 
-  // 🔹 Clear all active filters
   const handleClearAllFilters = useCallback(() => {
-    setTopicState({ topic: null, page: null });
-    setLanguageState({ language: null, page: null });
-  }, [setTopicState, setLanguageState]);
+    // ✍️ Instantly clear the UI...
+    setUiSelectedTopics([]);
+    setUiSelectedLangs([]);
+
+    // ✍️ ...then start a transition to update the URL and refetch data in the background.
+    startTopicsToggleTransition(() => {
+      setFilters({
+        topic: null,
+        language: null,
+        "topic-query": null,
+        "language-query": null,
+        page: null,
+      });
+    });
+  }, [setFilters, startTopicsToggleTransition]);
+
+  const handleSelectionChange = (
+    key: "topic" | "language",
+    item: string,
+    isChecked: boolean,
+  ) => {
+    const currentUiValues =
+      key === "topic" ? uiSelectedTopics : uiSelectedLangs;
+    const newUiValues = isChecked
+      ? [...currentUiValues, item]
+      : currentUiValues.filter((filter) => filter !== item);
+
+    // ✍️ FIRST, update the local UI state for an instant visual change (checking the box).
+    if (key === "topic") {
+      setUiSelectedTopics(newUiValues);
+    } else {
+      setUiSelectedLangs(newUiValues);
+    }
+
+    // ✍️ SECOND, start a transition to update the "real" filters and fetch the main grid data.
+    const transition =
+      key === "topic"
+        ? startTopicsToggleTransition
+        : startLanguagesToggleTransition;
+    transition(() => {
+      setFilters({ [key]: newUiValues, page: null });
+    });
+  };
+
+  // ✍️ This handler uses `nuqs`'s built-in debouncing for an instant typing experience.
+  const handleSearchChange = (
+    key: "topic-query" | "language-query",
+    value: string,
+  ) => {
+    const transition =
+      key === "topic-query"
+        ? startTopicQueryTransition
+        : startLanguageQueryTransition;
+
+    // ✍️ `nuqs` updates its returned state instantly, but debounces the URL update.
+    setFilters(
+      { [key]: value, page: null },
+      {
+        startTransition: transition,
+        limitUrlUpdates: value === "" ? undefined : debounce(300),
+      },
+    );
+  };
 
   return (
     <search>
@@ -100,113 +151,76 @@ export function OssProjectsSidebar({
             </Button>
           )}
         </div>
+
         <FilterSection
           title="Topics"
           items={uniqueTopics}
-          filterKey="topic"
-          startSearchTransition={startTopicsSearchTransition}
-          isSearchLoading={isTopicsSearchLoading}
-          values={topicState}
-          setValues={setTopicState}
+          searchTerm={filters["topic-query"]}
+          onSearchChange={(value) => handleSearchChange("topic-query", value)}
+          selectedItems={uiSelectedTopics}
+          onItemSelectChange={(item, isChecked) =>
+            handleSelectionChange("topic", item, isChecked)
+          }
+          isLoading={isTopicQueryLoading}
           defaultOpen={true}
         />
         <FilterSection
           title="Languages"
           items={uniqueLanguages}
-          filterKey="language"
-          startSearchTransition={startLanguagesSearchTransition}
-          isSearchLoading={isLanguagesSearchLoading}
-          values={languageState}
-          setValues={setLanguageState}
+          searchTerm={filters["language-query"]}
+          onSearchChange={(value) =>
+            handleSearchChange("language-query", value)
+          }
+          selectedItems={uiSelectedLangs}
+          onItemSelectChange={(item, isChecked) =>
+            handleSelectionChange("language", item, isChecked)
+          }
+          isLoading={isLanguageQueryLoading}
         />
       </aside>
     </search>
   );
 }
 
+// ======================================================================
+// FilterSection Component
+// ======================================================================
 type FilterSectionProps = {
   title: string;
   items: string[];
-  filterKey: "topic" | "language";
-  startSearchTransition: TransitionStartFunction;
-  isSearchLoading: boolean;
-  values: FilterSectionState;
-  setValues: (values: NullableFilterUpdatePayload) => Promise<URLSearchParams>;
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
+  selectedItems: string[];
+  onItemSelectChange: (item: string, isChecked: boolean) => void;
+  isLoading: boolean;
   defaultOpen?: boolean;
 };
-
-// -----------------------------------------------
-//
-//
-//
-//
-//  FilterSection
-//
-//
-//
-//
-// -----------------------------------------------
 
 function FilterSection({
   title,
   items,
-  filterKey,
-  startSearchTransition,
-  isSearchLoading,
-  values,
-  setValues,
+  searchTerm,
+  onSearchChange,
+  selectedItems,
+  onItemSelectChange,
+  isLoading,
   defaultOpen,
 }: FilterSectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
-  const filterValues = values[filterKey] ?? [];
-  const selectedFiltersCount = filterValues.length;
 
-  const searchQueryKey =
-    filterKey === "topic" ? "topic-query" : "language-query";
+  // ✍️ Handlers to clear the search input via button click or Escape key.
+  const clearSearch = useCallback(() => {
+    onSearchChange("");
+  }, [onSearchChange]);
 
-  const [search, setSearch] = useQueryStates(
-    {
-      [searchQueryKey]: parseAsString.withDefault(""),
-      page: parseAsInteger.withDefault(1),
-    },
-    { startTransition: startSearchTransition, shallow: false, history: "push" },
-  );
-  const searchTerm = search[searchQueryKey] ?? "";
-
-  const handleSearchChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      setSearch(
-        { [searchQueryKey]: value, page: null },
-        { limitUrlUpdates: value === "" ? undefined : debounce(300) },
-      );
-    },
-    [setSearch, searchQueryKey],
-  );
-
-  const handleSearchKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
-      const target = e.target as HTMLInputElement;
-      if (e.key === "Enter") {
-        setSearch({ [searchQueryKey]: target.value, page: null });
-      } else if (e.key === "Escape") {
-        setSearch({ [searchQueryKey]: null, page: null });
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Escape") {
+        clearSearch();
       }
     },
-    [setSearch, searchQueryKey],
+    [clearSearch],
   );
-
-  const clearSearch = useCallback(() => {
-    setSearch({ [searchQueryKey]: null, page: null });
-  }, [setSearch, searchQueryKey]);
-
-  const onCheckedChange = (isChecked: boolean, item: string) => {
-    const newValues = isChecked
-      ? [...filterValues, item]
-      : filterValues.filter((filter) => filter !== item);
-
-    setValues({ [filterKey]: newValues, page: null });
-  };
 
   return (
     <div>
@@ -221,96 +235,83 @@ function FilterSection({
           <Icons.chevronRight className="size-5" />
         </motion.div>
         <span className="text-sm font-medium">{title}</span>
-        {selectedFiltersCount > 0 && (
+        {selectedItems.length > 0 && (
           <Badge variant="outline" className="ml-auto tabular-nums">
-            {selectedFiltersCount}
+            {selectedItems.length}
           </Badge>
         )}
       </button>
-      <>
-        {isOpen && (
-          <div className="space-y-2">
-            <div className="grid grid-cols-1 items-center">
-              <Input
-                type="search"
-                placeholder={`Search ${title.toLowerCase()}…`}
-                value={searchTerm}
-                className={cn("col-start-1 row-start-1 pl-8")}
-                onChange={handleSearchChange}
-                onKeyDown={handleSearchKeyDown}
-              />
-              <div className="pointer-events-none col-start-1 row-start-1 w-fit pl-3">
-                <Icons.search className="size-4 text-muted-foreground" />
-              </div>
-              {searchTerm && (
-                <div className="pointer-events-none col-start-1 row-start-1 flex items-center justify-end pr-3">
-                  <button
-                    onClick={clearSearch}
-                    className="pointer-events-auto cursor-pointer rounded border bg-background px-1.5 py-0.5 text-xs text-muted-foreground transition-colors"
-                    aria-label="Clear search"
-                  >
-                    esc
-                  </button>
-                </div>
-              )}
+      {isOpen && (
+        <div className="space-y-2">
+          <div className="grid grid-cols-1 items-center">
+            <Input
+              type="search"
+              placeholder={`Search ${title.toLowerCase()}…`}
+              value={searchTerm}
+              onChange={(e) => onSearchChange(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="col-start-1 row-start-1 pl-9"
+            />
+            <div className="pointer-events-none col-start-1 row-start-1 w-fit pl-3">
+              <Icons.search className="size-4 text-muted-foreground" />
             </div>
-            <div className="relative">
-              {isSearchLoading && (
-                <div
-                  className="absolute top-[10px] left-1/2 z-10 -translate-x-1/2"
-                  aria-hidden="true"
+            {searchTerm && (
+              <div className="pointer-events-none col-start-1 row-start-1 flex items-center justify-end pr-3">
+                <button
+                  onClick={clearSearch}
+                  className="pointer-events-auto cursor-pointer rounded border bg-background px-1.5 py-0.5 text-xs text-muted-foreground transition-colors"
+                  aria-label="Clear search"
                 >
-                  <Icons.spinner className="size-6 animate-spin text-sky-700" />
-                </div>
-              )}
-              <ScrollArea
-                className={cn(
-                  "h-60",
-                  "[&_[data-slot=scroll-area-viewport]]:[mask-image:linear-gradient(to_bottom,transparent,black_5%,black_95%,transparent)]",
-                  isSearchLoading
-                    ? "pointer-events-none opacity-50"
-                    : "opacity-100",
-                )}
-              >
-                <div className={"flex flex-col pr-4"}>
-                  {items.length > 0 ? (
-                    items.map((item) => (
-                      <FilterItem
-                        key={item}
-                        label={item}
-                        isChecked={filterValues.includes(item)}
-                        onCheckedChange={(isChecked: boolean) =>
-                          onCheckedChange(isChecked, item)
-                        }
-                      />
-                    ))
-                  ) : (
-                    <p className="mt-[10px] text-center text-sm text-muted-foreground">
-                      No {title.toLowerCase()} found.
-                    </p>
-                  )}
-                </div>
-              </ScrollArea>
-            </div>
+                  esc
+                </button>
+              </div>
+            )}
           </div>
-        )}
-      </>
+          <div className="relative">
+            {isLoading && (
+              <div
+                className="absolute top-[10px] left-1/2 z-10 -translate-x-1/2"
+                aria-hidden="true"
+              >
+                <Icons.spinner className="size-6 animate-spin text-sky-700" />
+              </div>
+            )}
+            <ScrollArea
+              className={cn(
+                "h-60",
+                "[&_[data-slot=scroll-area-viewport]]:[mask-image:linear-gradient(to_bottom,transparent,black_5%,black_95%,transparent)]",
+                isLoading ? "pointer-events-none opacity-50" : "opacity-100",
+              )}
+            >
+              <div className="flex flex-col pr-4">
+                {items.length > 0 ? (
+                  items.map((item) => (
+                    <FilterItem
+                      key={item}
+                      label={item}
+                      isChecked={selectedItems.includes(item)}
+                      onCheckedChange={(isChecked) =>
+                        onItemSelectChange(item, isChecked)
+                      }
+                    />
+                  ))
+                ) : (
+                  <p className="mt-[10px] text-center text-sm text-muted-foreground">
+                    No {title.toLowerCase()} found.
+                  </p>
+                )}
+              </div>
+            </ScrollArea>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-// -----------------------------------------------
-//
-//
-//
-//
-//  FilterItem
-//
-//
-//
-//
-// -----------------------------------------------
-
+// ======================================================================
+// FilterItem Component
+// ======================================================================
 function FilterItem({
   label,
   isChecked,
@@ -321,18 +322,11 @@ function FilterItem({
   onCheckedChange: (isChecked: boolean) => void;
 }) {
   return (
-    <label
-      className={cn(
-        "flex cursor-pointer items-center gap-x-3 rounded-md px-2 py-1.5",
-        "transition-colors hover:bg-accent",
-      )}
-    >
+    <label className="flex cursor-pointer items-center gap-x-3 rounded-md px-2 py-1.5 transition-colors hover:bg-accent">
       <Checkbox
         checked={isChecked}
         onCheckedChange={(checked) => onCheckedChange(checked as boolean)}
-        className={cn(
-          "data-[state=checked]:border-sky-700 data-[state=checked]:bg-sky-700 data-[state=checked]:text-white",
-        )}
+        className="data-[state=checked]:border-sky-700 data-[state=checked]:bg-sky-700 data-[state=checked]:text-white"
       />
       <span className="text-sm">{label}</span>
     </label>
