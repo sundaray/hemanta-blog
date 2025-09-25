@@ -21,7 +21,11 @@ import {
 } from "nuqs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { OssProjectsSearchParams } from "@/lib/search-params";
+import {
+  type OssProjectsSearchParams,
+  type FilterSectionState,
+  type NullableFilterUpdatePayload,
+} from "@/lib/search-params";
 
 type OssProjectsSidebarProps = {
   uniqueTopics: string[];
@@ -38,7 +42,6 @@ export function OssProjectsSidebar({
   className,
   startTopicsToggleTransition,
   startLanguagesToggleTransition,
-  isClearing,
 }: OssProjectsSidebarProps) {
   const [isTopicsSearchLoading, startTopicsSearchTransition] = useTransition();
   const [isLanguagesSearchLoading, startLanguagesSearchTransition] =
@@ -70,7 +73,7 @@ export function OssProjectsSidebar({
     },
   );
 
-  // 🔹 Determine if any filters are active to conditionally show the button
+  // 🔹 Determine if any filters are active to conditionally show the Clear button
   const hasActiveFilters =
     topicState.topic.length > 0 || languageState.language.length > 0;
 
@@ -127,15 +130,8 @@ type FilterSectionProps = {
   filterKey: "topic" | "language";
   startSearchTransition: TransitionStartFunction;
   isSearchLoading: boolean;
-  values: Pick<OssProjectsSearchParams, "page"> &
-    Partial<Pick<OssProjectsSearchParams, "topic" | "language">>;
-  setValues: (
-    values: Partial<{
-      topic: string[] | null;
-      language: string[] | null;
-      page: number | null;
-    }>,
-  ) => Promise<URLSearchParams>;
+  values: FilterSectionState;
+  setValues: (values: NullableFilterUpdatePayload) => Promise<URLSearchParams>;
   defaultOpen?: boolean;
 };
 

@@ -20,13 +20,14 @@ export type OssProjectsSearchParams = Awaited<
   ReturnType<typeof searchParamsCache.parse>
 >;
 
-export type option4 = Pick<OssProjectsSearchParams, "page"> &
+export type FilterSectionState = Pick<OssProjectsSearchParams, "page"> &
   Partial<Pick<OssProjectsSearchParams, "topic" | "language">>;
 
-export type option = Partial<
+export type FilterUpdatePayload = Partial<
   Pick<OssProjectsSearchParams, "page" | "topic" | "language">
 >;
 
-export type option2<T> = { [K in keyof T]: T[K] | null };
+export type WithNullableFields<T> = { [K in keyof T]: T[K] | null };
 
-export type option3 = option2<option>;
+export type NullableFilterUpdatePayload =
+  WithNullableFields<FilterUpdatePayload>;
