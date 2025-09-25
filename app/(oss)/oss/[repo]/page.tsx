@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation";
 import { getOssProjectByName } from "@/lib/get-oss-project-by-name";
 import { TopicTagGroup } from "@/components/ui/topic-tag-group";
-import { Separator } from "@/components/ui/separator";
 import { ArrowLink } from "@/components/ui/arrow-link";
 import { Icons } from "@/components/icons";
 import { cn } from "@/lib/utils";
+import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb";
+import { FaGithub } from "react-icons/fa";
 
 export default async function OssProjectDetailsPage(
   props: PageProps<"/oss/[repo]">,
@@ -30,7 +31,7 @@ export default async function OssProjectDetailsPage(
             <p className="mt-2 text-muted-foreground">{result.error.message}</p>
           </div>
           <ArrowLink href="/oss" className="mt-4">
-            Back to All Projects
+            Back to all projects
           </ArrowLink>
         </div>
       </div>
@@ -47,52 +48,52 @@ export default async function OssProjectDetailsPage(
 
   return (
     <div className="container mx-auto max-w-3xl px-4 sm:px-6">
-      <ArrowLink href="/oss" direction="left" className="mb-8 -ml-4">
-        Back to all projects
-      </ArrowLink>
-
+      {/* Breadcrumbs */}
+      <DynamicBreadcrumb className="mb-4" />
       <article className="flex flex-col gap-y-8">
         {/* Header */}
-        <div className="flex flex-col gap-y-4">
+        <div className="flex flex-col gap-y-8">
           <h1>{project.name}</h1>
           {project.description && (
-            <p className="text-lg text-neutral-700">{project.description}</p>
+            <p className="text-lg text-neutral-600">{project.description}</p>
           )}
         </div>
-
         <div className="flex flex-wrap items-center gap-4">
+          <a
+            href={project.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(
+              "inline-flex items-center justify-center gap-2 rounded-md font-semibold whitespace-nowrap",
+              "h-9 bg-primary px-4 py-2 text-primary-foreground transition-colors hover:bg-primary/90",
+            )}
+          >
+            <FaGithub className="size-4" />
+            View on GitHub
+          </a>
+
           {project.homepage && (
             <a
               href={project.homepage}
               target="_blank"
               rel="noopener noreferrer"
               className={cn(
-                "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap",
-                "h-9 bg-primary px-4 py-2 text-primary-foreground transition-colors hover:bg-primary/90",
+                "inline-flex items-center justify-center gap-2 font-semibold whitespace-nowrap",
+                "h-9 px-4 py-2 text-secondary-foreground",
               )}
             >
               <Icons.globe className="size-4" />
               Visit Homepage
             </a>
           )}
-          <a
-            href={project.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={cn(
-              "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap",
-              "h-9 border bg-secondary px-4 py-2 text-secondary-foreground transition-colors hover:bg-secondary/80",
-            )}
-          >
-            View on GitHub
-          </a>
         </div>
-
         {/* Topics Section */}
-        <div>
-          <h2 className="mb-4 text-2xl">Topics</h2>
-          <TopicTagGroup topics={project.topics ?? []} />
-        </div>
+        {project.topics && project.topics.length > 0 && (
+          <div>
+            <h2 className="mb-4">Topics</h2>
+            <TopicTagGroup topics={project.topics} />
+          </div>
+        )}
       </article>
     </div>
   );

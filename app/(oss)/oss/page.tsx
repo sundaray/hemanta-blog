@@ -4,6 +4,8 @@ import { searchParamsCache } from "@/lib/search-params";
 import { OssProjectsContent } from "@/components/oss-projects-content";
 import { getOssProjectFilterOptions } from "@/lib/get-oss-project-filters-options";
 import type { SearchParams } from "nuqs/server";
+import Link from "next/link";
+import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb";
 
 const PROJECTS_PER_PAGE = 36;
 
@@ -47,6 +49,7 @@ export default async function OssPage({
   return (
     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="text-center">
+        <DynamicBreadcrumb className="mb-4 flex justify-center" />
         <h1>Open Source Software</h1>
         <p className="mx-auto mt-8 max-w-3xl text-lg text-pretty text-neutral-600">
           A collection of open-source projects I use or find interesting. Most

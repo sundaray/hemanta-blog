@@ -34,9 +34,11 @@ import {
   X,
   GitFork,
   Globe,
+  Slash,
 } from "lucide-react";
 
 export const Icons = {
+  slash: Slash,
   circleX: CircleX,
   filter: Filter,
   filterX: FilterX,
