@@ -6,7 +6,12 @@ import { searchParams } from "@/lib/search-params";
 import { OssProjectsContent } from "@/components/oss-projects-content";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Suspense, useDeferredValue } from "react";
-import { SelectOssProject } from "@/db/schema";
+import type { SelectOssProject } from "@/db/schema";
+import {
+  getOssProjectsAction,
+  getOssProjectsCountAction,
+  getOssProjectFilterOptionsAction,
+} from "@/lib/actions";
 
 // A simple skeleton loader for the initial loading state.
 // This is shown via the <Suspense> boundary below.
@@ -23,20 +28,47 @@ function ProjectsSkeleton() {
 function ProjectsInner() {
   // 🔗 This hook reads the filters from the URL.
   const [filters] = useQueryStates(searchParams);
-  // ✨ useDeferredValue is a React hook that makes the UI more responsive
-  // by deferring updates during rapid changes (like typing in a search box).
+
   const deferredFilters = useDeferredValue(filters);
 
-  const filterOptionsKey = {
-    topicQuery: deferredFilters["topic-query"],
-    languageQuery: deferredFilters["language-query"],
-  };
+  const projectsQueryKey = ["oss-projects", deferredFilters];
+  const totalProjectsQueryKey = ["oss-projects-count", deferredFilters];
+  const filterOptionsQueryKey = [
+    "oss-filter-options",
+    {
+      topicQuery: deferredFilters["topic-query"],
+      languageQuery: deferredFilters["language-query"],
+    },
+  ];
 
   // 🚀 This single hook fetches all our data in parallel.
-  // It hydrates the initial data from the server and handles client-side
-  // fetching for all subsequent updates.
-
-  // ✨ We now get the isFetching status to pass down for our fine-grained spinners.
+  // On initial load, it uses the hydrated data from the server.
+  // On subsequent filter changes, it fetches new data on the client.
+  const [projectsResult, totalProjectsResult, filterOptionsResult] =
+    useSuspenseQueries({
+      queries: [
+        {
+          queryKey: projectsQueryKey,
+          // 🔧 FIX: Call the Server Action instead
+          queryFn: () => getOssProjectsAction(deferredFilters),
+        },
+        {
+          queryKey: totalProjectsQueryKey,
+          // 🔧 FIX: Call the Server Action instead
+          queryFn: () => getOssProjectsCountAction(deferredFilters),
+        },
+        {
+          queryKey: filterOptionsQueryKey,
+          // 🔧 FIX: Call the Server Action instead
+          queryFn: () =>
+            getOssProjectFilterOptionsAction({
+              topicQuery: deferredFilters["topic-query"],
+              languageQuery: deferredFilters["language-query"],
+            }),
+        },
+      ],
+    });
+  // ✨ We get the isFetching status to pass down for our fine-grained spinners.
   const isProjectsFetching =
     projectsResult.isFetching || totalProjectsResult.isFetching;
   const isFilterOptionsFetching = filterOptionsResult.isFetching;
@@ -67,8 +99,8 @@ function ProjectsInner() {
 
 export function OssProjectsPageClient() {
   return (
-    // ⏳ Suspense handles the initial loading state, showing the skeleton
-    // while data is streamed from the server.
+    // ⏳ Suspense handles client-side loading states (e.g., when filters change).
+    // The initial load will be instant because the data is already hydrated.
     <Suspense fallback={<ProjectsSkeleton />}>
       <ProjectsInner />
     </Suspense>

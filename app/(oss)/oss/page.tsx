@@ -1,3 +1,4 @@
+// 🔄 app/(oss)/oss/page.tsx (Updated)
 import {
   HydrationBoundary,
   QueryClient,
@@ -7,21 +8,52 @@ import type { SearchParams } from "nuqs/server";
 import { searchParamsCache } from "@/lib/search-params";
 import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb";
 import { OssProjectsPageClient } from "@/components/oss-projects-page-client";
+import { getOssProjects, getOssProjectsCount } from "@/lib/get-oss-projects"; // 🔹 Import data fetching functions
+import { getOssProjectFilterOptions } from "@/lib/get-oss-project-filters-options"; // 🔹 Import data fetching functions
+import { unwrapResult } from "@/lib/utils"; // 🔹 Import a helper to unwrap the result
 
 export default async function OssPage({
   searchParams,
 }: {
   searchParams: SearchParams;
 }) {
+  // 🔹 Per the docs, create a new QueryClient for each server render
   const queryClient = new QueryClient();
   const filters = await searchParamsCache.parse(searchParams);
 
-  // 🚀 3. Kick off the queries on the server for prefetching.
-  // We do not `await` these. This allows the page to start streaming to the
-  // client while the data is being fetched in the background.
-  queryClient.prefetchQuery();
-  queryClient.prefetchQuery();
-  queryClient.prefetchQuery();
+  // 🔹 Define query keys. These must be identical on the client.
+  const projectsQueryKey = ["oss-projects", filters];
+  const totalProjectsQueryKey = ["oss-projects-count", filters];
+  const filterOptionsQueryKey = [
+    "oss-filter-options",
+    {
+      topicQuery: filters["topic-query"],
+      languageQuery: filters["language-query"],
+    },
+  ];
+
+  // 🚀 Await all prefetches in parallel to ensure data is ready before rendering.
+  // This fulfills your requirement for a spinner-free initial load.
+  await Promise.all([
+    queryClient.prefetchQuery({
+      queryKey: projectsQueryKey,
+      queryFn: () => unwrapResult(getOssProjects(filters)),
+    }),
+    queryClient.prefetchQuery({
+      queryKey: totalProjectsQueryKey,
+      queryFn: () => unwrapResult(getOssProjectsCount(filters)),
+    }),
+    queryClient.prefetchQuery({
+      queryKey: filterOptionsQueryKey,
+      queryFn: () =>
+        unwrapResult(
+          getOssProjectFilterOptions({
+            topicQuery: filters["topic-query"],
+            languageQuery: filters["language-query"],
+          }),
+        ),
+    }),
+  ]);
 
   return (
     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -34,6 +66,7 @@ export default async function OssPage({
           focus on my current tech stack: TypeScript, React, and PostgreSQL.
         </p>
       </div>
+      {/* 💧 Pass the dehydrated state to the client */}
       <HydrationBoundary state={dehydrate(queryClient)}>
         <OssProjectsPageClient />
       </HydrationBoundary>
