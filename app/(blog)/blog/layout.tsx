@@ -3,11 +3,11 @@ import { MainNav } from "@/components/navigation/main-nav";
 import { navbarLinks } from "@/config/navbar";
 
 export const metadata: Metadata = {
-  title: "OSS",
+  title: "Blog | hemantasundaray.com",
   description: "",
 };
 
-export default function OssPageLayout(props: LayoutProps<"/oss">) {
+export default function BlogPageLayout(props: LayoutProps<"/blog">) {
   return (
     <>
       <header>

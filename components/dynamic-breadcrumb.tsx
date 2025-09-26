@@ -41,7 +41,7 @@ export function DynamicBreadcrumb({ className }: DynamicBreadcrumbProps) {
           <BreadcrumbLink asChild>
             <Link
               href="/"
-              className="font-medium text-sky-700 hover:text-sky-700 hover:underline"
+              className="font-mono font-medium text-sky-700 hover:text-sky-700 hover:underline"
             >
               Home
             </Link>
@@ -53,17 +53,17 @@ export function DynamicBreadcrumb({ className }: DynamicBreadcrumbProps) {
 
           return (
             <React.Fragment key={href}>
-              <BreadcrumbSeparator>&gt;</BreadcrumbSeparator>
+              <BreadcrumbSeparator>/</BreadcrumbSeparator>
               <BreadcrumbItem>
                 {isLast ? (
-                  <BreadcrumbPage className="font-medium text-foreground">
+                  <BreadcrumbPage className="font-mono font-medium text-foreground">
                     {isOssDetailPage ? segment : unslugify(segment)}
                   </BreadcrumbPage>
                 ) : (
                   <BreadcrumbLink asChild>
                     <Link
                       href={href}
-                      className="font-medium text-sky-700 hover:text-sky-700 hover:underline"
+                      className="font-mono font-medium text-sky-700 hover:text-sky-700 hover:underline"
                     >
                       {unslugify(segment)}
                     </Link>

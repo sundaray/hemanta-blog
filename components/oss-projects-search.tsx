@@ -7,7 +7,7 @@ import * as React from "react";
 import { useQueryStates, parseAsString, parseAsInteger, debounce } from "nuqs";
 import { useCallback } from "react";
 
-export function OssProjectSearch({
+export function OssProjectsSearch({
   className,
   startTransition,
 }: {

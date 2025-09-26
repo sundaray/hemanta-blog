@@ -7,7 +7,7 @@ import { OssProjectsSidebar } from "@/components/oss-projects-sidebar";
 import { OssProjectCard } from "@/components/oss-project-card";
 import { OssProjectsSearchResultsHeader } from "@/components/oss-projects-search-results-header";
 import { Icons } from "@/components/icons";
-import { OssProjectSearch } from "@/components/oss-project-search";
+import { OssProjectsSearch } from "@/components/oss-projects-search";
 import { OssProjectsPagination } from "@/components/oss-projects-pagination";
 
 type OssContentProps = {
@@ -45,7 +45,7 @@ export function OssProjectsContent({
 
   return (
     <>
-      <OssProjectSearch
+      <OssProjectsSearch
         className="mt-24 mb-8"
         startTransition={startSearchTransition}
       />

@@ -1,7 +1,6 @@
 import { z } from "zod";
 import type { Route } from "next";
 import type { LucideIcon } from "lucide-react";
-import type { FieldError } from "react-hook-form";
 import { AddOssProjectFormSchema } from "@/lib/schema";
 
 export interface Frontmatter {
