@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
 import { RouterProvider } from "@/components/router-provider";
+import { TanstackQueryprovider } from "@/components/tanstack-query-provider";
 import "./globals.css";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
@@ -27,9 +28,11 @@ export default function RootLayout(props: LayoutProps<"/">) {
         className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
       >
         <NextTopLoader showSpinner={false} color="#0ea5e9" shadow={false} />
-        <RouterProvider>
-          <NuqsAdapter>{props.children}</NuqsAdapter>
-        </RouterProvider>
+        <TanstackQueryprovider>
+          <RouterProvider>
+            <NuqsAdapter>{props.children}</NuqsAdapter>
+          </RouterProvider>
+        </TanstackQueryprovider>
       </body>
     </html>
   );
