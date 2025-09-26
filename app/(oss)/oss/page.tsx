@@ -1,53 +1,27 @@
-import { getOssProjects, getOssProjectsCount } from "@/lib/get-oss-projects";
-import { Icons } from "@/components/icons";
-import { searchParamsCache } from "@/lib/search-params";
-import { OssProjectsContent } from "@/components/oss-projects-content";
-import { getOssProjectFilterOptions } from "@/lib/get-oss-project-filters-options";
+import {
+  HydrationBoundary,
+  QueryClient,
+  dehydrate,
+} from "@tanstack/react-query";
 import type { SearchParams } from "nuqs/server";
+import { searchParamsCache } from "@/lib/search-params";
 import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb";
-
-const PROJECTS_PER_PAGE = 36;
+import { OssProjectsPageClient } from "@/components/oss-projects-page-client";
 
 export default async function OssPage({
   searchParams,
 }: {
   searchParams: SearchParams;
 }) {
-  // 🔹 Parse filters from URL search params
+  const queryClient = new QueryClient();
   const filters = await searchParamsCache.parse(searchParams);
 
-  // 🔹 Fetch filter options and filtered projects in parallel
-  const [filterOptionsResult, projectsResult, totalProjectsResult] =
-    await Promise.all([
-      getOssProjectFilterOptions({
-        topicQuery: filters["topic-query"],
-        languageQuery: filters["language-query"],
-      }),
-      getOssProjects(filters),
-      getOssProjectsCount(filters),
-    ]);
-
-  if (
-    filterOptionsResult.isErr() ||
-    projectsResult.isErr() ||
-    totalProjectsResult.isErr()
-  ) {
-    return (
-      <div className="container mx-auto flex items-center justify-center">
-        <div className="flex items-center gap-x-2">
-          <Icons.alertTriangle className="size-5 shrink-0" />
-          <h2 className="text-2xl font-semibold tracking-tight text-red-600">
-            Error Fetching Projects
-          </h2>
-        </div>
-      </div>
-    );
-  }
-
-  const projects = projectsResult.value;
-  const totalProjects = totalProjectsResult.value;
-  const totalPages = Math.ceil(totalProjects / PROJECTS_PER_PAGE);
-  const { uniqueTopics, uniqueLanguages } = filterOptionsResult.value;
+  // 🚀 3. Kick off the queries on the server for prefetching.
+  // We do not `await` these. This allows the page to start streaming to the
+  // client while the data is being fetched in the background.
+  queryClient.prefetchQuery();
+  queryClient.prefetchQuery();
+  queryClient.prefetchQuery();
 
   return (
     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -60,14 +34,9 @@ export default async function OssPage({
           focus on my current tech stack: TypeScript, React, and PostgreSQL.
         </p>
       </div>
-
-      <OssProjectsContent
-        projects={projects}
-        uniqueTopics={uniqueTopics}
-        uniqueLanguages={uniqueLanguages}
-        totalPages={totalPages}
-        totalProjects={totalProjects}
-      />
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <OssProjectsPageClient />
+      </HydrationBoundary>
     </div>
   );
 }

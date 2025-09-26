@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  useState,
-  useTransition,
-  useCallback,
-  type TransitionStartFunction,
-  useEffect,
-  KeyboardEvent,
-} from "react";
+import { useState, useCallback, type KeyboardEvent, useEffect } from "react";
 import { motion } from "motion/react";
 import { Icons } from "@/components/icons";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -23,8 +16,7 @@ type OssProjectsSidebarProps = {
   uniqueTopics: string[];
   uniqueLanguages: string[];
   className?: string;
-  startTopicsToggleTransition: TransitionStartFunction;
-  startLanguagesToggleTransition: TransitionStartFunction;
+  isFiltering: boolean;
 };
 
 // ======================================================================
@@ -34,25 +26,16 @@ export function OssProjectsSidebar({
   uniqueTopics,
   uniqueLanguages,
   className,
-  startTopicsToggleTransition,
-  startLanguagesToggleTransition,
+  isFiltering,
 }: OssProjectsSidebarProps) {
-  // 🔹 Transitions for the spinners inside each filter section's search
-  const [isTopicQueryLoading, startTopicQueryTransition] = useTransition();
-  const [isLanguageQueryLoading, startLanguageQueryTransition] =
-    useTransition();
-
-  // 🔹 The "source of truth" state that is synced with the URL
   const [filters, setFilters] = useQueryStates(searchParams, {
     shallow: false,
     history: "push",
   });
 
-  // ✍️ Local "UI state" for checkboxes to provide INSTANT visual feedback.
   const [uiSelectedTopics, setUiSelectedTopics] = useState(filters.topic);
   const [uiSelectedLangs, setUiSelectedLangs] = useState(filters.language);
 
-  // ✍️ Effects to keep the instant UI state in sync with the URL state (e.g., for back/forward navigation).
   useEffect(() => {
     setUiSelectedTopics(filters.topic);
   }, [filters.topic]);
@@ -61,7 +44,6 @@ export function OssProjectsSidebar({
     setUiSelectedLangs(filters.language);
   }, [filters.language]);
 
-  // ✍️ The "Clear" button's visibility is now based on the instant UI state.
   const hasActiveFilters =
     uiSelectedTopics.length > 0 ||
     uiSelectedLangs.length > 0 ||
@@ -69,44 +51,19 @@ export function OssProjectsSidebar({
     filters["language-query"] !== "";
 
   const handleClearAllFilters = useCallback(() => {
-    const mainGridFiltersWereActive =
-      uiSelectedTopics.length > 0 || uiSelectedLangs.length > 0;
-    const topicQueryWasActive = filters["topic-query"] !== "";
-    const langQueryWasActive = filters["language-query"] !== "";
-
     // Instantly clear the UI for checkboxes
     setUiSelectedTopics([]);
     setUiSelectedLangs([]);
 
     // Define the state update action
-    const clearAction = () => {
-      setFilters({
-        topic: null,
-        language: null,
-        "topic-query": null,
-        "language-query": null,
-        page: null,
-      });
-    };
-
-    if (mainGridFiltersWereActive) {
-      startTopicsToggleTransition(clearAction);
-    }
-    if (topicQueryWasActive) {
-      startTopicQueryTransition(clearAction);
-    }
-    if (langQueryWasActive) {
-      startLanguageQueryTransition(clearAction);
-    }
-  }, [
-    uiSelectedTopics.length,
-    uiSelectedLangs.length,
-    filters,
-    setFilters,
-    startTopicsToggleTransition,
-    startTopicQueryTransition,
-    startLanguageQueryTransition,
-  ]);
+    setFilters({
+      topic: null,
+      language: null,
+      "topic-query": null,
+      "language-query": null,
+      page: null,
+    });
+  }, [setFilters]);
 
   const handleSelectionChange = (
     key: "topic" | "language",
@@ -126,14 +83,7 @@ export function OssProjectsSidebar({
       setUiSelectedLangs(newUiValues);
     }
 
-    // ✍️ SECOND, start a transition to update the "real" filters and fetch the main grid data.
-    const transition =
-      key === "topic"
-        ? startTopicsToggleTransition
-        : startLanguagesToggleTransition;
-    transition(() => {
-      setFilters({ [key]: newUiValues, page: null });
-    });
+    setFilters({ [key]: newUiValues, page: null });
   };
 
   // ✍️ This handler uses `nuqs`'s built-in debouncing for an instant typing experience.
@@ -141,16 +91,10 @@ export function OssProjectsSidebar({
     key: "topic-query" | "language-query",
     value: string,
   ) => {
-    const transition =
-      key === "topic-query"
-        ? startTopicQueryTransition
-        : startLanguageQueryTransition;
-
     // ✍️ `nuqs` updates its returned state instantly, but debounces the URL update.
     setFilters(
       { [key]: value, page: null },
       {
-        startTransition: transition,
         limitUrlUpdates: value === "" ? undefined : debounce(300),
       },
     );
@@ -183,7 +127,7 @@ export function OssProjectsSidebar({
           onItemSelectChange={(item, isChecked) =>
             handleSelectionChange("topic", item, isChecked)
           }
-          isLoading={isTopicQueryLoading}
+          isLoading={isFiltering}
           defaultOpen={true}
         />
         <FilterSection
@@ -197,7 +141,7 @@ export function OssProjectsSidebar({
           onItemSelectChange={(item, isChecked) =>
             handleSelectionChange("language", item, isChecked)
           }
-          isLoading={isLanguageQueryLoading}
+          isLoading={isFiltering}
         />
       </aside>
     </search>

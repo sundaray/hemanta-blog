@@ -20,16 +20,13 @@ const SIBLING_COUNT = 2;
 type OssProjectsPaginationProps = {
   totalPages: number;
   className?: string;
-  startTransition: TransitionStartFunction;
 };
 
 export function OssProjectsPagination({
   totalPages,
   className,
-  startTransition,
 }: OssProjectsPaginationProps) {
   const [filters, setFilters] = useQueryStates(searchParams, {
-    startTransition,
     shallow: false,
     scroll: true,
   });

@@ -1,4 +1,4 @@
-import { ResultAsync } from "neverthrow";
+import { Result, ResultAsync } from "neverthrow";
 import { db } from "@/db";
 import { ossProjects, type SelectOssProject } from "@/db/schema";
 import { DatabaseError } from "./errors";
@@ -40,9 +40,9 @@ function buildConditions(
 }
 
 // 🔹 Get the total count of filtered projects
-export function getOssProjectsCount(
+export async function getOssProjectsCount(
   filters: Omit<OssProjectsSearchParams, "page">,
-): ResultAsync<number, DatabaseError> {
+): Promise<Result<number, DatabaseError>> {
   const conditions = buildConditions(filters);
   const whereClause = and(
     ...conditions.filter((c): c is SQL => c !== undefined),
@@ -63,9 +63,9 @@ export function getOssProjectsCount(
   );
 }
 
-export function getOssProjects(
+export async function getOssProjects(
   filters: OssProjectsSearchParams,
-): ResultAsync<SelectOssProject[], DatabaseError> {
+): Promise<Result<SelectOssProject[], DatabaseError>> {
   const pageSize = 36;
   const conditions = buildConditions(filters);
   const whereClause = and(

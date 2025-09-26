@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import type { SelectOssProject } from "@/db/schema";
 import { OssProjectsSidebar } from "@/components/oss-projects-sidebar";
@@ -16,6 +16,8 @@ type OssContentProps = {
   uniqueLanguages: string[];
   totalPages: number;
   totalProjects: number;
+  isProjectsFetching: boolean;
+  isFilterOptionsFetching: boolean;
 };
 
 export function OssProjectsContent({
@@ -24,20 +26,10 @@ export function OssProjectsContent({
   uniqueLanguages,
   totalPages,
   totalProjects,
+  isProjectsFetching,
+  isFilterOptionsFetching,
 }: OssContentProps) {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
-
-  const [isSearchLoading, startSearchTransition] = useTransition();
-  const [isTopicsToggleLoading, startTopicsToggleTransition] = useTransition();
-  const [isLanguagesToggleLoading, startLanguagesToggleTransition] =
-    useTransition();
-  const [isPaginating, startPaginationTransition] = useTransition();
-
-  const isAnyToggleLoading = Boolean(
-    isTopicsToggleLoading || isLanguagesToggleLoading,
-  );
-
-  const isGridLoading = isSearchLoading || isAnyToggleLoading || isPaginating;
 
   const toggleSidebar = () => {
     setIsSidebarVisible((prev) => !prev);
@@ -45,10 +37,7 @@ export function OssProjectsContent({
 
   return (
     <>
-      <OssProjectsSearch
-        className="mt-24 mb-8"
-        startTransition={startSearchTransition}
-      />
+      <OssProjectsSearch className="mt-24 mb-8" />
 
       <OssProjectsSearchResultsHeader
         isSidebarVisible={isSidebarVisible}
@@ -64,14 +53,13 @@ export function OssProjectsContent({
             uniqueTopics={uniqueTopics}
             uniqueLanguages={uniqueLanguages}
             className="hidden w-64 lg:sticky lg:top-24 lg:block lg:self-start"
-            startTopicsToggleTransition={startTopicsToggleTransition}
-            startLanguagesToggleTransition={startLanguagesToggleTransition}
+            isFiltering={isFilterOptionsFetching}
           />
         )}
 
         <div className="flex-1">
           <div className="relative">
-            {isGridLoading && (
+            {isProjectsFetching && (
               <div
                 className="absolute top-[20px] left-1/2 z-30 -translate-x-1/2"
                 aria-hidden="true"
@@ -84,7 +72,7 @@ export function OssProjectsContent({
               className={cn(
                 "grid grid-cols-1 gap-8 sm:grid-cols-2",
                 isSidebarVisible ? "lg:grid-cols-3" : "lg:grid-cols-4",
-                isGridLoading
+                isProjectsFetching
                   ? "pointer-events-none opacity-30"
                   : "opacity-100",
                 "transition-opacity",
@@ -105,10 +93,7 @@ export function OssProjectsContent({
               )}
             </div>
 
-            <OssProjectsPagination
-              totalPages={totalPages}
-              startTransition={startPaginationTransition}
-            />
+            <OssProjectsPagination totalPages={totalPages} />
           </div>
         </div>
       </div>

@@ -7,19 +7,13 @@ import * as React from "react";
 import { useQueryStates, parseAsString, parseAsInteger, debounce } from "nuqs";
 import { useCallback } from "react";
 
-export function OssProjectsSearch({
-  className,
-  startTransition,
-}: {
-  className?: string;
-  startTransition: React.TransitionStartFunction;
-}) {
+export function OssProjectsSearch({ className }: { className?: string }) {
   const [values, setValues] = useQueryStates(
     {
       query: parseAsString.withDefault(""),
       page: parseAsInteger.withDefault(1),
     },
-    { startTransition, shallow: false, history: "push" },
+    { shallow: false, history: "push" },
   );
 
   const clearSearch = useCallback(() => {

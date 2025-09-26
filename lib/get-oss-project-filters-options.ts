@@ -1,16 +1,13 @@
-import "server-only";
-
 import { db } from "@/db";
 import { ossProjects } from "@/db/schema";
-import { ResultAsync } from "neverthrow";
+import { Result, ResultAsync } from "neverthrow";
 import { DatabaseError } from "./errors";
 
-export function getOssProjectFilterOptions(filters: {
+export async function getOssProjectFilterOptions(filters: {
   topicQuery: string;
   languageQuery: string;
-}): ResultAsync<
-  { uniqueTopics: string[]; uniqueLanguages: string[] },
-  DatabaseError
+}): Promise<
+  Result<{ uniqueTopics: string[]; uniqueLanguages: string[] }, DatabaseError>
 > {
   return ResultAsync.fromPromise(
     db
