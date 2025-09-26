@@ -20,7 +20,7 @@ export function BlogSearch({ className }: { className?: string }) {
           onChange={(e) => handleSearch(e.target.value)}
         />
         <div className="pointer-events-none col-start-1 row-start-1 pl-3">
-          <Icons.search className="size-4 text-muted-foreground" />
+          <Icons.search className="size-5 text-muted-foreground" />
         </div>
       </div>
     </div>
