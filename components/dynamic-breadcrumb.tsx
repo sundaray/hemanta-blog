@@ -29,10 +29,10 @@ function unslugify(slug: string): string {
 
 export function DynamicBreadcrumb({ className }: DynamicBreadcrumbProps) {
   const pathname = usePathname();
-  const segments = pathname.split("/").filter(Boolean);
+  const segments = pathname.split("/").filter(Boolean); // ✏️ We use the full, unmodified segments array
 
-  // 🔹 Check if the path matches the structure of an OSS detail page
   const isOssDetailPage = segments[0] === "oss" && segments.length === 2;
+  const isBlogPostPage = segments[0] === "blog" && segments.length === 2;
 
   return (
     <Breadcrumb className={cn(className)}>
@@ -48,6 +48,10 @@ export function DynamicBreadcrumb({ className }: DynamicBreadcrumbProps) {
           </BreadcrumbLink>
         </BreadcrumbItem>
         {segments.map((segment, index) => {
+          if (isBlogPostPage && index === segments.length - 1) {
+            return null;
+          }
+
           const href = `/${segments.slice(0, index + 1).join("/")}`;
           const isLast = index === segments.length - 1;
 

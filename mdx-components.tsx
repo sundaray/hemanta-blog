@@ -1,4 +1,4 @@
-import { CodeBlockWrapper } from "@/components/code-block-wrapper";
+import { CodeBlockWrapper } from "@/components/blog/code-block-wrapper";
 import { Icons } from "@/components/icons";
 import { slugify } from "@/lib/utils";
 import type { MDXComponents } from "mdx/types";

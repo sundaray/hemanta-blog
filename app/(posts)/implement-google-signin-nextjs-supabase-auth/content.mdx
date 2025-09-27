@@ -1,0 +1,97 @@
+---
+title: "How to Implement Google Sign-In in Next.js with Supabase Auth"
+description: "Learn how to integrate Google Sign-in in your Next.js app using Supabase Auth."
+author: "Hemanta Sundaray"
+publishedAt: "2025-09-26"
+tags: ["Next.js", "Supabase Auth"]
+isPublished: true
+---
+
+If you want to integrate "Sign in with Google" in your Next.js app using Supabase Auth, you're in the right place.
+
+In this comprehensive guide, you'll learn how to:
+
+- Set up a Supabase project and configure Google Cloud for OAuth
+- Implement Google Sign-in in your Next.js application
+- Access user information inside both client and server components
+- Protect routes using middleware
+- Assign roles to users using Supabase auth hooks
+- Create and manage a users table in the public schema
+
+Let's get started!
+
+## Create a Supabase Project
+
+- Go to supabase.com/dashboard/projects (sign in if you have an account, or create one if you don't).
+
+- Click on **New project**.
+
+- Give your project a name, choose a database password, select a region, and then click on **Create new project**.
+
+- The project setup may take a minute or two to complete. Once the setup is finished, scroll down the page to find the Project API and JWT Settings sections.
+
+  From the Project API section, copy the Project URL and API Key. From the JWT Settings section, copy the JWT Secret. Save these three values somewhere safe - we'll need them later in our setup process.
+
+  You'll notice that the API Key is tagged with anon and public. This anon key (short for anonymous) is a public key that's safe to use in a browser, but only if you've enabled RLS (row-level security) for your tables and configured appropriate policies.
+
+## Set up Supabase clients
+
+We need to set up two different Supabase clients.
+
+Create a new folder named `supabase` inside the `lib` folder, and inside `supabase`, create two files: `client.ts` and `server.ts`.
+
+In `client.ts`, add the following code:
+
+```ts title="lib/supabase/client.ts"
+import "client-only";
+
+import { createBrowserClient } from "@supabase/ssr";
+
+export function createClient() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  );
+}
+```
+
+In `server.ts`, add the following code:
+
+```ts title="lib/supabase/server.ts"
+import "server-only";
+
+import { cookies } from "next/headers";
+import { createServerClient } from "@supabase/ssr";
+
+export function createClient() {
+  const cookieStore = cookies();
+
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options),
+            );
+          } catch {
+            // The `setAll` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
+          }
+        },
+      },
+    },
+  );
+}
+```
+
+You might be wondering why we need two separate clients for Supabase Auth. The reason is that we use different methods to access Supabase depending on where we're making the call:
+
+- The `createClient` function in `client.ts` is used to access Supabase inside client components.
+- The `createClient` function in `server.ts` is used to access Supabase inside server components, server actions, and route handlers.

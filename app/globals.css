@@ -3,6 +3,53 @@
 
 @custom-variant dark (&:is(.dark *));
 
+[data-rehype-pretty-code-figure] {
+  @apply rounded-lg border border-border;
+
+  & [data-rehype-pretty-code-title] {
+    @apply flex-1 rounded-t-lg border-b py-3.5 pl-5 text-xs text-foreground dark:text-muted-foreground;
+  }
+  & pre {
+    @apply overflow-x-auto rounded-t-none rounded-b-lg bg-white font-mono dark:bg-transparent;
+  }
+
+  & code {
+    @apply text-[13px];
+  }
+
+  & [data-line] {
+    @apply block border-l-2 border-transparent px-4 first:pt-4 last:pb-4;
+  }
+
+  & [data-highlighted-line] {
+    @apply border-l-2 border-l-sky-500 bg-sky-50 dark:border-l-sky-500 dark:bg-sky-500/10;
+  }
+
+  & code[data-line-numbers] {
+    counter-reset: line;
+  }
+
+  & code[data-line-numbers] [data-line]::before {
+    @apply pr-4 text-neutral-400;
+    counter-increment: line;
+    content: counter(line);
+  }
+}
+
+/* --- Unchanged Shiki Dynamic Styles --- */
+pre.shiki {
+  background-color: var(--shiki-light-bg);
+}
+.dark pre.shiki {
+  background-color: var(--shiki-dark-bg);
+}
+code[data-theme] span {
+  color: var(--shiki-light);
+}
+.dark code[data-theme] span {
+  color: var(--shiki-dark);
+}
+
 @theme inline {
   --main-nav-height: 4rem;
   --color-background: var(--background);
@@ -134,6 +181,68 @@
   }
   h4 {
     @apply text-lg font-semibold tracking-tight text-foreground;
+  }
+}
+
+@layer components {
+  .link-focus {
+    @apply focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2 focus-visible:outline-none dark:focus-visible:ring-offset-background;
+  }
+
+  .blog-post h1 {
+    @apply text-6xl;
+  }
+
+  .blog-post h2 {
+    @apply mt-12 mb-4 text-2xl;
+  }
+
+  .blog-post h3 {
+    @apply mt-12 mb-4 text-xl;
+  }
+
+  .blog-post p {
+    @apply mb-6 leading-7 last:mb-0;
+  }
+
+  .blog-post p a {
+    @apply text-sky-700 underline underline-offset-4 dark:text-sky-300;
+  }
+
+  .blog-post ul,
+  .blog-post ol {
+    @apply mb-6 space-y-3 pl-8 marker:text-muted-foreground last:mb-0;
+  }
+
+  .blog-post ul {
+    @apply list-disc;
+  }
+  .blog-post ol {
+    @apply list-decimal;
+  }
+
+  .blog-post :not(pre) > code {
+    @apply rounded bg-neutral-200/60 px-1 py-0.5 font-mono text-sm text-foreground dark:bg-neutral-800;
+  }
+
+  .blog-post strong {
+    @apply font-semibold;
+  }
+
+  .blog-post figure {
+    @apply my-6;
+  }
+
+  .blog-post :where(h1, h2, h3, h4, h5, h6) {
+    @apply relative scroll-mt-20;
+  }
+
+  .blog-post .anchor {
+    @apply absolute top-1/2 -left-8 translate-x-2 -translate-y-1/2 cursor-pointer rounded-md p-1 text-muted-foreground opacity-0 transition-all duration-200 hover:text-foreground;
+  }
+
+  .blog-post :where(h1, h2, h3, h4, h5, h6):hover .anchor {
+    @apply translate-x-0 opacity-100;
   }
 }
 
