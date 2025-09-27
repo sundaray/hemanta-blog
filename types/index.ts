@@ -13,6 +13,10 @@ export interface Frontmatter {
   isPublished: boolean;
 }
 
+export type BlogPost = Frontmatter & {
+  slug: string;
+};
+
 export type NavItem = {
   title: string;
   href: Route;

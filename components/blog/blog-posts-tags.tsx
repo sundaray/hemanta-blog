@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, AnimatePresence } from "motion/react";
 import { useState, useRef, useEffect, useCallback } from "react";
 import {
   Button,
@@ -92,7 +93,7 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
           disabled={!canScrollLeft}
           aria-label="Scroll tags left"
           className={cn(
-            "z-10 flex size-9 items-center justify-center rounded-full border shadow-sm transition-opacity",
+            "z-10 flex size-9 items-center justify-center rounded-full border shadow-sm transition-opacity hover:bg-accent",
             "disabled:cursor-not-allowed disabled:opacity-30",
           )}
         >
@@ -140,7 +141,7 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
           disabled={!canScrollRight}
           aria-label="Scroll tags right"
           className={cn(
-            "z-10 flex size-9 shrink-0 items-center justify-center rounded-full border shadow-sm transition-opacity",
+            "z-10 flex size-9 shrink-0 items-center justify-center rounded-full border shadow-sm transition-opacity hover:bg-accent",
             "disabled:cursor-not-allowed disabled:opacity-30",
           )}
         >
