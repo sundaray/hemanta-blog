@@ -13,7 +13,7 @@ export default function BlogPage() {
   return (
     <div className="container mx-auto max-w-4xl px-4 sm:px-6">
       <h1>Blog</h1>
-      <p className="mt-4 text-lg text-neutral-600">
+      <p className="mt-4 text-lg font-semibold text-neutral-600">
         Posts on full-stack web development.
       </p>
 
@@ -24,7 +24,7 @@ export default function BlogPage() {
       <section className="divide-border-dashed mt-12 divide-y divide-border">
         {allPosts.map((post) => (
           <article key={post.slug} className="py-12">
-            <p className="font-mono text-xs text-neutral-500">
+            <p className="font-mono text-sm text-muted-foreground">
               {new Date(post.publishedAt).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "long",

@@ -71,11 +71,11 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
           disabled={!canScrollLeft}
           aria-label="Scroll tags left"
           className={cn(
-            "z-10 flex size-8 items-center justify-center rounded-full border bg-input shadow-sm transition-opacity",
+            "z-10 flex size-9 items-center justify-center rounded-full border shadow-sm transition-opacity",
             "disabled:cursor-not-allowed disabled:opacity-30",
           )}
         >
-          <Icons.chevronLeft className="size-6" />
+          <Icons.chevronLeft className="size-6 text-muted-foreground" />
         </button>
 
         {/* 🔹 Container with faded edges */}
@@ -96,11 +96,11 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
                     key={tag}
                     onPress={() => handleTagSelection(tag)}
                     className={cn(
-                      "cursor-pointer rounded-full border px-3 py-1.5 text-sm font-medium transition-colors outline-none",
-                      "hover:border-sky-700 hover:bg-foreground hover:text-white focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2",
+                      "cursor-pointer rounded-full border border-sky-200 px-3 py-1.5 text-sm font-semibold text-sky-700 transition-colors outline-none",
+                      "hover:border-sky-700 hover:bg-sky-700 hover:text-white focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2",
                       selectedTags.includes(tag)
                         ? "border-sky-700 bg-sky-700 text-white"
-                        : "border-border",
+                        : "border-sky-200",
                     )}
                   >
                     {tag}
@@ -121,11 +121,11 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
           disabled={!canScrollRight}
           aria-label="Scroll tags right"
           className={cn(
-            "z-10 flex size-8 shrink-0 items-center justify-center rounded-full border bg-input shadow-sm transition-opacity",
+            "z-10 flex size-9 shrink-0 items-center justify-center rounded-full border shadow-sm transition-opacity",
             "disabled:cursor-not-allowed disabled:opacity-30",
           )}
         >
-          <Icons.chevronRight className="size-6" />
+          <Icons.chevronRight className="size-6 text-muted-foreground" />
         </button>
       </div>
 
