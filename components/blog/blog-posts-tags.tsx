@@ -1,30 +1,53 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { TagGroup, TagList, Tag } from "react-aria-components";
+import {
+  Button,
+  TagGroup,
+  TagList,
+  Tag,
+  type Selection as AriaSelection,
+} from "react-aria-components";
 import { Icons } from "@/components/icons";
 import { cn } from "@/lib/utils";
+import { useQueryStates } from "nuqs";
+import { blogSearchParams } from "@/lib/blog-search-params";
 
 type BlogTagsProps = {
   tags: string[];
 };
 
 export function BlogPostsTags({ tags }: BlogTagsProps) {
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [urlState, setUrlState] = useQueryStates(
+    {
+      tag: blogSearchParams.tag,
+      page: blogSearchParams.page,
+    },
+    {
+      shallow: false, // Refetch server component on change
+      history: "push",
+    },
+  );
+  const selectedTags = urlState.tag;
   const scrollerRef = useRef<HTMLDivElement>(null);
 
-  // 🔹 State to manage chevron visibility based on scroll position
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
-  const handleTagSelection = (tag: string) => {
-    // 📝 This is where you'll later add logic to filter posts
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
-    );
+  const handleSelectionChange = (keys: AriaSelection) => {
+    let newTags: string[];
+    if (keys === "all") {
+      newTags = tags;
+    } else {
+      newTags = Array.from(keys) as string[];
+    }
+
+    setUrlState({
+      tag: newTags.length > 0 ? newTags : null,
+      page: null,
+    });
   };
 
-  // 🔹 Check if the container can be scrolled
   const checkScrollability = useCallback(() => {
     const el = scrollerRef.current;
     if (el) {
@@ -36,11 +59,10 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
     }
   }, []);
 
-  // 🔹 Effect to add event listeners and check scrollability on mount/update
   useEffect(() => {
     const scroller = scrollerRef.current;
     if (scroller) {
-      checkScrollability(); // Initial check
+      checkScrollability();
       const resizeObserver = new ResizeObserver(checkScrollability);
       resizeObserver.observe(scroller);
       scroller.addEventListener("scroll", checkScrollability);
@@ -52,7 +74,6 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
     }
   }, [checkScrollability, tags]);
 
-  // 🔹 Function to scroll the tag list horizontally
   const scroll = (direction: "left" | "right") => {
     const el = scrollerRef.current;
     if (el) {
@@ -64,7 +85,7 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
 
   return (
     <div className="space-y-4">
-      {/* 🔹 Tag Scroller UI */}
+      {/* Tag Scroller UI */}
       <div className="relative flex items-center gap-2">
         <button
           onClick={() => scroll("left")}
@@ -77,10 +98,7 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
         >
           <Icons.chevronLeft className="size-6 text-muted-foreground" />
         </button>
-
-        {/* 🔹 Container with faded edges */}
         <div className="relative flex-1 overflow-hidden">
-          {/* Left fade */}
           <div
             className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8"
             aria-hidden="true"
@@ -89,15 +107,21 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
             ref={scrollerRef}
             className="flex overflow-x-auto scroll-smooth py-2 whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
-            <TagGroup aria-label="Blog post tags" className="w-full">
+            <TagGroup
+              aria-label="Blog post tags"
+              className="w-full"
+              selectionMode="multiple"
+              selectedKeys={selectedTags}
+              onSelectionChange={handleSelectionChange}
+            >
               <TagList className="flex items-center gap-3">
                 {tags.map((tag) => (
                   <Tag
                     key={tag}
-                    onPress={() => handleTagSelection(tag)}
+                    id={tag}
                     className={cn(
-                      "cursor-pointer rounded-full border border-sky-200 px-3 py-1.5 text-sm font-semibold text-sky-700 transition-colors outline-none",
-                      "hover:border-sky-700 hover:bg-sky-700 hover:text-white focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2",
+                      "cursor-pointer rounded-md border border-sky-200 bg-sky-100 px-3 py-1.5 text-sm font-semibold text-sky-700 transition-colors outline-none",
+                      "hover:border-sky-700 hover:bg-sky-700 hover:text-white focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2", // This logic still works perfectly!
                       selectedTags.includes(tag)
                         ? "border-sky-700 bg-sky-700 text-white"
                         : "border-sky-200",
@@ -109,13 +133,11 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
               </TagList>
             </TagGroup>
           </div>
-          {/* Right fade */}
           <div
             className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8"
             aria-hidden="true"
           />
         </div>
-
         <button
           onClick={() => scroll("right")}
           disabled={!canScrollRight}
@@ -128,26 +150,34 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
           <Icons.chevronRight className="size-6 text-muted-foreground" />
         </button>
       </div>
-
-      {/* 🔹 Display Selected Tags */}
+      {/* Display Selected Tags */}
       {selectedTags.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="mt-8 flex flex-wrap items-center gap-3">
           <span className="text-sm font-medium">Filtered by:</span>
-          <TagGroup aria-label="Selected tags">
+          <TagGroup
+            aria-label="Selected tags"
+            onRemove={(keys) => {
+              const tagsToRemove = Array.from(keys) as string[];
+              handleSelectionChange(
+                new Set(selectedTags.filter((t) => !tagsToRemove.includes(t))),
+              );
+            }}
+          >
             <TagList className="flex flex-wrap gap-2">
               {selectedTags.map((tag) => (
                 <Tag
                   key={tag}
-                  onRemove={() => handleTagSelection(tag)}
-                  className="flex items-center gap-1.5 rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-sm text-sky-800 outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                  id={tag}
+                  className="flex items-center gap-1.5 rounded-md border border-sky-700 bg-sky-700 px-3 py-1.5 text-sm font-semibold text-white outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                 >
                   {tag}
-                  <button
+                  <Button
+                    slot="remove"
                     aria-label={`Remove ${tag} filter`}
-                    className="-mr-1 rounded-full p-0.5 transition-colors hover:bg-sky-200"
+                    className="-mr-1 rounded-full p-0.5 transition-colors hover:bg-sky-900/50"
                   >
-                    <Icons.x className="size-3.5" />
-                  </button>
+                    <Icons.x className="size-4" />
+                  </Button>
                 </Tag>
               ))}
             </TagList>

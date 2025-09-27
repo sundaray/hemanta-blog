@@ -42,7 +42,7 @@ export function OssProjectsSearch({
           type="search"
           value={values.query}
           placeholder="Search projects by name or description…"
-          className="col-start-1 row-start-1 h-12 rounded-full bg-background pl-10"
+          className="col-start-1 row-start-1 h-12 bg-background pl-10"
           onChange={(e) =>
             setValues(
               { query: e.target.value, page: null },

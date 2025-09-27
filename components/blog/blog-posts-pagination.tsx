@@ -17,12 +17,15 @@ import { useMemo } from "react";
 
 const SIBLING_COUNT = 2;
 
-type BlogPaginationProps = {
+type BlogPostsPaginationProps = {
   totalPages: number;
   className?: string;
 };
 
-export function BlogPagination({ totalPages, className }: BlogPaginationProps) {
+export function BlogPostsPagination({
+  totalPages,
+  className,
+}: BlogPostsPaginationProps) {
   const [filters, setFilters] = useQueryStates(
     {
       page: blogSearchParams.page,

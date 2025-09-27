@@ -39,7 +39,7 @@ export function BlogPostsSearch({ className }: { className?: string }) {
         <Input
           type="search"
           placeholder="Search posts by name or description…"
-          className="col-start-1 row-start-1 h-12 rounded-full bg-background pl-10"
+          className="col-start-1 row-start-1 h-12 bg-background pl-10"
           value={values.query}
           onChange={(e) =>
             setValues(
