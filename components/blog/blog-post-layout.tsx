@@ -1,4 +1,3 @@
-import { BlogPostsTags } from "@/components/blog/blog-posts-tags";
 import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb";
 import { TableOfContents } from "@/components/blog/toc";
 import { type TableOfContents as TOCType } from "@/lib/toc";
@@ -6,6 +5,7 @@ import { Frontmatter } from "@/types";
 import { format } from "date-fns";
 import Image from "next/image";
 import React from "react";
+import { TagDisplayList } from "@/components/blog/tag-display-list";
 
 type BlogPostLayoutProps = {
   frontmatter: Frontmatter;
@@ -49,8 +49,9 @@ export function BlogPostLayout({
         <div className="mt-12 lg:col-start-1 lg:col-end-13">
           <div className="blog-post">{children}</div>
           {tags && tags.length > 0 && (
-            <footer className="mt-12 border-t pt-6">
-              <BlogPostsTags tags={tags} />
+            <footer className="mt-12 flex gap-x-3 border-t pt-6">
+              <h4 className="text-lg font-semibold">Tags:</h4>
+              <TagDisplayList tags={tags} />
             </footer>
           )}
         </div>

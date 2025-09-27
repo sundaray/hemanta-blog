@@ -176,7 +176,7 @@ export function TableOfContents({ toc }: TocProps) {
         {indicator.visible && (
           <motion.span
             aria-hidden
-            className="pointer-events-none absolute bg-foreground transition-all duration-200"
+            className="pointer-events-none absolute bg-sky-700 transition-all duration-200"
             style={{
               left: `-${indicator.borderWidth}px`,
               top: `${indicator.top}px`,
