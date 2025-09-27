@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowLink } from "@/components/ui/arrow-link";
 import type { BlogPost } from "@/types";
-import { motion, AnimatePresence, easeOut } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 
 type BlogPostCardProps = {
   post: BlogPost;
