@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getBlogPosts } from "@/lib/get-blog-posts";
 import { getBlogPostsTags } from "@/lib/get-blog-posts-tags";
-import { BlogSearch } from "@/components/blog/blog-posts-search";
+import { BlogPostsSearch } from "@/components/blog/blog-posts-search";
 import { BlogPostsTags } from "@/components/blog/blog-posts-tags";
 import { ArrowLink } from "@/components/ui/arrow-link";
 
@@ -17,7 +17,7 @@ export default function BlogPage() {
         Posts on full-stack web development.
       </p>
 
-      <BlogSearch className="mt-12 mb-8" />
+      <BlogPostsSearch className="mt-12 mb-8" />
 
       <BlogPostsTags tags={uniqueTags} />
 
