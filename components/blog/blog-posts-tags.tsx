@@ -149,39 +149,49 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
         </button>
       </div>
       {/* Display Selected Tags */}
-      {selectedTags.length > 0 && (
-        <div className="mt-8 flex flex-wrap items-center gap-3">
-          <span className="text-sm font-medium">Filtered by:</span>
-          <TagGroup
-            aria-label="Selected tags"
-            onRemove={(keys) => {
-              const tagsToRemove = Array.from(keys) as string[];
-              handleSelectionChange(
-                new Set(selectedTags.filter((t) => !tagsToRemove.includes(t))),
-              );
-            }}
+      <AnimatePresence>
+        {selectedTags.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="mt-8 flex flex-wrap items-center gap-3"
           >
-            <TagList className="flex flex-wrap gap-2">
-              {selectedTags.map((tag) => (
-                <Tag
-                  key={tag}
-                  id={tag}
-                  className="flex items-center gap-1.5 rounded-md border border-sky-700 bg-sky-700 px-3 py-1.5 text-sm font-semibold text-white outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
-                >
-                  {tag}
-                  <Button
-                    slot="remove"
-                    aria-label={`Remove ${tag} filter`}
-                    className="-mr-1 rounded-full p-0.5 transition-colors hover:bg-sky-900/50"
+            <span className="text-sm font-medium">Filtered by:</span>
+            <TagGroup
+              aria-label="Selected tags"
+              onRemove={(keys) => {
+                const tagsToRemove = Array.from(keys) as string[];
+                handleSelectionChange(
+                  new Set(
+                    selectedTags.filter((t) => !tagsToRemove.includes(t)),
+                  ),
+                );
+              }}
+            >
+              <TagList className="flex flex-wrap gap-2">
+                {selectedTags.map((tag) => (
+                  <Tag
+                    key={tag}
+                    id={tag}
+                    className="flex items-center gap-1.5 rounded-md border border-sky-700 bg-sky-700 px-3 py-1.5 text-sm font-semibold text-white outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                   >
-                    <Icons.x className="size-4" />
-                  </Button>
-                </Tag>
-              ))}
-            </TagList>
-          </TagGroup>
-        </div>
-      )}
+                    {tag}
+                    <Button
+                      slot="remove"
+                      aria-label={`Remove ${tag} filter`}
+                      className="-mr-1 rounded-full p-0.5 transition-colors hover:bg-sky-900/50"
+                    >
+                      <Icons.x className="size-4" />
+                    </Button>
+                  </Tag>
+                ))}
+              </TagList>
+            </TagGroup>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

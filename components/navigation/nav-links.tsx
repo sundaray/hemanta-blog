@@ -143,7 +143,7 @@ export function NavLinks({
               <Link
                 className={cn(
                   "flex h-full items-center transition-colors",
-                  isActive ? "text-sky-700" : "text-neutral-600",
+                  isActive ? "text-sky-700" : "text-neutral-700",
                 )}
                 href={link.href}
               >
