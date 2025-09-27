@@ -98,11 +98,12 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
         >
           <Icons.chevronLeft className="size-6 text-muted-foreground" />
         </button>
-        <div className="relative flex-1 overflow-hidden">
-          <div
-            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8"
-            aria-hidden="true"
-          />
+        <div
+          className={cn(
+            "relative flex-1 overflow-hidden",
+            "[mask-image:linear-gradient(to_right,transparent,black_1rem,black_calc(100%-1rem),rgba(0,0,0,0.5))]",
+          )}
+        >
           <div
             ref={scrollerRef}
             className="flex overflow-x-auto scroll-smooth py-2 whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -133,10 +134,6 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
               </TagList>
             </TagGroup>
           </div>
-          <div
-            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8"
-            aria-hidden="true"
-          />
         </div>
         <button
           onClick={() => scroll("right")}
