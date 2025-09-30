@@ -54,7 +54,7 @@ export default async function OssPage({
       <div className="text-center">
         <DynamicBreadcrumb className="mb-4 flex justify-center" />
         <h1>Open Source Software</h1>
-        <p className="mx-auto mt-8 max-w-3xl text-lg text-balance">
+        <p className="mx-auto mt-8 max-w-3xl text-lg text-balance text-neutral-600">
           A collection of open-source projects I use or find interesting. Most
           are related to full-stack web development, with a focus on my current
           tech stack: TypeScript, React, and PostgreSQL.

@@ -38,7 +38,9 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
           </Link>
         </h2>
         {post.description && (
-          <p className="mt-3 text-neutral-700">{post.description}</p>
+          <p className="mt-3 line-clamp-2 text-neutral-600">
+            {post.description}
+          </p>
         )}
         <ArrowLink
           href={`/blog/${post.slug}`}

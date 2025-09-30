@@ -5,19 +5,20 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import React from "react";
 import type { Route } from "next";
+import { BiSolidLeftArrow, BiSolidRightArrow } from "react-icons/bi";
 
 type ArrowLinkProps = {
   href: Route;
   children: React.ReactNode;
   className?: string;
-  direction?: "left" | "right"; // 🔹 Add direction prop
+  direction?: "left" | "right";
 };
 
 export function ArrowLink({
   children,
   className,
   href,
-  direction = "right", // 🔹 Default to 'right'
+  direction = "right",
   ...props
 }: ArrowLinkProps) {
   const classes = cn(
@@ -28,13 +29,13 @@ export function ArrowLink({
 
   // 🔹 A small component to render the correct icon and animation
   const Arrow = () => {
-    const Icon = direction === "left" ? Icons.chevronLeft : Icons.chevronRight;
+    const Icon = direction === "left" ? BiSolidLeftArrow : BiSolidRightArrow;
     return (
-      <div className="relative size-5">
+      <div className="relative grid size-2.5">
         <Icon
           className={cn(
-            "absolute top-0 left-0 size-5 scale-100 transition-all duration-400 ease-out",
-            "text-sky-700 dark:text-sky-400",
+            "absolute top-0 left-0 size-2.5 scale-100 transition-all duration-400 ease-out",
+            "text-sky-700/50 dark:text-sky-400",
             direction === "right"
               ? "group-hover:translate-x-2 group-hover:scale-95 group-hover:opacity-0"
               : "group-hover:-translate-x-2 group-hover:scale-95 group-hover:opacity-0",
@@ -42,7 +43,7 @@ export function ArrowLink({
         />
         <Icon
           className={cn(
-            "absolute top-0 left-0 size-5 scale-95 opacity-0 transition-all duration-400 ease-out",
+            "absolute top-0 left-0 size-2.5 scale-95 opacity-0 transition-all duration-400 ease-out",
             "text-sky-700 dark:text-sky-400",
             direction === "right"
               ? "-translate-x-2 group-hover:translate-x-0 group-hover:scale-100 group-hover:opacity-100"

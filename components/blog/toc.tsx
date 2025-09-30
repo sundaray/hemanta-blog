@@ -4,24 +4,15 @@ import { Icons } from "@/components/icons";
 import { useMounted } from "@/hooks/use-mounted";
 import { type TableOfContents as TOCType } from "@/lib/toc";
 import { cn } from "@/lib/utils";
-import { AnimatePresence, easeOut, motion } from "motion/react";
+import { motion } from "motion/react"; // 🔹 We still need motion for the active indicator
 import * as React from "react";
 
 interface TocProps {
   toc: TOCType;
 }
 
-const submenuVariants = {
-  hidden: {
-    height: 0,
-    transition: { duration: 0.2, ease: easeOut },
-  },
-  visible: {
-    height: "auto",
-    transition: { duration: 0.2, ease: easeOut },
-  },
-};
 export function TableOfContents({ toc }: TocProps) {
+  // --- This section for parsing the TOC structure remains the same ---
   const { itemIds, parentMap, topLevel } = React.useMemo(() => {
     const ids: string[] = [];
     const map: Record<string, string> = {};
@@ -58,14 +49,10 @@ export function TableOfContents({ toc }: TocProps) {
     visible: false,
   });
 
-  // --- Measure and update the border-left width of the container ---
-  // Needed so the active indicator line can be aligned precisely
-  // with the left border, even if border width changes
+  // --- All the layout effects for the active indicator line remain the same ---
   React.useLayoutEffect(() => {
     const containerElement = containerRef.current;
-
     if (!containerElement) return;
-
     const borderWidth = parseFloat(
       getComputedStyle(containerElement).borderLeftWidth || "1",
     );
@@ -75,33 +62,22 @@ export function TableOfContents({ toc }: TocProps) {
     }));
   }, []);
 
-  // --- Track and update the active indicator line position ---
-  // Observes the currently active link (via IntersectionObserver).
-  // Recalculates its top/height whenever layout changes (resize,
-  // DOM mutations, or the active heading changes).
   React.useLayoutEffect(() => {
     const containerElement = containerRef.current;
-
     if (!containerElement || !activeHeading) {
       setIndicator((prev) => ({ ...prev, visible: false }));
       return;
     }
-
     const escapeCssSelector = (str: string) =>
       (window as any).CSS?.escape ? (window as any).CSS.escape(str) : str;
-
     const selector = `a[href="#${escapeCssSelector(activeHeading)}"]`;
-
     const linkElement =
       containerElement.querySelector<HTMLAnchorElement>(selector);
-
     if (!linkElement) {
       setIndicator((prev) => ({ ...prev, visible: false }));
       return;
     }
-
     let animationFrameId: number | null = null;
-
     const scheduleUpdate = () => {
       if (animationFrameId != null) cancelAnimationFrame(animationFrameId);
       animationFrameId = requestAnimationFrame(() => {
@@ -115,32 +91,20 @@ export function TableOfContents({ toc }: TocProps) {
       const linkRect = linkElement.getBoundingClientRect();
       const top = linkRect.top - containerRect.top;
       const height = linkRect.height;
-
-      setIndicator((prev) => ({
-        ...prev,
-        top,
-        height,
-        visible: height > 0,
-      }));
+      setIndicator((prev) => ({ ...prev, top, height, visible: height > 0 }));
     };
-
     updatePosition();
-
     const linkResizeObserver = new ResizeObserver(scheduleUpdate);
     linkResizeObserver.observe(linkElement);
-
     const containerResizeObserver = new ResizeObserver(scheduleUpdate);
     containerResizeObserver.observe(containerElement);
-
     const mutationObserver = new MutationObserver(scheduleUpdate);
-
     mutationObserver.observe(containerElement, {
       childList: true,
       subtree: true,
       attributes: true,
     });
     window.addEventListener("resize", scheduleUpdate);
-
     return () => {
       if (animationFrameId != null) cancelAnimationFrame(animationFrameId);
       containerResizeObserver.disconnect();
@@ -148,13 +112,7 @@ export function TableOfContents({ toc }: TocProps) {
     };
   }, [activeHeading, toc]);
 
-  const [manualOpen, setManualOpen] = React.useState<Record<string, boolean>>(
-    {},
-  );
-
-  const toggleManual = (h2Id: string) =>
-    setManualOpen((prev) => ({ ...prev, [h2Id]: !prev[h2Id] }));
-
+  // --- This logic for determining the active parent is still useful for highlighting ---
   const activeParent = React.useMemo(() => {
     if (!activeHeading) return null;
     if (topLevel.find((t) => t.url?.split("#")[1] === activeHeading)) {
@@ -186,103 +144,57 @@ export function TableOfContents({ toc }: TocProps) {
           />
         )}
 
-        <motion.ul layout className="list-none space-y-2">
+        <ul className="list-none space-y-2">
           {topLevel.map((h2) => {
             const h2Id = h2.url?.split("#")[1];
-
             const isActiveGroup = Boolean(h2Id && activeParent === h2Id);
 
-            const isManuallyOpen = Boolean(h2Id && manualOpen[h2Id]);
-
-            const expanded = isActiveGroup || isManuallyOpen;
-
             return (
-              <motion.li layout="position" key={h2Id} className="group">
+              <li key={h2Id} className="group">
                 <div className="flex items-center justify-between">
                   <a
                     href={h2.url}
                     className={cn(
                       "link-focus inline-block text-sm transition-colors",
-                      isActiveGroup
-                        ? "text-foreground"
-                        : "text-muted-foreground",
+                      isActiveGroup ? "text-foreground" : "text-neutral-600",
                     )}
                   >
                     {h2.title}
                   </a>
-
-                  {h2.items?.length ? (
-                    <button
-                      aria-expanded={expanded}
-                      aria-controls={`toc-${h2Id}`}
-                      onClick={() => toggleManual(h2Id!)}
-                      className={cn(
-                        "link-focus -mr-2 ml-3 inline-flex items-center justify-center rounded p-1 text-muted-foreground hover:text-foreground",
-                      )}
-                    >
-                      <Icons.chevronRight
-                        className={cn(
-                          "size-4 text-muted-foreground transition-transform duration-200",
-                          expanded ? "rotate-90" : "rotate-0",
-                        )}
-                        aria-hidden
-                      />
-                    </button>
-                  ) : null}
                 </div>
 
-                <AnimatePresence initial={false} mode="popLayout">
-                  {expanded && h2.items?.length ? (
-                    <motion.ul
-                      layout
-                      key={`submenu-${h2Id}`}
-                      id={`toc-${h2Id}`}
-                      initial="hidden"
-                      animate="visible"
-                      exit="hidden"
-                      variants={submenuVariants}
-                      className="mt-2 space-y-2"
-                    >
-                      {h2.items.map((h3, i) => {
-                        return (
-                          <li key={i} className="pl-4">
-                            <a
-                              href={h3.url}
-                              className={cn(
-                                "link-focus inline-block text-sm transition-colors",
-                                activeHeading === h3.url?.split("#")[1]
-                                  ? "text-foreground"
-                                  : "text-muted-foreground",
-                              )}
-                            >
-                              {h3.title}
-                            </a>
-                          </li>
-                        );
-                      })}
-                    </motion.ul>
-                  ) : null}
-                </AnimatePresence>
-              </motion.li>
+                {h2.items && h2.items.length > 0 && (
+                  <ul className="mt-2 space-y-2 pl-4">
+                    {h2.items.map((h3, i) => {
+                      return (
+                        <li key={i}>
+                          <a
+                            href={h3.url}
+                            className={cn(
+                              "link-focus inline-block text-sm transition-colors",
+                              activeHeading === h3.url?.split("#")[1]
+                                ? "text-foreground"
+                                : "text-neutral-600",
+                            )}
+                          >
+                            {h3.title}
+                          </a>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </li>
             );
           })}
-        </motion.ul>
+        </ul>
       </div>
     </div>
   );
 }
 
-/**********************************************************************
- * useActiveItem():
- *   Tracks which heading is currently active in the viewport.
- *   Observes all elements with the given IDs using IntersectionObserver.
- *   Updates state when a heading scrolls into the top 20% of the viewport.
- *   Returns the ID of the active heading, or null if none are active.
- *********************************************************************/
-
 function useActiveItem(itemIds: string[]) {
   const [activeId, setActiveId] = React.useState<string | null>(null);
-
   React.useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -309,6 +221,5 @@ function useActiveItem(itemIds: string[]) {
       });
     };
   }, [itemIds]);
-
   return activeId;
 }

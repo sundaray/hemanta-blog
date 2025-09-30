@@ -24,11 +24,11 @@ export default function GlobalNotFound() {
           <h2 className="text-3xl font-semibold tracking-tight">
             Page Not Found
           </h2>
-          <p className="text-pretty text-neutral-700">
+          <p className="text-pretty text-neutral-600">
             Oops! The page you're looking for seems to have gone on a little
             adventure.
           </p>
-          <ArrowLink href="/">Return to Home</ArrowLink>
+          <ArrowLink href="/">Return to home</ArrowLink>
         </div>
       </body>
     </html>
