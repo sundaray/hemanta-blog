@@ -50,7 +50,7 @@ Once the project is created, navigate to the project directory.
 
 shadcn/ui is a collection of re-usable components that we'll use in our project. To set it up, run the following command:
 
-```ts
+```bash title="Terminal"
 npx shadcn-ui@latest init
 ```
 
@@ -58,29 +58,41 @@ Follow the prompts to configure shadcn/ui according to your preferences.
 
 We'll be using the Button, Dropdown, and Toast components. Install them with these commands:
 
+```bash title="Terminal"
 npx shadcn-ui@latest add button
 npx shadcn-ui@latest add dropdown-menu
 npx shadcn-ui@latest add toast
+```
 
 ### Install Supabase packages
 
 We'll need the Supabase client library to interact with our Supabase backend:
 
+```bash title="Terminal"
 npm install @supabase/supabase-js @supabase/ssr
+```
 
 ### Install client-only and server-only packages
 
+```bash title="Terminal"
 npm install client-only server-only
+```
+
 These packages are useful for ensuring that certain modules are only used in their intended environment, client or server. For example, if you try to use a module marked as client-only in a server environment, you'll get an error, and vice versa.
 
 ### Install JWT decoding libraries
 
+```bash title="Terminal"
 npm install jose jwt-decode
+```
+
 These libraries are necessary to decode the JWT and access the user role. We'll be using Supabase auth hooks to add user roles inside the JWT, so we need libraries to decode them. jose is used for server-side decoding, while jwt-decode is used for client-side decoding.
 
 ### Install icon libraries
 
+```bash title="Terminal"
 npm install lucide-react react-icons
+```
 
 ## Set up Supabase clients
 
