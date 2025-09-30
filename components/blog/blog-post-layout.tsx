@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import Image from "next/image";
 import React from "react";
 import { TagDisplayList } from "@/components/blog/tag-display-list";
+import { ArrowLink } from "@/components/ui/arrow-link";
 
 type BlogPostLayoutProps = {
   frontmatter: Frontmatter;
@@ -24,7 +25,9 @@ export function BlogPostLayout({
     <div className="mx-auto max-w-6xl px-4 lg:grid lg:grid-cols-16 lg:gap-x-8">
       <article className="lg:contents">
         <header className="mx-auto border-b border-input pb-12 text-center lg:col-span-16">
-          <DynamicBreadcrumb className="mx-auto flex justify-center" />
+          <ArrowLink href="/blog" className="text-sky-700" direction="left">
+            Back to blog
+          </ArrowLink>
           <h1 className="mt-6 text-balance">{title}</h1>
           <div className="mt-12 flex w-full items-center justify-center space-x-4">
             <Image
@@ -36,7 +39,7 @@ export function BlogPostLayout({
             />
             <div className="flex flex-col items-start">
               <p className="text-sm font-medium">{author}</p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-neutral-600">
                 Published{" "}
                 <time dateTime={publishedAt}>
                   {format(new Date(publishedAt), "LLL d, yyyy")}

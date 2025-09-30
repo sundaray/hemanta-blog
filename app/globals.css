@@ -7,8 +7,9 @@
   @apply rounded-lg border border-input;
 
   & [data-rehype-pretty-code-title] {
-    @apply flex-1 rounded-t-lg border-b border-input py-3.5 pl-5 text-xs text-foreground dark:text-muted-foreground;
+    @apply flex-1 rounded-t-lg py-3.5 pl-5 text-xs text-foreground dark:text-muted-foreground;
   }
+
   & pre {
     @apply overflow-x-auto rounded-t-none rounded-b-lg bg-white font-mono dark:bg-transparent;
   }

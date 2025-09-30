@@ -30,9 +30,13 @@ export const CopyButton: FC<CopyButtonProps> = ({ text }) => {
         <button
           disabled={isCopied}
           onClick={copy}
-          className="cursor-pointer rounded-md p-2 text-foreground transition-colors hover:bg-neutral-200/60 dark:hover:bg-neutral-800"
+          className="cursor-pointer rounded-md p-2 text-foreground transition-colors hover:bg-neutral-200/50 dark:hover:bg-neutral-800"
         >
-          {isCopied ? <Check size={15} /> : <Copy size={15} />}
+          {isCopied ? (
+            <Check size={15} className="text-neutral-700" />
+          ) : (
+            <Copy size={15} className="text-neutral-700" />
+          )}
         </button>
       </TooltipTrigger>
       <TooltipContent>

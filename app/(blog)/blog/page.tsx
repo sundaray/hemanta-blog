@@ -15,7 +15,7 @@ export default async function BlogPage({
 }) {
   const allPosts = getBlogPosts();
   const allTagsWithCounts = getBlogPostsTags();
-  const uniqueTags = allTagsWithCounts.map((tag) => tag.name); // 🔹 1. Parse 'tag' from the search params
+  const uniqueTags = allTagsWithCounts.map((tag) => tag.name);
 
   const {
     query,
@@ -24,12 +24,11 @@ export default async function BlogPage({
   } = await blogSearchParamsCache.parse(searchParams);
 
   const filteredPosts = allPosts.filter((post) => {
-    // Match search query if it exists
     const queryMatch =
       !query ||
       `${post.title.toLowerCase()} ${post.description.toLowerCase()}`.includes(
         query.toLowerCase(),
-      ); // Match tags if any are selected
+      );
 
     const tagMatch =
       selectedTags.length === 0 ||

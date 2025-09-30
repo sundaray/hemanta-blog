@@ -52,8 +52,8 @@ export function CodeBlockWrapper({ children }: { children: React.ReactNode }) {
 
   return (
     <figure data-rehype-pretty-code-figure="">
-      <div className="flex items-center justify-between rounded-t-lg border-b border-border bg-transparent py-2 text-sm">
-        <span className="text-foregorund flex flex-1 items-center gap-2 pl-5">
+      <div className="flex items-center justify-between rounded-t-lg border-b border-input bg-transparent py-2 text-sm">
+        <span className="flex flex-1 items-center gap-2 pl-5 text-neutral-700">
           {IconComponent && <IconComponent className="size-4 shrink-0" />}
           {!ICON_ONLY_TITLES.includes(filename ?? "") && filename}
         </span>

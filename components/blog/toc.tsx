@@ -4,7 +4,7 @@ import { Icons } from "@/components/icons";
 import { useMounted } from "@/hooks/use-mounted";
 import { type TableOfContents as TOCType } from "@/lib/toc";
 import { cn } from "@/lib/utils";
-import { motion } from "motion/react"; // 🔹 We still need motion for the active indicator
+import { motion } from "motion/react";
 import * as React from "react";
 
 interface TocProps {
@@ -12,7 +12,6 @@ interface TocProps {
 }
 
 export function TableOfContents({ toc }: TocProps) {
-  // --- This section for parsing the TOC structure remains the same ---
   const { itemIds, parentMap, topLevel } = React.useMemo(() => {
     const ids: string[] = [];
     const map: Record<string, string> = {};
@@ -49,7 +48,6 @@ export function TableOfContents({ toc }: TocProps) {
     visible: false,
   });
 
-  // --- All the layout effects for the active indicator line remain the same ---
   React.useLayoutEffect(() => {
     const containerElement = containerRef.current;
     if (!containerElement) return;
@@ -112,7 +110,6 @@ export function TableOfContents({ toc }: TocProps) {
     };
   }, [activeHeading, toc]);
 
-  // --- This logic for determining the active parent is still useful for highlighting ---
   const activeParent = React.useMemo(() => {
     if (!activeHeading) return null;
     if (topLevel.find((t) => t.url?.split("#")[1] === activeHeading)) {
@@ -127,14 +124,14 @@ export function TableOfContents({ toc }: TocProps) {
     <div className="space-y-4">
       <p className="flex items-center gap-2">
         <Icons.toc className="size-4 text-muted-foreground" />
-        <span className="font-medium text-foreground">On this page</span>
+        <span className="text-foreground">ON THIS PAGE</span>
       </p>
 
       <div ref={containerRef} className="relative border-l pl-4">
         {indicator.visible && (
           <motion.span
             aria-hidden
-            className="pointer-events-none absolute bg-sky-700 transition-all duration-200"
+            className="pointer-events-none absolute bg-sky-600 transition-all duration-200"
             style={{
               left: `-${indicator.borderWidth}px`,
               top: `${indicator.top}px`,
@@ -156,7 +153,9 @@ export function TableOfContents({ toc }: TocProps) {
                     href={h2.url}
                     className={cn(
                       "link-focus inline-block text-sm transition-colors",
-                      isActiveGroup ? "text-foreground" : "text-neutral-600",
+                      isActiveGroup
+                        ? "font-medium text-sky-600"
+                        : "text-neutral-600",
                     )}
                   >
                     {h2.title}
@@ -173,7 +172,7 @@ export function TableOfContents({ toc }: TocProps) {
                             className={cn(
                               "link-focus inline-block text-sm transition-colors",
                               activeHeading === h3.url?.split("#")[1]
-                                ? "text-foreground"
+                                ? "text-sky-600"
                                 : "text-neutral-600",
                             )}
                           >
