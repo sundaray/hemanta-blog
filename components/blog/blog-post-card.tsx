@@ -20,8 +20,13 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
           ease: "easeOut",
           layout: { duration: 0.2, ease: "easeOut" },
         }}
-        className="py-12"
+        className="group relative cursor-pointer py-12"
       >
+        <Link
+          href={`/blog/${post.slug}`}
+          className="absolute inset-0 z-10"
+          aria-label={`Read more about ${post.title}`}
+        />
         <p className="font-mono text-sm text-muted-foreground">
           {new Date(post.publishedAt).toLocaleDateString("en-US", {
             year: "numeric",
@@ -29,13 +34,8 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
             day: "numeric",
           })}
         </p>
-        <h2 className="mt-2">
-          <Link
-            href={`/blog/${post.slug}`}
-            className="transition-colors hover:text-sky-700"
-          >
-            {post.title}
-          </Link>
+        <h2 className="mt-2 transition-colors group-hover:text-sky-700">
+          {post.title}
         </h2>
         {post.description && (
           <p className="mt-3 line-clamp-2 text-neutral-600">

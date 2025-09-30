@@ -127,11 +127,11 @@ export function TableOfContents({ toc }: TocProps) {
         <span className="text-foreground">ON THIS PAGE</span>
       </p>
 
-      <div ref={containerRef} className="relative border-l pl-4">
+      <div ref={containerRef} className="relative border-l border-input pl-4">
         {indicator.visible && (
           <motion.span
             aria-hidden
-            className="pointer-events-none absolute bg-sky-600 transition-all duration-200"
+            className="pointer-events-none absolute bg-sky-700 transition-all duration-200"
             style={{
               left: `-${indicator.borderWidth}px`,
               top: `${indicator.top}px`,
@@ -154,7 +154,7 @@ export function TableOfContents({ toc }: TocProps) {
                     className={cn(
                       "link-focus inline-block text-sm transition-colors",
                       isActiveGroup
-                        ? "font-medium text-sky-600"
+                        ? "font-medium text-sky-700"
                         : "text-neutral-600",
                     )}
                   >
@@ -172,7 +172,7 @@ export function TableOfContents({ toc }: TocProps) {
                             className={cn(
                               "link-focus inline-block text-sm transition-colors",
                               activeHeading === h3.url?.split("#")[1]
-                                ? "text-sky-600"
+                                ? "text-sky-700"
                                 : "text-neutral-600",
                             )}
                           >

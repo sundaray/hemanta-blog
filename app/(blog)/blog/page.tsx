@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { getBlogPosts } from "@/lib/get-blog-posts";
 import { getBlogPostsTags } from "@/lib/get-blog-posts-tags";
 import { BlogPostsSearch } from "@/components/blog/blog-posts-search";

@@ -52,8 +52,8 @@ export function BlogPostLayout({
         <div className="mt-12 lg:col-start-1 lg:col-end-13">
           <div className="blog-post">{children}</div>
           {tags && tags.length > 0 && (
-            <footer className="mt-12 flex gap-x-3 border-t pt-6">
-              <h4 className="text-lg font-semibold">Tags:</h4>
+            <footer className="mt-12 flex items-center gap-x-3 border-t border-input py-6">
+              <p className="text-foreground">TAGS:</p>
               <TagDisplayList tags={tags} />
             </footer>
           )}

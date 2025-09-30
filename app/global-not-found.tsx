@@ -21,9 +21,7 @@ export default function GlobalNotFound() {
           <h1 className="font-mono text-8xl font-bold tracking-tight text-primary">
             404
           </h1>
-          <h2 className="text-3xl font-semibold tracking-tight">
-            Page Not Found
-          </h2>
+          <h2>Page Not Found</h2>
           <p className="text-pretty text-neutral-600">
             Oops! The page you're looking for seems to have gone on a little
             adventure.
