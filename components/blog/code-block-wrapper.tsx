@@ -15,6 +15,8 @@ function extractText(node: ReactNode): string {
   return "";
 }
 
+const ICON_ONLY_TITLES = ["Terminal", "Shell", "Bash"];
+
 export function CodeBlockWrapper({ children }: { children: React.ReactNode }) {
   const childrenArray = React.Children.toArray(children);
   type ElementWithChildren = React.ReactElement<{ children: ReactNode }>;
@@ -51,9 +53,9 @@ export function CodeBlockWrapper({ children }: { children: React.ReactNode }) {
   return (
     <figure data-rehype-pretty-code-figure="">
       <div className="flex items-center justify-between rounded-t-lg border-b border-border bg-transparent py-2 text-sm">
-        <span className="text-tertiary-foreground flex flex-1 items-center gap-2 pl-5">
+        <span className="text-foregorund flex flex-1 items-center gap-2 pl-5">
           {IconComponent && <IconComponent className="size-4 shrink-0" />}
-          {filename}
+          {!ICON_ONLY_TITLES.includes(filename ?? "") && filename}
         </span>
 
         <div className="px-2">

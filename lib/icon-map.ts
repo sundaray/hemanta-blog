@@ -1,4 +1,5 @@
 import type { IconType } from "react-icons";
+import { BsTerminalFill } from "react-icons/bs";
 import {
   SiAstro,
   SiBiome,
@@ -71,6 +72,7 @@ import {
 } from "react-icons/si";
 
 export const filenameIconMap: Record<string, IconType> = {
+  Terminal: BsTerminalFill,
   ".env": SiDotenv,
   "*.astro": SiAstro,
   "biome.json": SiBiome,
