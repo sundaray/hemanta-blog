@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { MainNav } from "@/components/navigation/main-nav";
 import { navbarLinks } from "@/config/navbar";
+import { MainNavWrapper } from "@/components/navigation/main-nav-wrapper";
 
 export const metadata: Metadata = {
   title: "OSS",
@@ -11,7 +12,9 @@ export default function OssPageLayout(props: LayoutProps<"/oss">) {
   return (
     <>
       <header>
-        <MainNav links={navbarLinks.main} />
+        <MainNavWrapper>
+          <MainNav links={navbarLinks.main} />
+        </MainNavWrapper>
       </header>
       <main className="flex-1 py-40">{props.children}</main>
     </>

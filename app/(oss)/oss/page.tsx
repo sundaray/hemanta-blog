@@ -5,6 +5,7 @@ import { OssProjectsContent } from "@/components/oss-projects-content";
 import { getOssProjectFilterOptions } from "@/lib/get-oss-project-filters-options";
 import type { SearchParams } from "nuqs/server";
 import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb";
+import { ArrowLink } from "@/components/ui/arrow-link";
 
 const PROJECTS_PER_PAGE = 36;
 
@@ -52,15 +53,20 @@ export default async function OssPage({
   return (
     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="text-center">
-        <DynamicBreadcrumb className="mb-4 flex justify-center" />
+        <ArrowLink
+          href="/"
+          className="mb-4 font-mono font-semibold text-sky-700"
+          direction="left"
+        >
+          Home
+        </ArrowLink>
         <h1>Open Source Software</h1>
-        <p className="mx-auto mt-8 max-w-3xl text-lg text-balance text-neutral-600">
+        <p className="mx-auto mt-8 max-w-3xl text-balance text-lg text-neutral-600">
           A collection of open-source projects I use or find interesting. Most
           are related to full-stack web development, with a focus on my current
           tech stack: TypeScript, React, and PostgreSQL.
         </p>
       </div>
-
       <OssProjectsContent
         projects={projects}
         uniqueTopics={uniqueTopics}

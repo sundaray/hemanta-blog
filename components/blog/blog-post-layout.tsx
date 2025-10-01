@@ -22,15 +22,15 @@ export function BlogPostLayout({
   const { title, publishedAt, author, tags } = frontmatter;
 
   return (
-    <div className="mx-auto max-w-6xl px-4 lg:grid lg:grid-cols-16 lg:gap-x-8">
+    <div className="lg:grid-cols-16 mx-auto max-w-6xl px-4 lg:grid lg:gap-x-8">
       <article className="lg:contents">
-        <header className="mx-auto border-b border-input pb-12 text-center lg:col-span-16">
+        <header className="border-input lg:col-span-16 mx-auto border-b pb-12 text-center">
           <ArrowLink
             href="/blog"
             className="font-semibold text-sky-700"
             direction="left"
           >
-            Back to blog
+            Blog
           </ArrowLink>
           <h1 className="mt-6 text-balance">{title}</h1>
           <div className="mt-12 flex w-full items-center justify-center space-x-4">
@@ -56,7 +56,7 @@ export function BlogPostLayout({
         <div className="mt-12 lg:col-start-1 lg:col-end-13">
           <div className="blog-post">{children}</div>
           {tags && tags.length > 0 && (
-            <footer className="mt-12 flex items-center gap-x-3 border-t border-input py-6">
+            <footer className="border-input mt-12 flex items-center gap-x-3 border-t py-6">
               <p className="text-foreground">TAGS:</p>
               <TagDisplayList tags={tags} />
             </footer>
@@ -64,7 +64,7 @@ export function BlogPostLayout({
         </div>
       </article>
 
-      <aside className="mt-12 hidden lg:col-start-14 lg:col-end-17 lg:block">
+      <aside className="lg:col-start-14 lg:col-end-17 mt-12 hidden lg:block">
         <div className="sticky top-24">
           <TableOfContents toc={toc} />
         </div>

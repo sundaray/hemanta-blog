@@ -4,6 +4,7 @@ import { BlogPostsSearch } from "@/components/blog/blog-posts-search";
 import type { SearchParams } from "nuqs/server";
 import { blogSearchParamsCache } from "@/lib/blog-search-params";
 import { BlogPageContent } from "@/components/blog/blog-page-content";
+import { ArrowLink } from "@/components/ui/arrow-link";
 
 const POSTS_PER_PAGE = 5;
 
@@ -44,11 +45,20 @@ export default async function BlogPage({
 
   return (
     <div className="container mx-auto max-w-4xl px-4 sm:px-6">
-      <h1>Blog</h1>
-      <p className="mt-4 text-lg text-neutral-700">
-        Posts on full-stack web development.
-      </p>
-      <BlogPostsSearch className="mt-12 mb-8" />
+      <div className="text-center">
+        <ArrowLink
+          href="/"
+          className="mb-4 text-center font-mono font-semibold text-sky-700"
+          direction="left"
+        >
+          Home
+        </ArrowLink>
+        <h1 className="text-center">Blog</h1>
+        <p className="mt-4 text-center text-lg text-neutral-700">
+          Posts on full-stack web development.
+        </p>
+      </div>
+      <BlogPostsSearch className="mb-8 mt-12" />
       <BlogPageContent
         paginatedPosts={paginatedPosts}
         uniqueTags={uniqueTags}
