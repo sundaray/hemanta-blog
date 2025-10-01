@@ -1,0 +1,117 @@
+@layer components {
+  .blog-post h1 {
+    @apply text-6xl;
+  }
+
+  .blog-post h2 {
+    @apply mb-4 mt-12 text-2xl;
+  }
+
+  .blog-post h3 {
+    @apply mb-4 mt-12 text-xl;
+  }
+
+  .blog-post h4 {
+    @apply mb-4 mt-12 text-lg;
+  }
+
+  .blog-post p {
+    @apply mb-6 leading-7 text-neutral-700 last:mb-0;
+  }
+
+  .blog-post p a {
+    @apply text-sky-700 hover:underline hover:underline-offset-4;
+  }
+
+  .blog-post ul,
+  .blog-post ol {
+    @apply marker:text-muted-foreground mb-6 space-y-3 pl-8 last:mb-0;
+  }
+
+  .blog-post ul {
+    @apply list-disc;
+  }
+  .blog-post ol {
+    @apply list-decimal;
+  }
+
+  .blog-post :not(pre) > code {
+    @apply border-input text-foreground rounded-sm border bg-neutral-200/40 px-1 py-0.5 font-mono text-sm dark:bg-neutral-800;
+  }
+
+  .blog-post strong {
+    @apply font-semibold;
+  }
+
+  .blog-post figure {
+    @apply my-6;
+  }
+
+  .blog-post :where(h1, h2, h3, h4, h5, h6) {
+    @apply relative scroll-mt-20;
+  }
+
+  .blog-post .anchor {
+    @apply text-muted-foreground hover:text-foreground absolute -left-8 top-1/2 -translate-y-1/2 translate-x-2 cursor-pointer rounded-md p-1 opacity-0 transition-all duration-200;
+  }
+
+  .blog-post :where(h1, h2, h3, h4, h5, h6):hover .anchor {
+    @apply translate-x-0 opacity-100;
+  }
+
+  /*
+ * Code snippet styles
+ * ============================================
+ */
+
+  .blog-post [data-rehype-pretty-code-figure] {
+    @apply border-input rounded-lg border;
+  }
+
+  .blog-post [data-rehype-pretty-code-figure] [data-rehype-pretty-code-title] {
+    @apply text-foreground dark:text-muted-foreground flex-1 rounded-t-lg py-3.5 pl-5 text-xs;
+  }
+
+  .blog-post [data-rehype-pretty-code-figure] pre {
+    @apply overflow-x-auto rounded-b-lg rounded-t-none bg-white font-mono dark:bg-transparent;
+  }
+
+  .blog-post [data-rehype-pretty-code-figure] code {
+    @apply text-[14px];
+  }
+
+  .blog-post [data-rehype-pretty-code-figure] [data-line] {
+    @apply block border-l-2 border-transparent px-4 first:pt-4 last:pb-4;
+  }
+
+  .blog-post [data-rehype-pretty-code-figure] [data-highlighted-line] {
+    @apply border-l-2 border-l-sky-500 bg-sky-50 dark:border-l-sky-500 dark:bg-sky-500/10;
+  }
+
+  .blog-post [data-rehype-pretty-code-figure] code[data-line-numbers] {
+    counter-reset: line;
+  }
+
+  .blog-post
+    [data-rehype-pretty-code-figure]
+    code[data-line-numbers]
+    [data-line]::before {
+    @apply pr-4 text-neutral-400;
+    counter-increment: line;
+    content: counter(line);
+  }
+
+  /* --- Shiki dynamic styles --- */
+  pre.shiki {
+    background-color: var(--shiki-light-bg);
+  }
+  .dark pre.shiki {
+    background-color: var(--shiki-dark-bg);
+  }
+  code[data-theme] span {
+    color: var(--shiki-light);
+  }
+  .dark code[data-theme] span {
+    color: var(--shiki-dark);
+  }
+}

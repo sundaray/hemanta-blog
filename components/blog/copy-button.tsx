@@ -1,18 +1,33 @@
 "use client";
 
 import { Check, Copy } from "lucide-react";
-import { useState, type FC } from "react";
+import { useState } from "react";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { motion, AnimatePresence } from "motion/react";
 
-interface CopyButtonProps {
-  text: string;
-}
+const iconVariants = {
+  initial: {
+    opacity: 0,
+    filter: "blur(2px)",
+    scale: 0.95,
+  },
+  animate: {
+    opacity: 1,
+    filter: "blur(0px)",
+    scale: 1,
+  },
+  exit: {
+    opacity: 0,
+    filter: "blur(2px)",
+    scale: 0.95,
+  },
+};
 
-export const CopyButton: FC<CopyButtonProps> = ({ text }) => {
+export function CopyButton({ text }: { text: string }) {
   const [isCopied, setIsCopied] = useState(false);
 
   const copy = async () => {
@@ -30,18 +45,40 @@ export const CopyButton: FC<CopyButtonProps> = ({ text }) => {
         <button
           disabled={isCopied}
           onClick={copy}
-          className="cursor-pointer rounded-md p-2 text-foreground transition-colors hover:bg-neutral-200/50 dark:hover:bg-neutral-800"
+          className="relative flex size-8 cursor-pointer items-center justify-center rounded-md text-neutral-700 transition hover:bg-neutral-200/60 active:scale-[0.97] dark:hover:bg-neutral-800"
         >
-          {isCopied ? (
-            <Check size={15} className="text-neutral-700" />
-          ) : (
-            <Copy size={15} className="text-neutral-700" />
-          )}
+          <AnimatePresence initial={false} mode="wait">
+            {isCopied ? (
+              <motion.div
+                key="check"
+                variants={iconVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                transition={{ duration: 0.15, ease: "easeOut" }}
+                className="absolute"
+              >
+                <Check size={15} />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="copy"
+                variants={iconVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                transition={{ duration: 0.15, ease: "easeOut" }}
+                className="absolute"
+              >
+                <Copy size={15} />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </button>
       </TooltipTrigger>
       <TooltipContent>
-        <p>{isCopied ? "Copied!" : "Copy to Clipboard"}</p>
+        <p>{isCopied ? "Copied!" : "Copy code"}</p>
       </TooltipContent>
     </Tooltip>
   );
-};
+}

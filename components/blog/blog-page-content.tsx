@@ -34,7 +34,7 @@ export function BlogPageContent({
                 duration: 0.2,
                 ease: "easeOut",
               }}
-              className="divide-y divide-dashed divide-input"
+              className="mt-12 space-y-6"
             >
               {paginatedPosts.map((post) => (
                 <BlogPostCard key={post.slug} post={post} />

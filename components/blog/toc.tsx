@@ -154,7 +154,7 @@ export function TableOfContents({ toc }: TocProps) {
                     className={cn(
                       "link-focus inline-block text-sm transition-colors",
                       isActiveGroup
-                        ? "font-medium text-sky-700"
+                        ? "font-semibold text-sky-700"
                         : "text-neutral-600",
                     )}
                   >

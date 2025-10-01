@@ -15,7 +15,7 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
   return (
     <div
       className={cn(
-        "group relative flex flex-col rounded-lg border bg-card p-4 text-card-foreground shadow-sm transition-all hover:shadow-lg",
+        "border-border group relative flex flex-col rounded-lg border p-4 shadow-sm transition-all hover:shadow-lg",
         className,
       )}
     >
@@ -40,9 +40,9 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
             target="_blank"
             rel="noopener noreferrer"
             className={cn(
-              "relative z-20 text-muted-foreground hover:text-foreground",
+              "text-muted-foreground hover:text-foreground relative z-20",
               "-m-2 p-2",
-              "rounded-full transition-colors hover:bg-accent",
+              "hover:bg-accent rounded-full transition-colors",
             )}
             aria-label="Visit project website"
             onClick={(e) => e.stopPropagation()}
@@ -52,7 +52,7 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
         )}
       </div>
 
-      <div className="mt-4 flex flex-col gap-2 text-sm text-muted-foreground">
+      <div className="mt-4 flex flex-col gap-2 text-sm text-neutral-600">
         <StatItem icon={Icons.star} label="Stars" value={project.stars} />
         <StatItem icon={Icons.gitFork} label="Forks" value={project.forks} />
         <StatItem
@@ -62,7 +62,7 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
         />
       </div>
 
-      <Separator className="my-4 bg-input" />
+      <Separator className="bg-input my-4" />
 
       <div className="mt-auto flex items-center justify-between text-xs">
         <div className="flex items-center gap-2">
@@ -72,7 +72,7 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
                 <span className="absolute inline-flex size-full animate-ping rounded-full bg-sky-400 opacity-75"></span>
                 <span className="relative inline-flex size-3 rounded-full bg-sky-500"></span>
               </span>
-              <span className="font-medium text-foreground">
+              <span className="text-foreground font-medium">
                 {project.language}
               </span>
             </>
@@ -98,7 +98,7 @@ function StatItem({
         <Icon className="size-4 shrink-0" />
         <span>{label}</span>
       </div>
-      <span className="font-mono text-foreground">
+      <span className="text-foreground font-mono">
         {value.toLocaleString()}
       </span>
     </div>

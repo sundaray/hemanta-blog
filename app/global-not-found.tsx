@@ -1,7 +1,6 @@
-import "@/app/globals.css";
+import "@/app/styles/globals.css";
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
-import Link from "next/link";
 import { ArrowLink } from "@/components/ui/arrow-link";
 
 const geistSans = Geist({
@@ -16,9 +15,9 @@ export const metadata: Metadata = {
 export default function GlobalNotFound() {
   return (
     <html lang="en" className={geistSans.className}>
-      <body className="flex min-h-screen flex-col items-center justify-center bg-background p-4 text-foreground">
+      <body className="bg-background text-foreground flex min-h-screen flex-col items-center justify-center p-4">
         <div className="container flex max-w-7xl flex-col items-center gap-4 text-center">
-          <h1 className="font-mono text-8xl font-bold tracking-tight text-primary">
+          <h1 className="text-primary font-mono text-8xl font-bold tracking-tight">
             404
           </h1>
           <h2>Page Not Found</h2>

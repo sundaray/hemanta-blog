@@ -143,7 +143,7 @@ export function NavLinks({
               <Link
                 className={cn(
                   "flex h-full items-center transition-colors",
-                  isActive ? "text-sky-600" : "text-neutral-600",
+                  isActive ? "text-sky-700" : "text-neutral-600",
                 )}
                 href={link.href}
               >
@@ -162,7 +162,7 @@ export function NavLinks({
               <div
                 className={cn(
                   "gsap-underline pointer-events-none absolute bottom-5 left-0 h-[1.5px] w-full origin-left scale-x-0",
-                  isActive ? "bg-sky-600" : "bg-neutral-600",
+                  isActive ? "bg-sky-700" : "bg-neutral-600",
                 )}
               />
             </motion.li>

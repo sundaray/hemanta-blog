@@ -20,7 +20,7 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
           ease: "easeOut",
           layout: { duration: 0.2, ease: "easeOut" },
         }}
-        className="group relative cursor-pointer py-12"
+        className="group relative cursor-pointer rounded-lg p-4 hover:bg-neutral-200/40"
       >
         <Link
           href={`/blog/${post.slug}`}

@@ -67,7 +67,7 @@ export function DynamicBreadcrumb({ className }: DynamicBreadcrumbProps) {
                   <BreadcrumbLink asChild>
                     <Link
                       href={href}
-                      className="font-mono font-medium text-sky-600 hover:text-sky-600 hover:underline"
+                      className="font-mono font-medium text-sky-700 hover:text-sky-700 hover:underline"
                     >
                       {unslugify(segment)}
                     </Link>
