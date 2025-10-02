@@ -35,12 +35,19 @@ export default async function OssPage({
     totalProjectsResult.isErr()
   ) {
     return (
-      <div className="container mx-auto flex items-center justify-center">
-        <div className="flex items-center gap-x-2">
-          <Icons.alertTriangle className="size-5 shrink-0" />
-          <h2 className="text-2xl font-semibold tracking-tight text-red-600">
+      <div className="container mx-auto flex h-[60vh] items-center justify-center">
+        <div
+          role="alert"
+          className="bg-card flex flex-col items-center gap-y-4 rounded-lg border p-8 text-center shadow-sm"
+        >
+          <Icons.alertTriangle className="size-10 text-red-500" />
+          <h2 className="text-2xl font-semibold text-red-600">
             Error Fetching Projects
           </h2>
+          <p className="max-w-md text-pretty text-neutral-600">
+            An unexpected error occurred while trying to load the projects.
+            Please try refreshing the page, or check back again later.
+          </p>
         </div>
       </div>
     );

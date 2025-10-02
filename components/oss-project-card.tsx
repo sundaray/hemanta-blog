@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+
+import type { SelectOssProject } from "@/db/schema";
+import { cn } from "@/lib/utils";
+
 import { Icons } from "@/components/icons";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
-import type { SelectOssProject } from "@/db/schema";
 
 type OssProjectCardProps = {
   project: SelectOssProject;
@@ -15,7 +17,10 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
   return (
     <div
       className={cn(
-        "border-border group relative flex flex-col rounded-lg border p-4 shadow-sm transition-all hover:shadow-lg",
+        "group relative flex flex-col rounded-lg p-4 transition-all",
+        "bg-gradient-to-bl from-neutral-100 to-neutral-50",
+        "shadow-[inset_-2px_2px_#fff,_-4px_4px_10px_rgb(0_0_0_/_0.1)]",
+        "hover:scale-103",
         className,
       )}
     >
