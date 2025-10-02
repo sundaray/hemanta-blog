@@ -1,7 +1,8 @@
-import { Frontmatter } from "@/types";
 import fs from "fs";
-import matter from "gray-matter";
 import path from "path";
+
+import { Frontmatter } from "@/types";
+import matter from "gray-matter";
 
 const postsDirectory = path.join(process.cwd(), "app/(posts)");
 

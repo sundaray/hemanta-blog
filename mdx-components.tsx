@@ -1,10 +1,13 @@
-import { CodeBlockWrapper } from "@/components/blog/code-block-wrapper";
-import { Icons } from "@/components/icons";
-import { slugify } from "@/lib/utils";
+import React from "react";
+import Link, { LinkProps } from "next/link";
+
 import type { MDXComponents } from "mdx/types";
 import type { Route } from "next";
-import Link, { LinkProps } from "next/link";
-import React from "react";
+
+import { slugify } from "@/lib/utils";
+
+import { CodeBlockWrapper } from "@/components/blog/code-block-wrapper";
+import { Icons } from "@/components/icons";
 
 type CustomLinkProps = React.HTMLAttributes<HTMLAnchorElement> &
   Partial<LinkProps<Route>>;
@@ -34,7 +37,7 @@ function CustomLink(props: CustomLinkProps) {
         {...rest}
       >
         <span>{children}</span>
-        <Icons.arrowUpRight className="size-3 text-muted-foreground" />
+        <Icons.arrowUpRight className="text-muted-foreground size-3" />
       </a>
     );
   }

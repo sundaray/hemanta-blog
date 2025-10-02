@@ -1,4 +1,5 @@
-import { Result, ok, err } from "neverthrow";
+import { err, ok, Result } from "neverthrow";
+
 import { GitHubUrlParsingError } from "@/lib/errors";
 
 export function parseGitHubUrl(

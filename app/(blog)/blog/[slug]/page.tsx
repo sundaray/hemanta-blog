@@ -1,8 +1,9 @@
-import { BlogPostLayout } from "@/components/blog/blog-post-layout";
+import type { Metadata } from "next";
+
 import { getBlogPostBySlug } from "@/lib/get-blog-post-by-slug";
 import { getBlogPostsSlugs } from "@/lib/get-blog-posts-slugs";
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+
+import { BlogPostLayout } from "@/components/blog/blog-post-layout";
 
 export async function generateMetadata(
   props: PageProps<"/blog/[slug]">,

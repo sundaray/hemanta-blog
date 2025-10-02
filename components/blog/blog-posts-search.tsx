@@ -1,12 +1,15 @@
 "use client";
 
+import * as React from "react";
+import { useCallback } from "react";
+
+import { debounce, useQueryStates } from "nuqs";
+
+import { blogSearchParams } from "@/lib/blog-search-params";
+import { cn } from "@/lib/utils";
+
 import { Icons } from "@/components/icons";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import * as React from "react";
-import { useQueryStates, debounce } from "nuqs";
-import { blogSearchParams } from "@/lib/blog-search-params";
-import { useCallback } from "react";
 
 export function BlogPostsSearch({ className }: { className?: string }) {
   const [values, setValues] = useQueryStates(
@@ -39,7 +42,7 @@ export function BlogPostsSearch({ className }: { className?: string }) {
         <Input
           type="search"
           placeholder="Search posts by name or description…"
-          className="col-start-1 row-start-1 h-12 bg-background pl-10"
+          className="bg-background col-start-1 row-start-1 h-12 pl-10"
           value={values.query}
           onChange={(e) =>
             setValues(
@@ -54,13 +57,13 @@ export function BlogPostsSearch({ className }: { className?: string }) {
           onKeyDown={handleKeyDown}
         />
         <div className="pointer-events-none col-start-1 row-start-1 pl-4">
-          <Icons.search className="size-5 text-muted-foreground" />
+          <Icons.search className="text-muted-foreground size-5" />
         </div>
         {values.query && (
           <div className="pointer-events-none col-start-1 row-start-1 flex items-center justify-end pr-4">
             <button
               onClick={clearSearch}
-              className="pointer-events-auto cursor-pointer rounded border bg-background px-1.5 py-0.5 text-sm text-muted-foreground transition-colors hover:bg-accent"
+              className="bg-background text-muted-foreground hover:bg-accent pointer-events-auto cursor-pointer rounded border px-1.5 py-0.5 text-sm transition-colors"
               aria-label="Clear search"
             >
               esc

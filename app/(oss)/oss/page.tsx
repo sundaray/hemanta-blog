@@ -1,10 +1,11 @@
-import { getOssProjects, getOssProjectsCount } from "@/lib/get-oss-projects";
-import { Icons } from "@/components/icons";
-import { searchParamsCache } from "@/lib/search-params";
-import { OssProjectsContent } from "@/components/oss-projects-content";
-import { getOssProjectFilterOptions } from "@/lib/get-oss-project-filters-options";
 import type { SearchParams } from "nuqs/server";
-import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb";
+
+import { getOssProjectFilterOptions } from "@/lib/get-oss-project-filters-options";
+import { getOssProjects, getOssProjectsCount } from "@/lib/get-oss-projects";
+import { searchParamsCache } from "@/lib/search-params";
+
+import { Icons } from "@/components/icons";
+import { OssProjectsContent } from "@/components/oss-projects-content";
 import { ArrowLink } from "@/components/ui/arrow-link";
 
 const PROJECTS_PER_PAGE = 36;

@@ -1,5 +1,13 @@
 "use client";
 
+import { useMemo } from "react";
+
+import { useQueryStates } from "nuqs";
+
+import { blogSearchParams } from "@/lib/blog-search-params";
+import { calculatePaginationRange } from "@/lib/pagination";
+import { cn } from "@/lib/utils";
+
 import {
   Pagination,
   PaginationContent,
@@ -9,11 +17,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { blogSearchParams } from "@/lib/blog-search-params";
-import { calculatePaginationRange } from "@/lib/pagination";
-import { cn } from "@/lib/utils";
-import { useQueryStates } from "nuqs";
-import { useMemo } from "react";
 
 const SIBLING_COUNT = 2;
 

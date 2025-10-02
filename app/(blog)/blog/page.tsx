@@ -1,9 +1,11 @@
+import type { SearchParams } from "nuqs/server";
+
+import { blogSearchParamsCache } from "@/lib/blog-search-params";
 import { getBlogPosts } from "@/lib/get-blog-posts";
 import { getBlogPostsTags } from "@/lib/get-blog-posts-tags";
-import { BlogPostsSearch } from "@/components/blog/blog-posts-search";
-import type { SearchParams } from "nuqs/server";
-import { blogSearchParamsCache } from "@/lib/blog-search-params";
+
 import { BlogPageContent } from "@/components/blog/blog-page-content";
+import { BlogPostsSearch } from "@/components/blog/blog-posts-search";
 import { ArrowLink } from "@/components/ui/arrow-link";
 
 const POSTS_PER_PAGE = 5;

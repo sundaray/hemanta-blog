@@ -1,7 +1,9 @@
+import Link from "next/link";
+
+import type { NavItem as NavItemType } from "@/types";
+
 import { MobileNav } from "@/components/navigation/mobile-nav";
 import { NavLinks } from "@/components/navigation/nav-links";
-import type { NavItem as NavItemType } from "@/types";
-import Link from "next/link";
 
 type MainNavProps = {
   links: NavItemType[];

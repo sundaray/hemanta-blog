@@ -1,12 +1,14 @@
 "use client";
 
-import { navbarLinks } from "@/config/navbar";
-import { cn } from "@/lib/utils";
-import { AnimatePresence, motion, MotionConfig } from "motion/react";
-import type { Route } from "next";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useEffect, useState } from "react";
+
+import { AnimatePresence, motion, MotionConfig } from "motion/react";
+import type { Route } from "next";
+
+import { navbarLinks } from "@/config/navbar";
+import { cn } from "@/lib/utils";
 
 // ============================================================================
 // MobileNav

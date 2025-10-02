@@ -1,11 +1,12 @@
 "use client";
 
-import { LayoutGroup, motion, AnimatePresence } from "motion/react";
-import { BlogPostsTags } from "@/components/blog/blog-posts-tags";
-import { BlogPostsPagination } from "@/components/blog/blog-posts-pagination";
-import { Icons } from "@/components/icons";
 import type { BlogPost } from "@/types";
+import { AnimatePresence, LayoutGroup, motion } from "motion/react";
+
 import { BlogPostCard } from "@/components/blog/blog-post-card";
+import { BlogPostsPagination } from "@/components/blog/blog-posts-pagination";
+import { BlogPostsTags } from "@/components/blog/blog-posts-tags";
+import { Icons } from "@/components/icons";
 
 type BlogPageContentProps = {
   paginatedPosts: BlogPost[];
@@ -50,7 +51,7 @@ export function BlogPageContent({
               transition={{ duration: 0.2, ease: "easeOut" }}
               className="flex flex-col items-center justify-center py-24 text-center"
             >
-              <Icons.search className="size-10 text-muted-foreground" />
+              <Icons.search className="text-muted-foreground size-10" />
               <h2 className="mt-4">No Posts Found</h2>
               <p className="mt-2 text-neutral-600">
                 Try adjusting your search or filter criteria.

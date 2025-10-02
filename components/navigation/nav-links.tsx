@@ -1,15 +1,16 @@
 "use client";
 
-import { motion } from "motion/react";
-import { usePathname } from "next/navigation";
 import { useRef } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 import type { NavItem as NavItemType } from "@/types";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { SplitText } from "gsap/SplitText";
+import { motion } from "motion/react";
 
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 
 gsap.registerPlugin(useGSAP, SplitText);
 
@@ -152,7 +153,7 @@ export function NavLinks({
                     {link.title}
                   </span>
                   <span
-                    className="gsap-text-clone absolute top-full left-0 translate-y-0 whitespace-nowrap [font-kerning:none]"
+                    className="gsap-text-clone absolute left-0 top-full translate-y-0 whitespace-nowrap [font-kerning:none]"
                     aria-hidden="true"
                   >
                     {link.title}

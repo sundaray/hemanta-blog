@@ -1,4 +1,5 @@
 import type { AdminNavItem, NavItem } from "@/types";
+
 import { Icons } from "@/components/icons";
 
 type NavbarConfig = {

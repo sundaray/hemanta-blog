@@ -1,11 +1,14 @@
 import { notFound } from "next/navigation";
-import { getOssProjectByName } from "@/lib/get-oss-project-by-name";
-import { TopicTagGroup } from "@/components/ui/topic-tag-group";
-import { ArrowLink } from "@/components/ui/arrow-link";
-import { Icons } from "@/components/icons";
-import { cn } from "@/lib/utils";
-import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb";
+
 import { FaGithub } from "react-icons/fa";
+
+import { getOssProjectByName } from "@/lib/get-oss-project-by-name";
+import { cn } from "@/lib/utils";
+
+import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb";
+import { Icons } from "@/components/icons";
+import { ArrowLink } from "@/components/ui/arrow-link";
+import { TopicTagGroup } from "@/components/ui/topic-tag-group";
 
 export default async function OssProjectDetailsPage(
   props: PageProps<"/oss/[repo]">,
@@ -21,14 +24,14 @@ export default async function OssProjectDetailsPage(
       <div className="container mx-auto flex h-[60vh] items-center justify-center">
         <div
           role="alert"
-          className="flex flex-col items-center gap-y-4 rounded-lg border bg-card p-8 text-card-foreground shadow-sm"
+          className="bg-card text-card-foreground flex flex-col items-center gap-y-4 rounded-lg border p-8 shadow-sm"
         >
           <Icons.alertTriangle className="size-8 text-red-500" />
           <div className="text-center">
             <h1 className="text-2xl text-red-500">
               Error Fetching Project Details
             </h1>
-            <p className="mt-2 text-muted-foreground">{result.error.message}</p>
+            <p className="text-muted-foreground mt-2">{result.error.message}</p>
           </div>
           <ArrowLink href="/oss" className="mt-4">
             Back to all projects
@@ -64,8 +67,8 @@ export default async function OssProjectDetailsPage(
             target="_blank"
             rel="noopener noreferrer"
             className={cn(
-              "inline-flex items-center justify-center gap-2 rounded-md font-semibold whitespace-nowrap",
-              "h-9 bg-primary px-4 py-2 text-primary-foreground transition-colors hover:bg-primary/90",
+              "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-semibold",
+              "bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2 transition-colors",
             )}
           >
             <FaGithub className="size-4" />
@@ -78,8 +81,8 @@ export default async function OssProjectDetailsPage(
               target="_blank"
               rel="noopener noreferrer"
               className={cn(
-                "inline-flex items-center justify-center gap-2 font-semibold whitespace-nowrap",
-                "h-9 px-4 py-2 text-secondary-foreground",
+                "inline-flex items-center justify-center gap-2 whitespace-nowrap font-semibold",
+                "text-secondary-foreground h-9 px-4 py-2",
               )}
             >
               <Icons.globe className="size-4" />

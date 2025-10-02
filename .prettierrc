@@ -1,7 +1,29 @@
 {
   "plugins": [
+    "@ianvs/prettier-plugin-sort-imports",
     "prettier-plugin-tailwindcss"
   ],
   "tailwindFunctions": ["cn"],
-  "tailwindStylesheet": "./app/globals.css"
+  "tailwindStylesheet": "./app/globals.css",
+  "importOrder": [
+    "^react$",
+    "^next/(.*)$",
+    "",
+
+    "<THIRD_PARTY_MODULES>",
+    "",
+
+    "^@/config/(.*)$",
+    "^@/db/(.*)$",
+    "^@/types/(.*)$",
+    "^@/lib/(.*)$",
+    "^@/hooks/(.*)$",
+    "",
+
+    "^@/components/(.*)$",
+    "",
+
+    "^[./]"
+  ],
+  "importOrderTypeScriptVersion": "5.0.0"
 }

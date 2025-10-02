@@ -1,13 +1,15 @@
 "use client";
 
-import { Check, Copy } from "lucide-react";
 import { useState } from "react";
+
+import { Check, Copy } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { motion, AnimatePresence } from "motion/react";
 
 const iconVariants = {
   initial: {

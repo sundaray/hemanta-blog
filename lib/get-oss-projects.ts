@@ -1,18 +1,20 @@
-import { ResultAsync } from "neverthrow";
 import { db } from "@/db";
-import { ossProjects, type SelectOssProject } from "@/db/schema";
-import { DatabaseError } from "./errors";
 import {
   and,
-  ilike,
   arrayOverlaps,
-  SQL,
-  desc,
-  inArray,
   count,
+  desc,
+  ilike,
+  inArray,
   or,
+  SQL,
 } from "drizzle-orm";
+import { ResultAsync } from "neverthrow";
+
+import { ossProjects, type SelectOssProject } from "@/db/schema";
 import type { OssProjectsSearchParams } from "@/lib/search-params";
+
+import { DatabaseError } from "./errors";
 
 // 🔹 Build the query conditions
 function buildConditions(

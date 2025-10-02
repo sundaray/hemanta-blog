@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { MainNav } from "@/components/navigation/main-nav";
+
 import { navbarLinks } from "@/config/navbar";
+
+import { MainNav } from "@/components/navigation/main-nav";
 import { MainNavWrapper } from "@/components/navigation/main-nav-wrapper";
 
 export const metadata: Metadata = {

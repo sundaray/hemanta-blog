@@ -1,11 +1,13 @@
-import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb";
-import { TableOfContents } from "@/components/blog/toc";
-import { type TableOfContents as TOCType } from "@/lib/toc";
+import React from "react";
+import Image from "next/image";
+
 import { Frontmatter } from "@/types";
 import { format } from "date-fns";
-import Image from "next/image";
-import React from "react";
+
+import { type TableOfContents as TOCType } from "@/lib/toc";
+
 import { TagDisplayList } from "@/components/blog/tag-display-list";
+import { TableOfContents } from "@/components/blog/toc";
 import { ArrowLink } from "@/components/ui/arrow-link";
 
 type BlogPostLayoutProps = {

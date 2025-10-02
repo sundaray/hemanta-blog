@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { ArrowLink } from "@/components/ui/arrow-link";
+
 import type { BlogPost } from "@/types";
-import { motion, AnimatePresence } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
+
+import { ArrowLink } from "@/components/ui/arrow-link";
 
 type BlogPostCardProps = {
   post: BlogPost;
@@ -27,7 +29,7 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
           className="absolute inset-0 z-10"
           aria-label={`Read more about ${post.title}`}
         />
-        <p className="font-mono text-sm text-muted-foreground">
+        <p className="text-muted-foreground font-mono text-sm">
           {new Date(post.publishedAt).toLocaleDateString("en-US", {
             year: "numeric",
             month: "long",

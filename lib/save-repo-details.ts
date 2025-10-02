@@ -1,8 +1,10 @@
-import { ok, ResultAsync } from "neverthrow";
 import { db } from "@/db";
-import { ossProjects } from "@/db/schema";
-import { DatabaseError } from "./errors";
 import type { GitHubRepoData } from "@/types";
+import { ok, ResultAsync } from "neverthrow";
+
+import { ossProjects } from "@/db/schema";
+
+import { DatabaseError } from "./errors";
 
 export function saveRepoDetails(
   repoData: GitHubRepoData,

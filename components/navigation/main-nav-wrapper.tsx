@@ -1,8 +1,10 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { useMotionValueEvent, useScroll } from "motion/react";
 import { useState } from "react";
+
+import { useMotionValueEvent, useScroll } from "motion/react";
+
+import { cn } from "@/lib/utils";
 
 export function MainNavWrapper({ children }: { children: React.ReactNode }) {
   const [scrolled, setScrolled] = useState(false);

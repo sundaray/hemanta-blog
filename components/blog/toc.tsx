@@ -1,11 +1,14 @@
 "use client";
 
-import { Icons } from "@/components/icons";
-import { useMounted } from "@/hooks/use-mounted";
+import * as React from "react";
+
+import { motion } from "motion/react";
+
 import { type TableOfContents as TOCType } from "@/lib/toc";
 import { cn } from "@/lib/utils";
-import { motion } from "motion/react";
-import * as React from "react";
+import { useMounted } from "@/hooks/use-mounted";
+
+import { Icons } from "@/components/icons";
 
 interface TocProps {
   toc: TOCType;
@@ -123,11 +126,11 @@ export function TableOfContents({ toc }: TocProps) {
   return (
     <div className="space-y-4">
       <p className="flex items-center gap-2">
-        <Icons.toc className="size-4 text-muted-foreground" />
+        <Icons.toc className="text-muted-foreground size-4" />
         <span className="text-foreground">ON THIS PAGE</span>
       </p>
 
-      <div ref={containerRef} className="relative border-l border-input pl-4">
+      <div ref={containerRef} className="border-input relative border-l pl-4">
         {indicator.visible && (
           <motion.span
             aria-hidden

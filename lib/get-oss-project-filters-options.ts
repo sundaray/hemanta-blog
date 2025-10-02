@@ -1,8 +1,10 @@
 import "server-only";
 
 import { db } from "@/db";
-import { ossProjects } from "@/db/schema";
 import { ResultAsync } from "neverthrow";
+
+import { ossProjects } from "@/db/schema";
+
 import { DatabaseError } from "./errors";
 
 export function getOssProjectFilterOptions(filters: {

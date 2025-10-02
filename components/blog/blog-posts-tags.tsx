@@ -1,18 +1,21 @@
 "use client";
 
-import { motion, AnimatePresence } from "motion/react";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+import { AnimatePresence, motion } from "motion/react";
+import { useQueryStates } from "nuqs";
 import {
   Button,
+  Tag,
   TagGroup,
   TagList,
-  Tag,
   type Selection as AriaSelection,
 } from "react-aria-components";
-import { Icons } from "@/components/icons";
-import { cn } from "@/lib/utils";
-import { useQueryStates } from "nuqs";
+
 import { blogSearchParams } from "@/lib/blog-search-params";
+import { cn } from "@/lib/utils";
+
+import { Icons } from "@/components/icons";
 
 type BlogTagsProps = {
   tags: string[];
@@ -93,11 +96,11 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
           disabled={!canScrollLeft}
           aria-label="Scroll tags left"
           className={cn(
-            "z-10 flex size-9 items-center justify-center rounded-full border shadow-sm transition-opacity hover:bg-accent",
+            "hover:bg-accent z-10 flex size-9 items-center justify-center rounded-full border shadow-sm transition-opacity",
             "disabled:cursor-not-allowed disabled:opacity-30",
           )}
         >
-          <Icons.chevronLeft className="size-6 text-muted-foreground" />
+          <Icons.chevronLeft className="text-muted-foreground size-6" />
         </button>
         <div
           className={cn(
@@ -107,7 +110,7 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
         >
           <div
             ref={scrollerRef}
-            className="flex overflow-x-auto scroll-smooth py-2 whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex overflow-x-auto scroll-smooth whitespace-nowrap py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             <TagGroup
               aria-label="Blog post tags"
@@ -122,7 +125,7 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
                     key={tag}
                     id={tag}
                     className={cn(
-                      "cursor-pointer rounded-full border border-sky-200 bg-sky-100 px-3 py-1.5 text-sm font-semibold text-sky-700 transition-colors outline-none",
+                      "cursor-pointer rounded-full border border-sky-200 bg-sky-100 px-3 py-1.5 text-sm font-semibold text-sky-700 outline-none transition-colors",
                       "hover:border-sky-700 hover:bg-sky-700 hover:text-white focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2", // This logic still works perfectly!
                       selectedTags.includes(tag)
                         ? "border-sky-700 bg-sky-700 text-white"
@@ -141,11 +144,11 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
           disabled={!canScrollRight}
           aria-label="Scroll tags right"
           className={cn(
-            "z-10 flex size-9 shrink-0 items-center justify-center rounded-full border shadow-sm transition-opacity hover:bg-accent",
+            "hover:bg-accent z-10 flex size-9 shrink-0 items-center justify-center rounded-full border shadow-sm transition-opacity",
             "disabled:cursor-not-allowed disabled:opacity-30",
           )}
         >
-          <Icons.chevronRight className="size-6 text-muted-foreground" />
+          <Icons.chevronRight className="text-muted-foreground size-6" />
         </button>
       </div>
       {/* Display Selected Tags */}

@@ -1,8 +1,10 @@
-import { ResultAsync } from "neverthrow";
 import { db } from "@/db";
-import { ossProjects, type SelectOssProject } from "@/db/schema";
-import { DatabaseError } from "./errors";
 import { eq } from "drizzle-orm";
+import { ResultAsync } from "neverthrow";
+
+import { ossProjects, type SelectOssProject } from "@/db/schema";
+
+import { DatabaseError } from "./errors";
 
 export function getOssProjectByName(
   name: string,

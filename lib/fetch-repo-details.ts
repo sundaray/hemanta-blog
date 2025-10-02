@@ -1,5 +1,6 @@
-import { errAsync, ResultAsync } from "neverthrow";
 import type { GitHubRepoData } from "@/types";
+import { errAsync, ResultAsync } from "neverthrow";
+
 import {
   AppError,
   GithubApiError,
