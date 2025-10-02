@@ -1,5 +1,7 @@
 "use client";
 
+import { IoMdCloseCircle } from "react-icons/io";
+
 import { cn } from "@/lib/utils";
 
 import { Icons } from "@/components/icons";
@@ -40,7 +42,7 @@ export function OssProjectsSearchResultsHeader({
             onClick={onResetFilters}
             className="text-sm font-semibold text-sky-700 hover:bg-sky-100/50 hover:text-sky-700"
           >
-            <Icons.circleX className="size-4" />
+            <IoMdCloseCircle className="size-4" />
             Reset
           </Button>
         )}

@@ -1,26 +1,17 @@
 "use client";
 
-import {
-  useCallback,
-  useState,
-  useTransition,
-  type KeyboardEvent,
-} from "react";
+import { useCallback, useState, type KeyboardEvent } from "react";
 
 import { motion } from "motion/react";
-import { debounce, useQueryState } from "nuqs";
 
-import { searchParams } from "@/lib/search-params";
 import { cn } from "@/lib/utils";
 
 import { Icons } from "@/components/icons";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-// 🔹 MODIFIED: The props are much simpler now, focused on receiving data and functions.
 type OssProjectsSidebarProps = {
   uniqueTopics: string[];
   uniqueLanguages: string[];
@@ -31,92 +22,60 @@ type OssProjectsSidebarProps = {
   onLanguageSelect: (item: string, isChecked: boolean) => void;
   selectedTopics: string[];
   selectedLanguages: string[];
+  topicQuery: string;
+  onTopicQueryChange: (value: string) => void;
+  languageQuery: string;
+  onLanguageQueryChange: (value: string) => void;
+  isLoading: boolean;
 };
 
 export function OssProjectsSidebar({
   uniqueTopics,
   uniqueLanguages,
   className,
-  hasActiveSidebarFilters,
-  onClearAllFilters,
   onTopicSelect,
   onLanguageSelect,
   selectedTopics,
   selectedLanguages,
+  topicQuery,
+  onTopicQueryChange,
+  languageQuery,
+  onLanguageQueryChange,
+  isLoading,
 }: OssProjectsSidebarProps) {
-  // 🔹 REMOVED: All the complex state and effect hooks.
-
-  // 🔹 KEPT & SIMPLIFIED: Only the local state for the filter search inputs remains.
-  const [isTopicQueryLoading, startTopicQueryTransition] = useTransition();
-  const [isLanguageQueryLoading, startLanguageQueryTransition] =
-    useTransition();
-
-  // This hook now uses `nuqs`'s `useQueryState` for individual control,
-  // which is simpler than managing the whole object.
-  const [topicQuery, setTopicQuery] = useQueryState("topic-query", {
-    ...searchParams["topic-query"],
-    startTransition: startTopicQueryTransition,
-    shallow: false,
-    history: "push",
-    limitUrlUpdates: debounce(300),
-  });
-
-  const [languageQuery, setLanguageQuery] = useQueryState("language-query", {
-    ...searchParams["language-query"],
-    startTransition: startLanguageQueryTransition,
-    shallow: false,
-    history: "push",
-    limitUrlUpdates: debounce(300),
-  });
-
   return (
     <search>
       <aside className={cn(className, "divide-y-1 divide-input divide-solid")}>
-        <div className="flex h-10 items-start justify-between">
+        <div className="h-10">
           <h4>Filter OSS Projects</h4>
-          {/* 🔹 This button now uses the props passed down from the parent */}
-          {hasActiveSidebarFilters && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClearAllFilters}
-              className="text-muted-foreground text-sm"
-            >
-              <Icons.circleX className="size-4" />
-              Clear
-            </Button>
-          )}
         </div>
 
         <FilterSection
           title="Topics"
           items={uniqueTopics}
           searchTerm={topicQuery}
-          onSearchChange={(value) => setTopicQuery(value || null)}
+          onSearchChange={onTopicQueryChange}
           selectedItems={selectedTopics}
           onItemSelectChange={onTopicSelect}
-          isLoading={isTopicQueryLoading}
+          isLoading={isLoading}
           defaultOpen={true}
         />
         <FilterSection
           title="Languages"
           items={uniqueLanguages}
           searchTerm={languageQuery}
-          onSearchChange={(value) => setLanguageQuery(value || null)}
+          onSearchChange={onLanguageQueryChange}
           selectedItems={selectedLanguages}
           onItemSelectChange={onLanguageSelect}
-          isLoading={isLanguageQueryLoading}
+          isLoading={isLoading}
         />
       </aside>
     </search>
   );
 }
 
-// ... The FilterSection and FilterItem components below need no changes.
-// I am including them here so you can replace the whole file.
-
 // ======================================================================
-// FilterSection Component (No changes needed)
+// FilterSection Component
 // ======================================================================
 type FilterSectionProps = {
   title: string;
@@ -242,7 +201,7 @@ function FilterSection({
 }
 
 // ======================================================================
-// FilterItem Component (No changes needed)
+// FilterItem Component
 // ======================================================================
 function FilterItem({
   label,

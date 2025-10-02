@@ -31,9 +31,9 @@ export function OssProjectsContent({
   totalProjects,
 }: OssContentProps) {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+
   const [isFiltering, startFilteringTransition] = useTransition();
   const [isPaginating, startPaginationTransition] = useTransition();
-  const isGridLoading = isFiltering || isPaginating;
 
   const [filters, setFilters] = useQueryStates(searchParams, {
     startTransition: startFilteringTransition,
@@ -41,7 +41,8 @@ export function OssProjectsContent({
     history: "push",
   });
 
-  // (All the logic for buttons is the same)
+  const isGridLoading = isFiltering || isPaginating;
+
   const hasActiveSidebarFilters =
     filters.topic.length > 0 ||
     filters.language.length > 0 ||
@@ -54,8 +55,8 @@ export function OssProjectsContent({
     setFilters({
       topic: null,
       language: null,
-      "topic-query": null,
-      "language-query": null,
+      "topic-query": "",
+      "language-query": "",
       page: null,
     });
   }, [setFilters]);
@@ -64,9 +65,9 @@ export function OssProjectsContent({
     setFilters({
       topic: null,
       language: null,
-      "topic-query": null,
-      "language-query": null,
-      query: null,
+      "topic-query": "",
+      "language-query": "",
+      query: "",
       page: null,
     });
   }, [setFilters]);
@@ -75,6 +76,24 @@ export function OssProjectsContent({
     setFilters(
       { query: value, page: null },
       { limitUrlUpdates: value === "" ? undefined : debounce(300) },
+    );
+  };
+
+  const handleTopicQueryChange = (value: string) => {
+    setFilters(
+      { "topic-query": value },
+      {
+        limitUrlUpdates: value === "" ? undefined : debounce(300),
+      },
+    );
+  };
+
+  const handleLanguageQueryChange = (value: string) => {
+    setFilters(
+      { "language-query": value },
+      {
+        limitUrlUpdates: value === "" ? undefined : debounce(300),
+      },
     );
   };
 
@@ -129,6 +148,11 @@ export function OssProjectsContent({
             onLanguageSelect={(item, isChecked) =>
               handleSelectionChange("language", item, isChecked)
             }
+            topicQuery={filters["topic-query"]}
+            onTopicQueryChange={handleTopicQueryChange}
+            languageQuery={filters["language-query"]}
+            onLanguageQueryChange={handleLanguageQueryChange}
+            isLoading={isFiltering}
           />
         )}
         <div className="flex-1">
