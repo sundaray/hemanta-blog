@@ -32,7 +32,7 @@ export function BlogPostLayout({
             className="font-semibold text-sky-700"
             direction="left"
           >
-            Blog
+            Back to blog
           </ArrowLink>
           <h1 className="mt-6 text-balance">{title}</h1>
           <div className="mt-12 flex w-full items-center justify-center space-x-4">

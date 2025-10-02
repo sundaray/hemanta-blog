@@ -40,14 +40,15 @@ export default async function OssPage({
           role="alert"
           className="bg-card flex flex-col items-center gap-y-4 rounded-lg border p-8 text-center shadow-sm"
         >
-          <Icons.alertTriangle className="size-10 text-red-500" />
-          <h2 className="text-2xl font-semibold text-red-600">
-            Error Fetching Projects
-          </h2>
+          <Icons.alertTriangle className="size-8 text-red-500" />
+          <h2 className="text-red-600">Error Fetching Projects</h2>
           <p className="max-w-md text-pretty text-neutral-600">
             An unexpected error occurred while trying to load the projects.
             Please try refreshing the page, or check back again later.
           </p>
+          <ArrowLink href="/" className="mt-4 font-semibold" direction="left">
+            Back to home
+          </ArrowLink>
         </div>
       </div>
     );

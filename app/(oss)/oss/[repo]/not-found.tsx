@@ -8,8 +8,8 @@ export default function NotFound() {
         Oops! We couldn't find the project you were looking for. It might have
         been moved, or the URL may be incorrect.
       </p>
-      <ArrowLink href="/oss" className="mt-8">
-        Back to All Projects
+      <ArrowLink href="/oss" className="mt-8 font-semibold" direction="left">
+        Back to projects
       </ArrowLink>
     </div>
   );
