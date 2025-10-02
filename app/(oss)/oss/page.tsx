@@ -55,10 +55,10 @@ export default async function OssPage({
       <div className="text-center">
         <ArrowLink
           href="/"
-          className="mb-4 font-mono font-semibold text-sky-700"
+          className="mb-4 font-semibold text-sky-700"
           direction="left"
         >
-          Home
+          Back to home
         </ArrowLink>
         <h1>Open Source Software</h1>
         <p className="mx-auto mt-8 max-w-3xl text-balance text-lg text-neutral-600">
