@@ -33,15 +33,39 @@ export function OssProjectsContent({
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
   const [isFiltering, startFilteringTransition] = useTransition();
-  const [isPaginating, startPaginationTransition] = useTransition();
+  const [isPaginating, startPaginationTransition] = useTransition(); // 🔹 ADDED: New transition specifically for sidebar option searches
+  const [isSidebarQuerying, startSidebarQueryingTransition] = useTransition(); // 🔹 SPLIT: State management is now split to use different transitions
 
-  const [filters, setFilters] = useQueryStates(searchParams, {
-    startTransition: startFilteringTransition,
-    shallow: false,
-    history: "push",
-  });
+  const [mainFilters, setMainFilters] = useQueryStates(
+    {
+      query: searchParams.query,
+      topic: searchParams.topic,
+      language: searchParams.language,
+      page: searchParams.page,
+    },
+    {
+      startTransition: startFilteringTransition,
+      shallow: false,
+      history: "push",
+    },
+  );
+
+  const [sidebarQueries, setSidebarQueries] = useQueryStates(
+    {
+      "topic-query": searchParams["topic-query"],
+      "language-query": searchParams["language-query"],
+    },
+    {
+      startTransition: startSidebarQueryingTransition,
+      shallow: false,
+      history: "push",
+    },
+  );
+
+  const filters = { ...mainFilters, ...sidebarQueries };
 
   const isGridLoading = isFiltering || isPaginating;
+  const isSidebarLoading = isSidebarQuerying;
 
   const hasActiveSidebarFilters =
     filters.topic.length > 0 ||
@@ -52,35 +76,53 @@ export function OssProjectsContent({
   const hasActiveFilters = hasActiveSidebarFilters || filters.query !== "";
 
   const handleClearSidebarFilters = useCallback(() => {
-    setFilters({
+    setMainFilters({
       topic: null,
       language: null,
-      "topic-query": "",
-      "language-query": "",
       page: null,
     });
-  }, [setFilters]);
+    setSidebarQueries({
+      "topic-query": "",
+      "language-query": "",
+    });
+  }, [setMainFilters, setSidebarQueries]);
 
   const handleResetAll = useCallback(() => {
-    setFilters({
-      topic: null,
-      language: null,
-      "topic-query": "",
-      "language-query": "",
-      query: "",
-      page: null,
-    });
-  }, [setFilters]);
+    const areMainFiltersActive =
+      filters.query !== "" ||
+      filters.topic.length > 0 ||
+      filters.language.length > 0;
+
+    if (areMainFiltersActive) {
+      setMainFilters({
+        query: "",
+        topic: null,
+        language: null,
+        page: null,
+      });
+    }
+
+    const areSidebarQueriesActive =
+      filters["topic-query"] !== "" || filters["language-query"] !== "";
+
+    if (areSidebarQueriesActive) {
+      setSidebarQueries({
+        "topic-query": "",
+        "language-query": "",
+      });
+    }
+  }, [setMainFilters, setSidebarQueries, filters]);
 
   const handleQueryChange = (value: string) => {
-    setFilters(
+    setMainFilters(
       { query: value, page: null },
       { limitUrlUpdates: value === "" ? undefined : debounce(300) },
     );
   };
 
   const handleTopicQueryChange = (value: string) => {
-    setFilters(
+    // 🔹 UPDATED: Use the sidebar query setter
+    setSidebarQueries(
       { "topic-query": value },
       {
         limitUrlUpdates: value === "" ? undefined : debounce(300),
@@ -89,7 +131,7 @@ export function OssProjectsContent({
   };
 
   const handleLanguageQueryChange = (value: string) => {
-    setFilters(
+    setSidebarQueries(
       { "language-query": value },
       {
         limitUrlUpdates: value === "" ? undefined : debounce(300),
@@ -102,12 +144,15 @@ export function OssProjectsContent({
     item: string,
     isChecked: boolean,
   ) => {
-    const currentValues = filters[key];
+    const currentValues = mainFilters[key];
     const newValues = isChecked
       ? [...currentValues, item]
       : currentValues.filter((filter) => filter !== item);
 
-    setFilters({ [key]: newValues.length > 0 ? newValues : null, page: null });
+    setMainFilters({
+      [key]: newValues.length > 0 ? newValues : null,
+      page: null,
+    });
   };
 
   const toggleSidebar = () => {
@@ -121,7 +166,6 @@ export function OssProjectsContent({
         value={filters.query}
         onChange={handleQueryChange}
       />
-
       <OssProjectsSearchResultsHeader
         isSidebarVisible={isSidebarVisible}
         onToggleSidebar={toggleSidebar}
@@ -131,7 +175,6 @@ export function OssProjectsContent({
         hasActiveFilters={hasActiveFilters}
         onResetFilters={handleResetAll}
       />
-
       <div className="lg:flex lg:gap-8">
         {isSidebarVisible && (
           <OssProjectsSidebar
@@ -152,7 +195,7 @@ export function OssProjectsContent({
             onTopicQueryChange={handleTopicQueryChange}
             languageQuery={filters["language-query"]}
             onLanguageQueryChange={handleLanguageQueryChange}
-            isLoading={isFiltering}
+            isLoading={isSidebarLoading}
           />
         )}
         <div className="flex-1">
@@ -162,7 +205,7 @@ export function OssProjectsContent({
                 className="absolute left-1/2 top-[20px] z-30 -translate-x-1/2"
                 aria-hidden="true"
               >
-                <Icons.spinner className="size-8 animate-spin text-sky-700" />
+                <Icons.spinner className="size-8 animate-spin text-sky-700" /> 
               </div>
             )}
             <div
