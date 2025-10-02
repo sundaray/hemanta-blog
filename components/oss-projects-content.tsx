@@ -1,14 +1,19 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { cn } from "@/lib/utils";
+import { useCallback, useState, useTransition } from "react";
+
+import { debounce, useQueryStates } from "nuqs";
+
 import type { SelectOssProject } from "@/db/schema";
-import { OssProjectsSidebar } from "@/components/oss-projects-sidebar";
-import { OssProjectCard } from "@/components/oss-project-card";
-import { OssProjectsSearchResultsHeader } from "@/components/oss-projects-search-results-header";
+import { searchParams } from "@/lib/search-params";
+import { cn } from "@/lib/utils";
+
 import { Icons } from "@/components/icons";
-import { OssProjectsSearch } from "@/components/oss-projects-search";
+import { OssProjectCard } from "@/components/oss-project-card";
 import { OssProjectsPagination } from "@/components/oss-projects-pagination";
+import { OssProjectsSearch } from "@/components/oss-projects-search";
+import { OssProjectsSearchResultsHeader } from "@/components/oss-projects-search-results-header";
+import { OssProjectsSidebar } from "@/components/oss-projects-sidebar";
 
 type OssContentProps = {
   projects: SelectOssProject[];
@@ -26,18 +31,65 @@ export function OssProjectsContent({
   totalProjects,
 }: OssContentProps) {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
-
-  const [isSearchLoading, startSearchTransition] = useTransition();
-  const [isTopicsToggleLoading, startTopicsToggleTransition] = useTransition();
-  const [isLanguagesToggleLoading, startLanguagesToggleTransition] =
-    useTransition();
+  const [isFiltering, startFilteringTransition] = useTransition();
   const [isPaginating, startPaginationTransition] = useTransition();
+  const isGridLoading = isFiltering || isPaginating;
 
-  const isAnyToggleLoading = Boolean(
-    isTopicsToggleLoading || isLanguagesToggleLoading,
-  );
+  const [filters, setFilters] = useQueryStates(searchParams, {
+    startTransition: startFilteringTransition,
+    shallow: false,
+    history: "push",
+  });
 
-  const isGridLoading = isSearchLoading || isAnyToggleLoading || isPaginating;
+  // (All the logic for buttons is the same)
+  const hasActiveSidebarFilters =
+    filters.topic.length > 0 ||
+    filters.language.length > 0 ||
+    filters["topic-query"] !== "" ||
+    filters["language-query"] !== "";
+
+  const hasActiveFilters = hasActiveSidebarFilters || filters.query !== "";
+
+  const handleClearSidebarFilters = useCallback(() => {
+    setFilters({
+      topic: null,
+      language: null,
+      "topic-query": null,
+      "language-query": null,
+      page: null,
+    });
+  }, [setFilters]);
+
+  const handleResetAll = useCallback(() => {
+    setFilters({
+      topic: null,
+      language: null,
+      "topic-query": null,
+      "language-query": null,
+      query: null,
+      page: null,
+    });
+  }, [setFilters]);
+
+  const handleQueryChange = (value: string) => {
+    setFilters(
+      { query: value, page: null },
+      { limitUrlUpdates: value === "" ? undefined : debounce(300) },
+    );
+  };
+
+  const handleSelectionChange = (
+    key: "topic" | "language",
+    item: string,
+    isChecked: boolean,
+  ) => {
+    const currentValues = filters[key];
+    const newValues = isChecked
+      ? [...currentValues, item]
+      : currentValues.filter((filter) => filter !== item);
+
+    setFilters({ [key]: newValues.length > 0 ? newValues : null, page: null });
+  };
 
   const toggleSidebar = () => {
     setIsSidebarVisible((prev) => !prev);
@@ -46,8 +98,9 @@ export function OssProjectsContent({
   return (
     <>
       <OssProjectsSearch
-        className="mt-24 mb-8"
-        startTransition={startSearchTransition}
+        className="mb-8 mt-24"
+        value={filters.query}
+        onChange={handleQueryChange}
       />
 
       <OssProjectsSearchResultsHeader
@@ -56,6 +109,8 @@ export function OssProjectsContent({
         className="mb-8"
         currentCount={projects.length}
         totalCount={totalProjects}
+        hasActiveFilters={hasActiveFilters}
+        onResetFilters={handleResetAll}
       />
 
       <div className="lg:flex lg:gap-8">
@@ -64,22 +119,28 @@ export function OssProjectsContent({
             uniqueTopics={uniqueTopics}
             uniqueLanguages={uniqueLanguages}
             className="hidden w-64 lg:sticky lg:top-24 lg:block lg:self-start"
-            startTopicsToggleTransition={startTopicsToggleTransition}
-            startLanguagesToggleTransition={startLanguagesToggleTransition}
+            hasActiveSidebarFilters={hasActiveSidebarFilters}
+            onClearAllFilters={handleClearSidebarFilters}
+            selectedTopics={filters.topic}
+            selectedLanguages={filters.language}
+            onTopicSelect={(item, isChecked) =>
+              handleSelectionChange("topic", item, isChecked)
+            }
+            onLanguageSelect={(item, isChecked) =>
+              handleSelectionChange("language", item, isChecked)
+            }
           />
         )}
-
         <div className="flex-1">
           <div className="relative">
             {isGridLoading && (
               <div
-                className="absolute top-[20px] left-1/2 z-30 -translate-x-1/2"
+                className="absolute left-1/2 top-[20px] z-30 -translate-x-1/2"
                 aria-hidden="true"
               >
                 <Icons.spinner className="size-8 animate-spin text-sky-700" />
               </div>
             )}
-
             <div
               className={cn(
                 "grid grid-cols-1 gap-8 sm:grid-cols-2",
@@ -96,7 +157,7 @@ export function OssProjectsContent({
                 ))
               ) : (
                 <div className="col-span-full mx-auto flex h-64 w-full flex-col items-center justify-center rounded-lg border-2 border-dashed text-center">
-                  <Icons.search className="size-10 text-muted-foreground" />
+                  <Icons.search className="text-muted-foreground size-10" />
                   <h2 className="mt-4">No Projects Found</h2>
                   <p className="mt-2 text-neutral-600">
                     Try adjusting your search or filter criteria.
@@ -104,7 +165,6 @@ export function OssProjectsContent({
                 </div>
               )}
             </div>
-
             <OssProjectsPagination
               totalPages={totalPages}
               startTransition={startPaginationTransition}

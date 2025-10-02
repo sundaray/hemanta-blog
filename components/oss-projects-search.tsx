@@ -1,33 +1,36 @@
 "use client";
 
+import { useCallback, type ChangeEvent, type KeyboardEvent } from "react";
+
+import { cn } from "@/lib/utils";
+
 import { Icons } from "@/components/icons";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import * as React from "react";
-import { useQueryStates, parseAsString, parseAsInteger, debounce } from "nuqs";
-import { useCallback } from "react";
+
+// 🔹 MODIFIED: The props have changed completely.
+type OssProjectsSearchProps = {
+  className?: string;
+  value: string;
+  onChange: (value: string) => void;
+};
 
 export function OssProjectsSearch({
   className,
-  startTransition,
-}: {
-  className?: string;
-  startTransition: React.TransitionStartFunction;
-}) {
-  const [values, setValues] = useQueryStates(
-    {
-      query: parseAsString.withDefault(""),
-      page: parseAsInteger.withDefault(1),
-    },
-    { startTransition, shallow: false, history: "push" },
-  );
+  value,
+  onChange,
+}: OssProjectsSearchProps) {
+  // 🔹 REMOVED: The `useQueryStates` hook is gone. This component no longer manages state.
 
   const clearSearch = useCallback(() => {
-    setValues({ query: null, page: null });
-  }, [setValues]);
+    onChange("");
+  }, [onChange]);
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    onChange(e.target.value);
+  };
 
   const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
+    (e: KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "Escape") {
         clearSearch();
       }
@@ -40,28 +43,20 @@ export function OssProjectsSearch({
       <div className="grid w-full grid-cols-1 items-center">
         <Input
           type="search"
-          value={values.query}
+          value={value} // 🔹 The value now comes directly from props.
           placeholder="Search projects by name or description…"
-          className="col-start-1 row-start-1 h-12 bg-background pl-10"
-          onChange={(e) =>
-            setValues(
-              { query: e.target.value, page: null },
-              {
-                limitUrlUpdates:
-                  e.target.value === "" ? undefined : debounce(300),
-              },
-            )
-          }
+          className="bg-background col-start-1 row-start-1 h-12 pl-10"
+          onChange={handleInputChange} // 🔹 The onChange now comes directly from props.
           onKeyDown={handleKeyDown}
         />
         <div className="pointer-events-none col-start-1 row-start-1 pl-4">
-          <Icons.search className="size-5 text-muted-foreground" />
+          <Icons.search className="text-muted-foreground size-5" />
         </div>
-        {values.query && (
+        {value && (
           <div className="pointer-events-none col-start-1 row-start-1 flex items-center justify-end pr-4">
             <button
               onClick={clearSearch}
-              className="pointer-events-auto cursor-pointer rounded border bg-background px-1.5 py-0.5 text-sm text-muted-foreground transition-colors hover:bg-accent"
+              className="bg-background text-muted-foreground hover:bg-accent pointer-events-auto cursor-pointer rounded border px-1.5 py-0.5 text-sm transition-colors"
               aria-label="Clear search"
             >
               esc

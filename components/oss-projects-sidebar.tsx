@@ -1,172 +1,86 @@
 "use client";
 
 import {
+  useCallback,
   useState,
   useTransition,
-  useCallback,
-  type TransitionStartFunction,
-  useEffect,
-  KeyboardEvent,
+  type KeyboardEvent,
 } from "react";
-import { motion } from "motion/react";
-import { Icons } from "@/components/icons";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Checkbox } from "@/components/ui/checkbox";
-import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
-import { useQueryStates, debounce } from "nuqs";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { searchParams } from "@/lib/search-params";
 
+import { motion } from "motion/react";
+import { debounce, useQueryState } from "nuqs";
+
+import { searchParams } from "@/lib/search-params";
+import { cn } from "@/lib/utils";
+
+import { Icons } from "@/components/icons";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+// 🔹 MODIFIED: The props are much simpler now, focused on receiving data and functions.
 type OssProjectsSidebarProps = {
   uniqueTopics: string[];
   uniqueLanguages: string[];
   className?: string;
-  startTopicsToggleTransition: TransitionStartFunction;
-  startLanguagesToggleTransition: TransitionStartFunction;
+  hasActiveSidebarFilters: boolean;
+  onClearAllFilters: () => void;
+  onTopicSelect: (item: string, isChecked: boolean) => void;
+  onLanguageSelect: (item: string, isChecked: boolean) => void;
+  selectedTopics: string[];
+  selectedLanguages: string[];
 };
 
-// ======================================================================
-// Parent Sidebar Component
-// ======================================================================
 export function OssProjectsSidebar({
   uniqueTopics,
   uniqueLanguages,
   className,
-  startTopicsToggleTransition,
-  startLanguagesToggleTransition,
+  hasActiveSidebarFilters,
+  onClearAllFilters,
+  onTopicSelect,
+  onLanguageSelect,
+  selectedTopics,
+  selectedLanguages,
 }: OssProjectsSidebarProps) {
-  // 🔹 Transitions for the spinners inside each filter section's search
+  // 🔹 REMOVED: All the complex state and effect hooks.
+
+  // 🔹 KEPT & SIMPLIFIED: Only the local state for the filter search inputs remains.
   const [isTopicQueryLoading, startTopicQueryTransition] = useTransition();
   const [isLanguageQueryLoading, startLanguageQueryTransition] =
     useTransition();
 
-  // 🔹 The "source of truth" state that is synced with the URL
-  const [filters, setFilters] = useQueryStates(searchParams, {
+  // This hook now uses `nuqs`'s `useQueryState` for individual control,
+  // which is simpler than managing the whole object.
+  const [topicQuery, setTopicQuery] = useQueryState("topic-query", {
+    ...searchParams["topic-query"],
+    startTransition: startTopicQueryTransition,
     shallow: false,
     history: "push",
+    limitUrlUpdates: debounce(300),
   });
 
-  // ✍️ Local "UI state" for checkboxes to provide INSTANT visual feedback.
-  const [uiSelectedTopics, setUiSelectedTopics] = useState(filters.topic);
-  const [uiSelectedLangs, setUiSelectedLangs] = useState(filters.language);
-
-  // ✍️ Effects to keep the instant UI state in sync with the URL state (e.g., for back/forward navigation).
-  useEffect(() => {
-    setUiSelectedTopics(filters.topic);
-  }, [filters.topic]);
-
-  useEffect(() => {
-    setUiSelectedLangs(filters.language);
-  }, [filters.language]);
-
-  // ✍️ The "Clear" button's visibility is now based on the instant UI state.
-  const hasActiveFilters =
-    uiSelectedTopics.length > 0 ||
-    uiSelectedLangs.length > 0 ||
-    filters["topic-query"] !== "" ||
-    filters["language-query"] !== "";
-
-  const handleClearAllFilters = useCallback(() => {
-    const mainGridFiltersWereActive =
-      uiSelectedTopics.length > 0 || uiSelectedLangs.length > 0;
-    const topicQueryWasActive = filters["topic-query"] !== "";
-    const langQueryWasActive = filters["language-query"] !== "";
-
-    // Instantly clear the UI for checkboxes
-    setUiSelectedTopics([]);
-    setUiSelectedLangs([]);
-
-    // Define the state update action
-    const clearAction = () => {
-      setFilters({
-        topic: null,
-        language: null,
-        "topic-query": null,
-        "language-query": null,
-        page: null,
-      });
-    };
-
-    if (mainGridFiltersWereActive) {
-      startTopicsToggleTransition(clearAction);
-    }
-    if (topicQueryWasActive) {
-      startTopicQueryTransition(clearAction);
-    }
-    if (langQueryWasActive) {
-      startLanguageQueryTransition(clearAction);
-    }
-  }, [
-    uiSelectedTopics.length,
-    uiSelectedLangs.length,
-    filters,
-    setFilters,
-    startTopicsToggleTransition,
-    startTopicQueryTransition,
-    startLanguageQueryTransition,
-  ]);
-
-  const handleSelectionChange = (
-    key: "topic" | "language",
-    item: string,
-    isChecked: boolean,
-  ) => {
-    const currentUiValues =
-      key === "topic" ? uiSelectedTopics : uiSelectedLangs;
-    const newUiValues = isChecked
-      ? [...currentUiValues, item]
-      : currentUiValues.filter((filter) => filter !== item);
-
-    // ✍️ FIRST, update the local UI state for an instant visual change (checking the box).
-    if (key === "topic") {
-      setUiSelectedTopics(newUiValues);
-    } else {
-      setUiSelectedLangs(newUiValues);
-    }
-
-    // ✍️ SECOND, start a transition to update the "real" filters and fetch the main grid data.
-    const transition =
-      key === "topic"
-        ? startTopicsToggleTransition
-        : startLanguagesToggleTransition;
-    transition(() => {
-      setFilters({ [key]: newUiValues, page: null });
-    });
-  };
-
-  // ✍️ This handler uses `nuqs`'s built-in debouncing for an instant typing experience.
-  const handleSearchChange = (
-    key: "topic-query" | "language-query",
-    value: string,
-  ) => {
-    const transition =
-      key === "topic-query"
-        ? startTopicQueryTransition
-        : startLanguageQueryTransition;
-
-    // ✍️ `nuqs` updates its returned state instantly, but debounces the URL update.
-    setFilters(
-      { [key]: value, page: null },
-      {
-        startTransition: transition,
-        limitUrlUpdates: value === "" ? undefined : debounce(300),
-      },
-    );
-  };
+  const [languageQuery, setLanguageQuery] = useQueryState("language-query", {
+    ...searchParams["language-query"],
+    startTransition: startLanguageQueryTransition,
+    shallow: false,
+    history: "push",
+    limitUrlUpdates: debounce(300),
+  });
 
   return (
     <search>
-      <aside className={cn(className, "divide-y-1 divide-solid divide-input")}>
+      <aside className={cn(className, "divide-y-1 divide-input divide-solid")}>
         <div className="flex h-10 items-start justify-between">
           <h4>Filter OSS Projects</h4>
-          {hasActiveFilters && (
+          {/* 🔹 This button now uses the props passed down from the parent */}
+          {hasActiveSidebarFilters && (
             <Button
               variant="ghost"
               size="sm"
-              onClick={handleClearAllFilters}
-              className="text-sm text-muted-foreground"
+              onClick={onClearAllFilters}
+              className="text-muted-foreground text-sm"
             >
               <Icons.circleX className="size-4" />
               Clear
@@ -177,26 +91,20 @@ export function OssProjectsSidebar({
         <FilterSection
           title="Topics"
           items={uniqueTopics}
-          searchTerm={filters["topic-query"]}
-          onSearchChange={(value) => handleSearchChange("topic-query", value)}
-          selectedItems={uiSelectedTopics}
-          onItemSelectChange={(item, isChecked) =>
-            handleSelectionChange("topic", item, isChecked)
-          }
+          searchTerm={topicQuery}
+          onSearchChange={(value) => setTopicQuery(value || null)}
+          selectedItems={selectedTopics}
+          onItemSelectChange={onTopicSelect}
           isLoading={isTopicQueryLoading}
           defaultOpen={true}
         />
         <FilterSection
           title="Languages"
           items={uniqueLanguages}
-          searchTerm={filters["language-query"]}
-          onSearchChange={(value) =>
-            handleSearchChange("language-query", value)
-          }
-          selectedItems={uiSelectedLangs}
-          onItemSelectChange={(item, isChecked) =>
-            handleSelectionChange("language", item, isChecked)
-          }
+          searchTerm={languageQuery}
+          onSearchChange={(value) => setLanguageQuery(value || null)}
+          selectedItems={selectedLanguages}
+          onItemSelectChange={onLanguageSelect}
           isLoading={isLanguageQueryLoading}
         />
       </aside>
@@ -204,8 +112,11 @@ export function OssProjectsSidebar({
   );
 }
 
+// ... The FilterSection and FilterItem components below need no changes.
+// I am including them here so you can replace the whole file.
+
 // ======================================================================
-// FilterSection Component
+// FilterSection Component (No changes needed)
 // ======================================================================
 type FilterSectionProps = {
   title: string;
@@ -230,7 +141,6 @@ function FilterSection({
 }: FilterSectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
-  // ✍️ Handlers to clear the search input via button click or Escape key.
   const clearSearch = useCallback(() => {
     onSearchChange("");
   }, [onSearchChange]);
@@ -275,13 +185,13 @@ function FilterSection({
               className="col-start-1 row-start-1 pl-9"
             />
             <div className="pointer-events-none col-start-1 row-start-1 w-fit pl-3">
-              <Icons.search className="size-4 text-muted-foreground" />
+              <Icons.search className="text-muted-foreground size-4" />
             </div>
             {searchTerm && (
               <div className="pointer-events-none col-start-1 row-start-1 flex items-center justify-end pr-3">
                 <button
                   onClick={clearSearch}
-                  className="pointer-events-auto cursor-pointer rounded border bg-background px-1.5 py-0.5 text-xs text-muted-foreground transition-colors"
+                  className="bg-background text-muted-foreground pointer-events-auto cursor-pointer rounded border px-1.5 py-0.5 text-xs transition-colors"
                   aria-label="Clear search"
                 >
                   esc
@@ -292,7 +202,7 @@ function FilterSection({
           <div className="relative">
             {isLoading && (
               <div
-                className="absolute top-[10px] left-1/2 z-10 -translate-x-1/2"
+                className="absolute left-1/2 top-[10px] z-10 -translate-x-1/2"
                 aria-hidden="true"
               >
                 <Icons.spinner className="size-6 animate-spin text-sky-700" />
@@ -318,7 +228,7 @@ function FilterSection({
                     />
                   ))
                 ) : (
-                  <p className="mt-[10px] text-center text-sm text-muted-foreground">
+                  <p className="text-muted-foreground mt-[10px] text-center text-sm">
                     No {title.toLowerCase()} found.
                   </p>
                 )}
@@ -332,7 +242,7 @@ function FilterSection({
 }
 
 // ======================================================================
-// FilterItem Component
+// FilterItem Component (No changes needed)
 // ======================================================================
 function FilterItem({
   label,
@@ -344,7 +254,7 @@ function FilterItem({
   onCheckedChange: (isChecked: boolean) => void;
 }) {
   return (
-    <label className="flex cursor-pointer items-center gap-x-3 rounded-md px-2 py-1.5 transition-colors hover:bg-accent">
+    <label className="hover:bg-accent flex cursor-pointer items-center gap-x-3 rounded-md px-2 py-1.5 transition-colors">
       <Checkbox
         checked={isChecked}
         onCheckedChange={(checked) => onCheckedChange(checked as boolean)}

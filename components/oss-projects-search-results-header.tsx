@@ -1,5 +1,8 @@
-import { Icons } from "@/components/icons";
+"use client";
+
 import { cn } from "@/lib/utils";
+
+import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 
 type OssProjectsSearchResultsHeaderProps = {
@@ -8,6 +11,8 @@ type OssProjectsSearchResultsHeaderProps = {
   className?: string;
   currentCount: number;
   totalCount: number;
+  hasActiveFilters: boolean;
+  onResetFilters: () => void;
 };
 
 export function OssProjectsSearchResultsHeader({
@@ -16,20 +21,35 @@ export function OssProjectsSearchResultsHeader({
   className,
   currentCount,
   totalCount,
+  hasActiveFilters,
+  onResetFilters,
 }: OssProjectsSearchResultsHeaderProps) {
   return (
     <div className={cn("flex h-10 items-center justify-between", className)}>
-      <div className="flex items-baseline gap-x-2">
-        <h4>OSS Projects</h4>
-        <span className="text-base font-medium text-muted-foreground tabular-nums">
-          ({currentCount} of {totalCount})
-        </span>
-      </div>{" "}
+      <div className="flex items-center gap-x-4">
+        <div className="flex items-baseline gap-x-2">
+          <h4>OSS Projects</h4>
+          <span className="text-muted-foreground text-base font-medium tabular-nums">
+            ({currentCount} of {totalCount})
+          </span>
+        </div>
+        {hasActiveFilters && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onResetFilters}
+            className="text-sm font-semibold text-sky-700 hover:bg-sky-100/50 hover:text-sky-700"
+          >
+            <Icons.circleX className="size-4" />
+            Reset
+          </Button>
+        )}
+      </div>
       <Button
         variant="ghost"
         size="sm"
         onClick={onToggleSidebar}
-        className="text-sm text-muted-foreground"
+        className="text-muted-foreground text-sm"
       >
         {isSidebarVisible ? (
           <>
