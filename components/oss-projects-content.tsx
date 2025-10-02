@@ -33,36 +33,15 @@ export function OssProjectsContent({
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
   const [isFiltering, startFilteringTransition] = useTransition();
-  const [isPaginating, startPaginationTransition] = useTransition(); // 🔹 ADDED: New transition specifically for sidebar option searches
-  const [isSidebarQuerying, startSidebarQueryingTransition] = useTransition(); // 🔹 SPLIT: State management is now split to use different transitions
+  const [isPaginating, startPaginationTransition] = useTransition();
+  const [isSidebarQuerying, startSidebarQueryingTransition] = useTransition();
 
-  const [mainFilters, setMainFilters] = useQueryStates(
-    {
-      query: searchParams.query,
-      topic: searchParams.topic,
-      language: searchParams.language,
-      page: searchParams.page,
-    },
-    {
-      startTransition: startFilteringTransition,
-      shallow: false,
-      history: "push",
-    },
-  );
-
-  const [sidebarQueries, setSidebarQueries] = useQueryStates(
-    {
-      "topic-query": searchParams["topic-query"],
-      "language-query": searchParams["language-query"],
-    },
-    {
-      startTransition: startSidebarQueryingTransition,
-      shallow: false,
-      history: "push",
-    },
-  );
-
-  const filters = { ...mainFilters, ...sidebarQueries };
+  // 🔄️ All URL state is now managed by a single, unified hook.
+  const [filters, setFilters] = useQueryStates(searchParams, {
+    startTransition: startFilteringTransition, // Default transition for most filter changes
+    shallow: false,
+    history: "push",
+  });
 
   const isGridLoading = isFiltering || isPaginating;
   const isSidebarLoading = isSidebarQuerying;
@@ -76,64 +55,52 @@ export function OssProjectsContent({
   const hasActiveFilters = hasActiveSidebarFilters || filters.query !== "";
 
   const handleClearSidebarFilters = useCallback(() => {
-    setMainFilters({
+    // 🔄️ Updates all relevant sidebar filters in one atomic call.
+    setFilters({
+      topic: null,
+      language: null,
+      "topic-query": "",
+      "language-query": "",
+      page: null,
+    });
+  }, [setFilters]);
+
+  const handleResetAll = useCallback(() => {
+    // 🔄️ Resets everything in a single call to prevent flickering.
+    setFilters({
+      query: "",
       topic: null,
       language: null,
       page: null,
-    });
-    setSidebarQueries({
       "topic-query": "",
       "language-query": "",
     });
-  }, [setMainFilters, setSidebarQueries]);
-
-  const handleResetAll = useCallback(() => {
-    const areMainFiltersActive =
-      filters.query !== "" ||
-      filters.topic.length > 0 ||
-      filters.language.length > 0;
-
-    if (areMainFiltersActive) {
-      setMainFilters({
-        query: "",
-        topic: null,
-        language: null,
-        page: null,
-      });
-    }
-
-    const areSidebarQueriesActive =
-      filters["topic-query"] !== "" || filters["language-query"] !== "";
-
-    if (areSidebarQueriesActive) {
-      setSidebarQueries({
-        "topic-query": "",
-        "language-query": "",
-      });
-    }
-  }, [setMainFilters, setSidebarQueries, filters]);
+  }, [setFilters]);
 
   const handleQueryChange = (value: string) => {
-    setMainFilters(
+    setFilters(
       { query: value, page: null },
       { limitUrlUpdates: value === "" ? undefined : debounce(300) },
     );
   };
 
   const handleTopicQueryChange = (value: string) => {
-    // 🔹 UPDATED: Use the sidebar query setter
-    setSidebarQueries(
+    // 🔄️ Uses the unified setter, but overrides the transition to only show the sidebar spinner.
+    setFilters(
       { "topic-query": value },
       {
+        startTransition: startSidebarQueryingTransition,
         limitUrlUpdates: value === "" ? undefined : debounce(300),
       },
     );
   };
 
   const handleLanguageQueryChange = (value: string) => {
-    setSidebarQueries(
+    // 🔄️ Same as above, overriding the transition for a better UX.
+    setFilters(
       { "language-query": value },
       {
+        startTransition: startSidebarQueryingTransition,
         limitUrlUpdates: value === "" ? undefined : debounce(300),
       },
     );
@@ -144,12 +111,12 @@ export function OssProjectsContent({
     item: string,
     isChecked: boolean,
   ) => {
-    const currentValues = mainFilters[key];
+    const currentValues = filters[key];
     const newValues = isChecked
       ? [...currentValues, item]
       : currentValues.filter((filter) => filter !== item);
 
-    setMainFilters({
+    setFilters({
       [key]: newValues.length > 0 ? newValues : null,
       page: null,
     });
@@ -205,7 +172,7 @@ export function OssProjectsContent({
                 className="absolute left-1/2 top-[20px] z-30 -translate-x-1/2"
                 aria-hidden="true"
               >
-                <Icons.spinner className="size-8 animate-spin text-sky-700" /> 
+                <Icons.spinner className="size-8 animate-spin text-sky-700" />
               </div>
             )}
             <div
