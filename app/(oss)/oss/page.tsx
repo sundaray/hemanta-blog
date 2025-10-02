@@ -8,9 +8,9 @@ import type { SearchParams } from "nuqs/server";
 import { searchParamsCache } from "@/lib/search-params";
 import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb";
 import { OssProjectsPageClient } from "@/components/oss-projects-page-client";
-import { getOssProjects, getOssProjectsCount } from "@/lib/get-oss-projects"; // 🔹 Import data fetching functions
-import { getOssProjectFilterOptions } from "@/lib/get-oss-project-filters-options"; // 🔹 Import data fetching functions
-import { unwrapResult } from "@/lib/utils"; // 🔹 Import a helper to unwrap the result
+import { getOssProjects, getOssProjectsCount } from "@/lib/get-oss-projects";
+import { getOssProjectFilterOptions } from "@/lib/get-oss-project-filters-options";
+import { unwrapResult } from "@/lib/utils";
 
 export default async function OssPage({
   searchParams,
