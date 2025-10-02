@@ -5,6 +5,7 @@ import { RouterProvider } from "@/components/router-provider";
 import { TanstackQueryProvider } from "@/app/tanstack-query-provider";
 import "./globals.css";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +33,7 @@ export default function RootLayout(props: LayoutProps<"/">) {
           <RouterProvider>
             <NuqsAdapter>{props.children}</NuqsAdapter>
           </RouterProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
         </TanstackQueryProvider>
       </body>
     </html>

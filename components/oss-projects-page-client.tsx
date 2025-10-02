@@ -4,7 +4,6 @@ import { useSuspenseQueries } from "@tanstack/react-query";
 import { useQueryStates } from "nuqs";
 import { searchParams } from "@/lib/search-params";
 import { OssProjectsContent } from "@/components/oss-projects-content";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Suspense, useDeferredValue } from "react";
 import type { SelectOssProject } from "@/db/schema";
 import {
@@ -16,28 +15,22 @@ import {
 // A simple skeleton loader for the initial loading state.
 // This is shown via the <Suspense> boundary below.
 function ProjectsSkeleton() {
-  return (
-    <div className="mt-24 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-      {Array.from({ length: 12 }).map((_, i) => (
-        <Skeleton key={i} className="h-48 w-full" />
-      ))}
-    </div>
-  );
+  return <p>Fecthing...</p>;
 }
 
 function ProjectsInner() {
   // 🔗 This hook reads the filters from the URL.
   const [filters] = useQueryStates(searchParams);
 
-  const deferredFilters = useDeferredValue(filters);
+  // const deferredFilters = useDeferredValue(filters);
 
-  const projectsQueryKey = ["oss-projects", deferredFilters];
-  const totalProjectsQueryKey = ["oss-projects-count", deferredFilters];
+  const projectsQueryKey = ["oss-projects", filters];
+  const totalProjectsQueryKey = ["oss-projects-count", filters];
   const filterOptionsQueryKey = [
     "oss-filter-options",
     {
-      topicQuery: deferredFilters["topic-query"],
-      languageQuery: deferredFilters["language-query"],
+      topicQuery: filters["topic-query"],
+      languageQuery: filters["language-query"],
     },
   ];
 
@@ -50,25 +43,29 @@ function ProjectsInner() {
         {
           queryKey: projectsQueryKey,
           // 🔧 FIX: Call the Server Action instead
-          queryFn: () => getOssProjectsAction(deferredFilters),
+          queryFn: () => getOssProjectsAction(filters),
         },
         {
           queryKey: totalProjectsQueryKey,
           // 🔧 FIX: Call the Server Action instead
-          queryFn: () => getOssProjectsCountAction(deferredFilters),
+          queryFn: () => getOssProjectsCountAction(filters),
         },
         {
           queryKey: filterOptionsQueryKey,
           // 🔧 FIX: Call the Server Action instead
           queryFn: () =>
             getOssProjectFilterOptionsAction({
-              topicQuery: deferredFilters["topic-query"],
-              languageQuery: deferredFilters["language-query"],
+              topicQuery: filters["topic-query"],
+              languageQuery: filters["language-query"],
             }),
         },
       ],
     });
   // ✨ We get the isFetching status to pass down for our fine-grained spinners.
+
+  // const isStale = JSON.stringify(filters) !== JSON.stringify(filters);
+  // const isFilterOptionsFetching = filterOptionsResult.isFetching;
+
   const isProjectsFetching =
     projectsResult.isFetching || totalProjectsResult.isFetching;
   const isFilterOptionsFetching = filterOptionsResult.isFetching;
@@ -101,7 +98,7 @@ export function OssProjectsPageClient() {
   return (
     // ⏳ Suspense handles client-side loading states (e.g., when filters change).
     // The initial load will be instant because the data is already hydrated.
-    <Suspense fallback={<ProjectsSkeleton />}>
+    <Suspense>
       <ProjectsInner />
     </Suspense>
   );
