@@ -18,6 +18,15 @@ export type BlogPost = Frontmatter & {
   slug: string;
 };
 
+export type KodeKloudPost = {
+  id: number;
+  title: string;
+  image: string;
+  href: string;
+  category: string[];
+  publishedAt: string;
+};
+
 export type NavItem = {
   title: string;
   href: Route;

@@ -1,3 +1,4 @@
+// 🔹 ADDED: New content for the technical writing page data.
 export const blogPosts = [
   {
     id: 1,
@@ -5,7 +6,7 @@ export const blogPosts = [
     image: "eof-bash-what-is-it-and-how-does-it-work.webp",
     href: "https://kodekloud.com/blog/eof-bash/",
     category: ["Bash Scripting"],
-    date: "2023-08-04",
+    publishedAt: "2023-08-04",
   },
   {
     id: 2,
@@ -21,7 +22,7 @@ export const blogPosts = [
     image: "bash-compare-strings-how-to-check-if-two-strings-are-equal.webp",
     href: "https://kodekloud.com/blog/bash-compare-strings/",
     category: ["Bash Scripting"],
-    date: "2023-08-03",
+    publishedAt: "2023-08-03",
   },
   {
     id: 4,
@@ -29,7 +30,7 @@ export const blogPosts = [
     image: "how-to-search-packages-with-apt-search-command.webp",
     category: ["Linux"],
     href: "https://kodekloud.com/blog/apt-search-command/",
-    date: "2023-08-02",
+    publishedAt: "2023-08-02",
   },
   {
     id: 5,
@@ -37,7 +38,7 @@ export const blogPosts = [
     image: "how-to-count-the-number-of-files-in-a-directory-in-linux.webp",
     category: ["Linux"],
     href: "https://kodekloud.com/blog/file-count-in-directory-linux/",
-    date: "2023-07-25",
+    publishedAt: "2023-07-25",
   },
   {
     id: 6,
@@ -45,7 +46,7 @@ export const blogPosts = [
     image: "how-to-check-if-a-file-exists-in-bash.webp",
     href: "https://kodekloud.com/blog/check-file-in-bash/",
     category: ["Bash Scripting"],
-    date: "2023-07-19",
+    publishedAt: "2023-07-19",
   },
   {
     id: 7,
@@ -53,7 +54,7 @@ export const blogPosts = [
     image: "how-to-read-a-file-line-by-line-in-bash.webp",
     href: "https://kodekloud.com/blog/read-file-in-bash/",
     category: ["Bash Scripting"],
-    date: "2023-07-17",
+    publishedAt: "2023-07-17",
   },
   {
     id: 8,
@@ -61,7 +62,7 @@ export const blogPosts = [
     image: "how-to-write-bash-scripts-to-loop-through-array-values.webp",
     href: "https://kodekloud.com/blog/bash-scripts-loop-through-array-values/",
     category: ["Bash Scripting"],
-    date: "2023-07-12",
+    publishedAt: "2023-07-12",
   },
   {
     id: 9,
@@ -69,7 +70,7 @@ export const blogPosts = [
     image: "how-to-run-shell-script-files-in-linux.webp",
     href: "https://kodekloud.com/blog/linux-run-sh-script/",
     category: ["Linux"],
-    date: "2023-07-14",
+    publishedAt: "2023-07-14",
   },
   {
     id: 10,
@@ -77,7 +78,7 @@ export const blogPosts = [
     image: "how-to-build-a-docker-image-with-dockerfile-from-scratch.webp",
     href: "https://kodekloud.com/blog/how-to-build-a-docker-image/",
     category: ["Docker"],
-    date: "2023-07-05",
+    publishedAt: "2023-07-05",
   },
   {
     id: 11,
@@ -85,7 +86,7 @@ export const blogPosts = [
     image: "how-to-pass-environment-variables-to-docker-containers.webp",
     href: "https://kodekloud.com/blog/docker-pass-environment-variables/",
     category: ["Docker"],
-    date: "2023-06-26",
+    publishedAt: "2023-06-26",
   },
   {
     id: 12,
@@ -93,7 +94,7 @@ export const blogPosts = [
     image: "how-to-restart-a-pod-in-kubernetes.webp",
     href: "https://kodekloud.com/blog/kubernetes-pod-restart/",
     category: ["Kubernetes"],
-    date: "2023-06-16",
+    publishedAt: "2023-06-16",
   },
   {
     id: 13,
@@ -101,7 +102,7 @@ export const blogPosts = [
     image: "docker-compose-logs-how-to-view-log-output.webp",
     href: "https://kodekloud.com/blog/docker-compose-logs/",
     category: ["Docker"],
-    date: "2023-06-12",
+    publishedAt: "2023-06-12",
   },
   {
     id: 14,
@@ -109,7 +110,7 @@ export const blogPosts = [
     image: "kubectl-rollout-restart-what-is-it-and-how-to-use-it.webp",
     href: "https://kodekloud.com/blog/kubectl-rollout-restart/",
     category: ["Kubernetes"],
-    date: "2023-06-09",
+    publishedAt: "2023-06-09",
   },
   {
     id: 15,
@@ -117,7 +118,7 @@ export const blogPosts = [
     image: "how-to-debug-crashLoopBackOff-in-a-container-or-pod.webp",
     href: "https://kodekloud.com/blog/debug-crashloopbackoff/",
     category: ["Kubernetes"],
-    date: "2023-06-07",
+    publishedAt: "2023-06-07",
   },
   {
     id: 16,
@@ -125,7 +126,7 @@ export const blogPosts = [
     image: "how-to-use-docker-cp-command-with-examples.webp",
     href: "https://kodekloud.com/blog/docker-cp/",
     category: ["Docker"],
-    date: "2023-05-19",
+    publishedAt: "2023-05-19",
   },
   {
     id: 17,
@@ -133,7 +134,7 @@ export const blogPosts = [
     image: "why-and-how-to-tag-a-docker-image.webp",
     href: "https://kodekloud.com/blog/docker-image-tag/",
     category: ["Docker"],
-    date: "2023-05-17",
+    publishedAt: "2023-05-17",
   },
   {
     id: 18,
@@ -141,7 +142,7 @@ export const blogPosts = [
     image: "what-are-docker-image-layers-and-how-do-they-work.webp",
     href: "https://kodekloud.com/blog/docker-image-layers/",
     category: ["Docker"],
-    date: "2023-05-16",
+    publishedAt: "2023-05-16",
   },
   {
     id: 19,
@@ -151,7 +152,7 @@ export const blogPosts = [
       "docker-entrypoint-vs-cmd-What-is-the-difference-and-how-to-choose.webp",
     href: "https://kodekloud.com/blog/docker-entrypoint-cmd/",
     category: ["Docker"],
-    date: "2023-05-15",
+    publishedAt: "2023-05-15",
   },
   {
     id: 20,
@@ -159,7 +160,7 @@ export const blogPosts = [
     image: "how-to-remove-unused-and-dangling-docker-images.webp",
     href: "https://kodekloud.com/blog/docker-remove-unused-images/",
     category: ["Docker"],
-    date: "2023-05-03",
+    publishedAt: "2023-05-03",
   },
   {
     id: 21,
@@ -167,7 +168,7 @@ export const blogPosts = [
     image: "kubectl-cp-how-to-copy-file-from-pod-to-local-with-examples.webp",
     href: "https://kodekloud.com/blog/kubectl-cp/",
     category: ["Kubernetes"],
-    date: "2023-05-11",
+    publishedAt: "2023-05-11",
   },
   {
     id: 22,
@@ -175,7 +176,7 @@ export const blogPosts = [
     image: "how-to-create-docker-image-from-a-container.webp",
     href: "https://kodekloud.com/blog/docker-create-image-from-container/",
     category: ["Docker"],
-    date: "2023-04-28",
+    publishedAt: "2023-04-28",
   },
   {
     id: 23,
@@ -184,7 +185,7 @@ export const blogPosts = [
       "differences-between-put-and-patch-in-rest-api-and-when-to-use-them.webp",
     href: "https://kodekloud.com/blog/put-and-patch-in-rest-api/",
     category: ["REST API"],
-    date: "2023-04-26",
+    publishedAt: "2023-04-26",
   },
   {
     id: 24,
@@ -192,7 +193,7 @@ export const blogPosts = [
     image: "how-to-get-docker-container-ip-address-from-the-host.webp",
     href: "https://kodekloud.com/blog/get-docker-container-ip/",
     category: ["Docker"],
-    date: "2023-04-21",
+    publishedAt: "2023-04-21",
   },
   {
     id: 25,
@@ -200,7 +201,7 @@ export const blogPosts = [
     image: "how-to-use-kubectl-delete-deployment-with-examples.webp",
     href: "https://kodekloud.com/blog/kubectl-delete-deployment/",
     category: ["Kubernetes"],
-    date: "2023-04-18",
+    publishedAt: "2023-04-18",
   },
   {
     id: 26,
@@ -208,7 +209,7 @@ export const blogPosts = [
     image: "kubectl-create-namespace-how-to-create-a-custom-namespace.webp",
     href: "https://kodekloud.com/blog/kubectl-create-namespace/",
     category: ["Kubernetes"],
-    date: "2023-04-10",
+    publishedAt: "2023-04-10",
   },
   {
     id: 27,
@@ -218,7 +219,7 @@ export const blogPosts = [
       "kubectl-exec-how-to-execute-shell-commands-into-a-container-with-examples.webp",
     href: "https://kodekloud.com/blog/kubectl-exec/",
     category: ["Kubernetes"],
-    date: "2023-04-04",
+    publishedAt: "2023-04-04",
   },
   {
     id: 28,
@@ -226,7 +227,7 @@ export const blogPosts = [
     image: "what-is-kubectl-port-forward-and-how-does-it-work.webp",
     href: "https://kodekloud.com/blog/port-forwarding-kubernetes/",
     category: ["Kubernetes"],
-    date: "2023-04-03",
+    publishedAt: "2023-04-03",
   },
   {
     id: 29,
@@ -234,7 +235,7 @@ export const blogPosts = [
     image: "what-is-kubernetes-daemonSet-and-how-to-use-it.webp",
     href: "https://kodekloud.com/blog/kubernetes-daemonset/",
     category: ["Kubernetes"],
-    date: "2023-03-30",
+    publishedAt: "2023-03-30",
   },
   {
     id: 30,
@@ -242,7 +243,7 @@ export const blogPosts = [
     image: "how-to-run-a-docker-image-as-a-container.webp",
     href: "https://kodekloud.com/blog/run-docker-image/",
     category: ["Docker"],
-    date: "2023-03-28",
+    publishedAt: "2023-03-28",
   },
   {
     id: 31,
@@ -252,7 +253,7 @@ export const blogPosts = [
       "clusterip-vs-nodeport-vs-loadbalancer-key-differences-and-when-to-use-them.webp",
     href: "https://kodekloud.com/blog/clusterip-nodeport-loadbalancer/",
     category: ["Kubernetes"],
-    date: "2023-03-23",
+    publishedAt: "2023-03-23",
   },
   {
     id: 32,
@@ -260,7 +261,7 @@ export const blogPosts = [
     image: "docker-exec-how-to-enter-into-a-docker-containers-shell.webp",
     href: "https://kodekloud.com/blog/docker-exec/",
     category: ["Docker"],
-    date: "2023-03-21",
+    publishedAt: "2023-03-21",
   },
   {
     id: 33,
@@ -270,7 +271,7 @@ export const blogPosts = [
       "what-are-objects-used-for-in-kubernetes-11-types-of-objects-explained.webp",
     href: "https://kodekloud.com/blog/kubernetes-objects/",
     category: ["Kubernetes"],
-    date: "2023-03-20",
+    publishedAt: "2023-03-20",
   },
   {
     id: 34,
@@ -278,7 +279,7 @@ export const blogPosts = [
     image: "what-is-kubernetes-headless-service-with-examples.webp",
     href: "https://kodekloud.com/blog/kubernetes-headless-service/",
     category: ["Kubernetes"],
-    date: "2023-03-14",
+    publishedAt: "2023-03-14",
   },
   {
     id: 35,
@@ -286,7 +287,7 @@ export const blogPosts = [
     image: "kubernetes-services-definitions-and-examples-2023.webp",
     href: "https://kodekloud.com/blog/kubernetes-services/",
     category: ["Kubernetes"],
-    date: "2023-03-03",
+    publishedAt: "2023-03-03",
   },
   {
     id: 36,
@@ -294,7 +295,7 @@ export const blogPosts = [
     image: "what-are-kubernetes-keps.webp",
     href: "https://kodekloud.com/blog/kubernetes-keps/",
     category: ["Kubernetes"],
-    date: "2023-03-02",
+    publishedAt: "2023-03-02",
   },
   {
     id: 37,
@@ -302,7 +303,7 @@ export const blogPosts = [
     image: "kubernetes-networking-fundamental-concepts-explained-2023.webp",
     href: "https://kodekloud.com/blog/kubernetes-networking-explained/",
     category: ["Kubernetes"],
-    date: "2023-03-01",
+    publishedAt: "2023-03-01",
   },
   {
     id: 38,
@@ -310,7 +311,7 @@ export const blogPosts = [
     image: "devops-vs-agile-whats-the-difference.webp",
     href: "https://kodekloud.com/blog/devops-vs-agile/",
     category: ["DevOps", "Agile"],
-    date: "2023-02-28",
+    publishedAt: "2023-02-28",
   },
   {
     id: 39,
@@ -318,7 +319,7 @@ export const blogPosts = [
     image: "docker-containerization-key-benefits-and-use-cases.webp",
     href: "https://kodekloud.com/blog/docker-containerization/",
     category: ["Docker"],
-    date: "2023-02-21",
+    publishedAt: "2023-02-21",
   },
   {
     id: 40,
@@ -328,7 +329,7 @@ export const blogPosts = [
       "docker-architecture-explained-docker-client-docker-daemon-and-docker-registry.webp",
     href: "https://kodekloud.com/blog/docker-architecture/",
     category: ["Docker"],
-    date: "2023-02-13",
+    publishedAt: "2023-02-13",
   },
   {
     id: 41,
@@ -336,7 +337,7 @@ export const blogPosts = [
     image: "why-should-you-learn-hash icorp-terraform.webp",
     href: "https://kodekloud.com/blog/learn-hashicorp-terraform/",
     category: ["Terraform"],
-    date: "2023-01-04",
+    publishedAt: "2023-01-04",
   },
   {
     id: 42,
@@ -344,7 +345,7 @@ export const blogPosts = [
     image: "kubernetes-terminology-pods-containers-nodes-and-clusters.webp",
     href: "https://kodekloud.com/blog/kubernetes-terms/",
     category: ["Kubernetes"],
-    date: "2022-12-14",
+    publishedAt: "2022-12-14",
   },
   {
     id: 43,
@@ -352,7 +353,7 @@ export const blogPosts = [
     image: "what-is-puppet-in-devops.webp",
     href: "https://kodekloud.com/blog/puppet-in-devops/",
     category: ["Puppet"],
-    date: "2022-12-06",
+    publishedAt: "2022-12-06",
   },
   {
     id: 44,
@@ -360,7 +361,7 @@ export const blogPosts = [
     image: "how-to-extract-bash-substring.webp",
     href: "https://kodekloud.com/blog/bash-substring/",
     category: ["Bash Scripting"],
-    date: "2023-09-13",
+    publishedAt: "2023-09-13",
   },
   {
     id: 45,
@@ -368,7 +369,7 @@ export const blogPosts = [
     image: "how-to-return-value-from-a-bash-function.webp",
     category: ["Bash Scripting"],
     href: "https://kodekloud.com/blog/return-value-from-bash-function/",
-    date: "2023-09-14",
+    publishedAt: "2023-09-14",
   },
   {
     id: 46,
@@ -376,7 +377,7 @@ export const blogPosts = [
     image: "how-to-use-bash-getopts-with-examples.webp",
     href: "https://kodekloud.com/blog/bash-getopts/",
     category: ["Bash Scripting"],
-    date: "2023-09-20",
+    publishedAt: "2023-09-20",
   },
   {
     id: 47,
@@ -384,7 +385,7 @@ export const blogPosts = [
     image: "bash-regex-how-to-use-regex-in-a-shell-script.webp",
     href: "https://kodekloud.com/blog/regex-shell-script/",
     category: ["Bash Scripting"],
-    date: "2023-10-24",
+    publishedAt: "2023-10-24",
   },
   {
     id: 48,
@@ -392,7 +393,7 @@ export const blogPosts = [
     image: "how-to-manage-your-k8s-with-k9s-kubernetes-cli.webp",
     href: "https://kodekloud.com/blog/manage-k8s-with-k9s-kubernetes-cli/",
     category: ["Kubernetes"],
-    date: "2023-12-13",
+    publishedAt: "2023-12-13",
   },
   {
     id: 49,
@@ -400,7 +401,7 @@ export const blogPosts = [
     image: "how-to-clear-docker-logs-for-a-container.webp",
     href: "https://kodekloud.com/blog/clear-docker-container-logs/",
     category: ["Docker"],
-    date: "2024-01-03",
+    publishedAt: "2024-01-03",
   },
   {
     id: 50,
@@ -408,7 +409,7 @@ export const blogPosts = [
     image: "docker-build-args-what-are-they-and-how-to-use-them.webp",
     category: ["Docker"],
     href: "https://kodekloud.com/blog/docker-build-args/",
-    date: "2024-01-16",
+    publishedAt: "2024-01-16",
   },
   {
     id: 51,
@@ -416,7 +417,7 @@ export const blogPosts = [
     image: "how-to-fix-docker-build-requires-exactly-1-argument.webp",
     category: ["Docker"],
     href: "https://kodekloud.com/blog/fix-docker-build-one-argument-error/",
-    date: "2024-01-24",
+    publishedAt: "2024-01-24",
   },
   {
     id: 52,
@@ -424,7 +425,7 @@ export const blogPosts = [
     image: "how-ci-cd-pipeline-works.webp",
     category: ["CI/CD"],
     href: "https://kodekloud.com/blog/how-ci-cd-pipeline-works/",
-    date: "2024-01-25",
+    publishedAt: "2024-01-25",
   },
   {
     id: 53,
@@ -432,7 +433,7 @@ export const blogPosts = [
     image: "how-to-collect-kubernetes-events-and-extract-values.webp",
     category: ["Kubernetes"],
     href: "https://kodekloud.com/blog/collect-kubernetes-events/",
-    date: "2024-03-15",
+    publishedAt: "2024-03-15",
   },
   {
     id: 54,
@@ -440,7 +441,7 @@ export const blogPosts = [
     image: "docker-compose-command-not-found-3-possible-causes-and-fixes.webp",
     category: ["Docker"],
     href: "https://kodekloud.com/blog/docker-compose-command-not-found/",
-    date: "2024-03-25",
+    publishedAt: "2024-03-25",
   },
   {
     id: 55,
@@ -448,7 +449,7 @@ export const blogPosts = [
     image: "where-docker-images-are-stored.webp",
     category: ["Docker"],
     href: "https://kodekloud.com/blog/where-docker-images-are-stored/",
-    date: "2024-03-27",
+    publishedAt: "2024-03-27",
   },
   {
     id: 56,
@@ -456,7 +457,7 @@ export const blogPosts = [
     image: "how-dockerfile-works.webp",
     category: ["Docker"],
     href: "https://kodekloud.com/blog/how-dockerfile-works/",
-    date: "2024-03-27",
+    publishedAt: "2024-03-27",
   },
   {
     id: 57,
@@ -464,7 +465,7 @@ export const blogPosts = [
     image: "how-grafana-works.webp",
     category: ["Grafana"],
     href: "https://kodekloud.com/blog/how-grafana-works/",
-    date: "2024-04-23",
+    publishedAt: "2024-04-23",
   },
   {
     id: 58,
@@ -472,7 +473,7 @@ export const blogPosts = [
     image: "golang-vs-rust.webp",
     category: ["Golang", "Rust"],
     href: "https://kodekloud.com/blog/golang-vs-rust/",
-    date: "2024-04-29",
+    publishedAt: "2024-04-29",
   },
   {
     id: 59,
@@ -480,7 +481,7 @@ export const blogPosts = [
     image: "10-essential-devops-tools-you-should-learn-in-2024.webp",
     category: ["DevOps"],
     href: "https://kodekloud.com/blog/10-essential-devops-tools-you-should-learn-in-2024/",
-    date: "2024-05-29",
+    publishedAt: "2024-05-29",
   },
   {
     id: 60,
@@ -488,7 +489,7 @@ export const blogPosts = [
     image: "learning-python-for-beginners.webp",
     category: ["Python"],
     href: "https://kodekloud.com/blog/learning-python-for-beginners/",
-    date: "2024-09-20",
+    publishedAt: "2024-09-20",
   },
   {
     id: 61,
@@ -496,6 +497,6 @@ export const blogPosts = [
     image: "what-is-cloud-data-security-risks-and-best-practices.webp",
     category: ["Cloud Security"],
     href: "https://kodekloud.com/blog/what-is-cloud-data-security-risks-and-best-practices/",
-    date: "2024-09-21",
+    publishedAt: "2024-09-21",
   },
 ];

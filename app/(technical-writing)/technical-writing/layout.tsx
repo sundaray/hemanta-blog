@@ -1,21 +1,26 @@
 import type { Metadata } from "next";
-import { MainNav } from "@/components/navigation/main-nav";
+
 import { navbarLinks } from "@/config/navbar";
+
+import { MainNav } from "@/components/navigation/main-nav";
+import { MainNavWrapper } from "@/components/navigation/main-nav-wrapper";
 
 export const metadata: Metadata = {
   title: "Technical Writing",
   description: "",
 };
 
-export default function TechnicalWritingLayout(
+export default function OssPageLayout(
   props: LayoutProps<"/technical-writing">,
 ) {
   return (
     <>
       <header>
-        <MainNav links={navbarLinks.main} />
+        <MainNavWrapper>
+          <MainNav links={navbarLinks.main} />
+        </MainNavWrapper>
       </header>
-      <main className="flex-1 py-32">{props.children}</main>
+      <main className="flex-1 py-40">{props.children}</main>
     </>
   );
 }
