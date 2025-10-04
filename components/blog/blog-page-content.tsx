@@ -20,13 +20,12 @@ export function BlogPageContent({
   totalPages,
 }: BlogPageContentProps) {
   return (
-    <LayoutGroup>
+    <>
       <BlogPostsTags tags={uniqueTags} />
       <section>
         <AnimatePresence mode="wait" initial={false}>
           {paginatedPosts.length > 0 ? (
             <motion.div
-              layout
               key="posts-list"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -43,7 +42,6 @@ export function BlogPageContent({
             </motion.div>
           ) : (
             <motion.div
-              layout
               key="no-posts"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -61,6 +59,6 @@ export function BlogPageContent({
         </AnimatePresence>
       </section>
       <BlogPostsPagination totalPages={totalPages} />
-    </LayoutGroup>
+    </>
   );
 }

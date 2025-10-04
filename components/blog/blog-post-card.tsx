@@ -13,7 +13,6 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
   return (
     <AnimatePresence mode="wait" initial={false}>
       <motion.article
-        layout
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
