@@ -83,28 +83,25 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 px-5">
       {/* Tag Scroller UI */}
       <div className="relative flex items-center gap-2">
-        <motion.button
-          animate={{
-            opacity: canScrollLeft ? 1 : 0,
-            scale: canScrollLeft ? 1 : 0.8,
-          }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          onClick={() => scroll("left")}
-          aria-label="Scroll tags left"
-          disabled={!canScrollLeft}
-          className="hover:bg-accent z-10 flex size-10 items-center justify-center rounded-full border shadow-xl"
-        >
-          <Icons.chevronLeft className="text-muted-foreground size-6" />
-        </motion.button>{" "}
-        <div
-          className={cn(
-            "relative flex-1 overflow-hidden",
-            // "[mask-image:linear-gradient(to_right,transparent,black_1rem,black_calc(100%-1rem),rgba(0,0,0,0.5))]",
+        <AnimatePresence>
+          {canScrollLeft && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              onClick={() => scroll("left")}
+              aria-label="Scroll tags left"
+              className="bg-background hover:bg-accent absolute left-0 top-1/2 z-10 flex size-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border shadow-xl backdrop-blur-sm"
+            >
+              <Icons.chevronLeft className="text-muted-foreground size-6" />
+            </motion.button>
           )}
-        >
+        </AnimatePresence>
+        <div className={cn("relative flex-1 overflow-hidden")}>
           <div
             ref={scrollerRef}
             className="flex overflow-x-auto scroll-smooth whitespace-nowrap py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -126,19 +123,21 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
             </TagGroup>
           </div>
         </div>
-        <motion.button
-          animate={{
-            opacity: canScrollRight ? 1 : 0,
-            scale: canScrollRight ? 1 : 0.8,
-          }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          onClick={() => scroll("right")}
-          aria-label="Scroll tags right"
-          disabled={!canScrollRight}
-          className="hover:bg-accent z-10 flex size-10 shrink-0 items-center justify-center rounded-full border shadow-xl"
-        >
-          <Icons.chevronRight className="text-muted-foreground size-6" />
-        </motion.button>
+        <AnimatePresence>
+          {canScrollRight && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              onClick={() => scroll("right")}
+              aria-label="Scroll tags right"
+              className="bg-background hover:bg-accent absolute right-0 top-1/2 z-10 flex size-10 shrink-0 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full border shadow-xl backdrop-blur-sm"
+            >
+              <Icons.chevronRight className="text-muted-foreground size-6" />
+            </motion.button>
+          )}
+        </AnimatePresence>{" "}
       </div>
       {/* Display Selected Tags */}
       <AnimatePresence>
@@ -166,7 +165,7 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
                   <Tag
                     key={tag}
                     id={tag}
-                    className="flex items-center justify-between gap-1 bg-sky-200 text-neutral-700"
+                    className="flex items-center justify-between gap-1 bg-sky-200 text-neutral-700 hover:bg-sky-200 hover:text-neutral-700"
                   >
                     {tag}
                     <Button
