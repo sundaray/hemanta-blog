@@ -149,11 +149,11 @@ export function NavLinks({
                 href={link.href}
               >
                 <div className="relative flex h-auto items-center overflow-hidden">
-                  <span className="gsap-text-original [font-kerning:none]">
+                  <span className="gsap-text-original tracking-tight [font-kerning:none]">
                     {link.title}
                   </span>
                   <span
-                    className="gsap-text-clone absolute left-0 top-full translate-y-0 whitespace-nowrap [font-kerning:none]"
+                    className="gsap-text-clone absolute left-0 top-full translate-y-0 whitespace-nowrap tracking-tight [font-kerning:none]"
                     aria-hidden="true"
                   >
                     {link.title}

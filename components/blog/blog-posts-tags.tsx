@@ -96,7 +96,7 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
           disabled={!canScrollLeft}
           aria-label="Scroll tags left"
           className={cn(
-            "hover:bg-accent z-10 flex size-9 items-center justify-center rounded-full border shadow-sm transition-opacity",
+            "hover:bg-accent z-10 flex size-9 items-center justify-center rounded-full border shadow-xl transition-opacity",
             "disabled:cursor-not-allowed disabled:opacity-30",
           )}
         >
@@ -125,10 +125,10 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
                     key={tag}
                     id={tag}
                     className={cn(
-                      "cursor-pointer rounded-md bg-sky-100 px-3 py-1.5 text-sm font-semibold tracking-tight text-neutral-700 outline-none transition-colors",
-                      "hover:border-sky-700 hover:bg-sky-700 hover:text-white focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2", // This logic still works perfectly!
+                      "cursor-pointer rounded-md bg-neutral-200 px-2 py-1 text-sm font-semibold tracking-tight text-neutral-700 outline-none transition-colors",
+                      "hover:bg-neutral-200 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2",
                       selectedTags.includes(tag)
-                        ? "border-sky-700 bg-sky-700 text-white"
+                        ? "bg-sky-200 text-neutral-700"
                         : "border-sky-200",
                     )}
                   >
@@ -161,7 +161,7 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
             transition={{ duration: 0.2, ease: "easeOut" }}
             className="mt-8 flex flex-wrap items-center gap-3"
           >
-            <span className="text-sm font-medium">Filtered by:</span>
+            {/* <span className="text-sm font-medium">Filtered by:</span> */}
             <TagGroup
               aria-label="Selected tags"
               onRemove={(keys) => {
@@ -178,13 +178,13 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
                   <Tag
                     key={tag}
                     id={tag}
-                    className="flex items-center gap-1.5 rounded-full border border-sky-700 bg-sky-700 px-3 py-1.5 text-sm font-semibold text-white outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                    className="flex items-center gap-1.5 rounded-md bg-sky-200 px-2 py-1 text-sm font-semibold tracking-tight text-neutral-700 outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                   >
                     {tag}
                     <Button
                       slot="remove"
                       aria-label={`Remove ${tag} filter`}
-                      className="-mr-1 rounded-full p-0.5 transition-colors hover:bg-sky-900/50"
+                      className="-mr-1 rounded-full p-1 transition-colors hover:bg-sky-300/40"
                     >
                       <Icons.x className="size-4" />
                     </Button>

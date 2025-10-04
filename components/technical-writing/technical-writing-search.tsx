@@ -42,7 +42,7 @@ export function TechnicalWritingSearch({
           type="search"
           value={value}
           placeholder="Search articles by title…"
-          className="bg-background col-start-1 row-start-1 h-12 pl-10"
+          className="col-start-1 row-start-1 h-12 rounded-full pl-10"
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
         />

@@ -53,7 +53,7 @@ export default async function BlogPage({
           className="mb-4 text-center font-mono font-semibold text-sky-700"
           direction="left"
         >
-          Home
+          Back to home
         </ArrowLink>
         <h1 className="text-center">Blog</h1>
         <p className="mt-4 text-center text-lg text-neutral-700">
