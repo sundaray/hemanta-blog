@@ -125,7 +125,7 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
                     key={tag}
                     id={tag}
                     className={cn(
-                      "cursor-pointer rounded-full border border-sky-200 bg-sky-100 px-3 py-1.5 text-sm font-semibold text-sky-700 outline-none transition-colors",
+                      "cursor-pointer rounded-md bg-sky-100 px-3 py-1.5 text-sm font-semibold tracking-tight text-neutral-700 outline-none transition-colors",
                       "hover:border-sky-700 hover:bg-sky-700 hover:text-white focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2", // This logic still works perfectly!
                       selectedTags.includes(tag)
                         ? "border-sky-700 bg-sky-700 text-white"
@@ -144,7 +144,7 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
           disabled={!canScrollRight}
           aria-label="Scroll tags right"
           className={cn(
-            "hover:bg-accent z-10 flex size-9 shrink-0 items-center justify-center rounded-full border shadow-sm transition-opacity",
+            "hover:bg-accent z-10 flex size-9 shrink-0 items-center justify-center rounded-full border shadow-xl transition-opacity",
             "disabled:cursor-not-allowed disabled:opacity-30",
           )}
         >

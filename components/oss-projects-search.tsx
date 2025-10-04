@@ -43,10 +43,10 @@ export function OssProjectsSearch({
       <div className="grid w-full grid-cols-1 items-center">
         <Input
           type="search"
-          value={value} // 🔹 The value now comes directly from props.
+          value={value}
           placeholder="Search projects by name or description…"
-          className="bg-background col-start-1 row-start-1 h-12 pl-10"
-          onChange={handleInputChange} // 🔹 The onChange now comes directly from props.
+          className="col-start-1 row-start-1 h-12 rounded-full bg-neutral-200/40 pl-10"
+          onChange={handleInputChange}
           onKeyDown={handleKeyDown}
         />
         <div className="pointer-events-none col-start-1 row-start-1 pl-4">

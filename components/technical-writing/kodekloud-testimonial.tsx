@@ -2,7 +2,6 @@ import { Merriweather } from "next/font/google"; // ✏️ Changed font import
 
 import { cn } from "@/lib/utils";
 
-// ✏️ Initialize the Merriweather font instead of Playfair Display
 const merriweather = Merriweather({
   subsets: ["latin"],
   style: ["italic", "normal"],
@@ -13,7 +12,7 @@ export function KodeKloudTestimonial() {
   return (
     <section className="mx-auto max-w-3xl text-center">
       <h2 className="mb-8 text-4xl">Testimonial</h2>
-      <figure className="bg-accent rounded-lg border p-8 text-left">
+      <figure className="text-left">
         <blockquote>
           <svg
             className="mb-4 size-8 text-neutral-300"
