@@ -45,11 +45,8 @@ export function OssProjectsSidebar({
 }: OssProjectsSidebarProps) {
   return (
     <search>
-      <aside className="w-60">
-        <div className="h-10">
-          <h4>Filter OSS Projects</h4>
-        </div>
-
+      <aside className="w-60 space-y-2">
+        <h4>Filter OSS Projects</h4>
         <FilterSection
           title="Topics"
           items={uniqueTopics}

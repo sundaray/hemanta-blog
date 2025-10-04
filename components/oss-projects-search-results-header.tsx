@@ -49,10 +49,9 @@ export function OssProjectsSearchResultsHeader({
         )}
       </div>
       <Button
-        variant="secondary"
         size="sm"
         onClick={onToggleSidebar}
-        className="cursor-pointer rounded-full text-sm"
+        className="cursor-pointer rounded-full bg-neutral-200/40 text-sm text-neutral-700 hover:bg-neutral-200"
       >
         {isSidebarVisible ? (
           <>
