@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
+import { AnimatePresence, motion } from "motion/react";
 
 import { cn } from "@/lib/utils";
 
@@ -102,12 +103,12 @@ function Button({
         {ripples.map(({ key, x, y, size }) => (
           <motion.div
             key={key}
-            className="absolute rounded-full bg-current/20"
+            className="bg-current/20 absolute rounded-full"
             style={{ left: x, top: y, x: "-50%", y: "-50%" }}
             initial={{ width: 0, height: 0, opacity: 0.5 }}
             animate={{ width: size, height: size, opacity: 0.5 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
             onAnimationComplete={() => handleAnimationComplete(key)}
           />
         ))}

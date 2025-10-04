@@ -45,7 +45,7 @@ export function OssProjectsSidebar({
 }: OssProjectsSidebarProps) {
   return (
     <search>
-      <aside className={cn(className, "divide-y-1 divide-input divide-solid")}>
+      <aside className="w-60">
         <div className="h-10">
           <h4>Filter OSS Projects</h4>
         </div>
@@ -114,9 +114,9 @@ function FilterSection({
   );
 
   return (
-    <div>
+    <div className="space-y-2">
       <button
-        className="flex h-12 w-full items-center gap-x-2 text-left"
+        className="hover:bg-accent flex h-12 w-full items-center gap-x-2 text-left"
         onClick={() => setIsOpen(!isOpen)}
       >
         <motion.div

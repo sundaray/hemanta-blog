@@ -1,4 +1,142 @@
-// 🔹 ADDED: New content for the technical writing page data.
+export const playgroundItems = [
+  { href: "https://kodekloud.com/playgrounds/playground-chef", title: "Chef" },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-saltstack",
+    title: "SaltStack",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-arch-linux",
+    title: "Arch Linux",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-alpine-linux",
+    title: "Alpine Linux",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-rocky-linux",
+    title: "Rocky Linux",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-centos-stream-8",
+    title: "Centos Stream 8",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-ubuntu-18-04",
+    title: "Linux Ubuntu 18.04",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-ubuntu-22-04",
+    title: "Linux Ubuntu 22.04",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-consul-datacenter-3-node",
+    title: "Consul datacenter 3-node",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-jsonnet-tanka",
+    title: "Jsonnet Tanka",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-gvisor",
+    title: "Kubernetes with gVisor",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-kubernetes-with-calic",
+    title: "Kubernetes with Calico",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-kubernetes-with-kata-containers",
+    title: "Kubernetes with Kata containers",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-mongodb",
+    title: "MongoDB",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-redis",
+    title: "Redis",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-nodejs",
+    title: "Node.js",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-postgresql",
+    title: "PostgreSQL",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-jupyter",
+    title: "JupyterLab",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-terraform",
+    title: "Terraform",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-terragrunt",
+    title: "Terragrunt",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-terraform-aws",
+    title: "Terraform + AWS",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-nagios",
+    title: "Nagios",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-istio",
+    title: "Istio",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-linkerd",
+    title: "Linkerd",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-containerd",
+    title: "Containerd",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-buildpacks-io",
+    title: "Buildpacks",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-ci-cd",
+    title: "CI CD playground",
+  },
+  {
+    href: "https://kodekloud.com/playgrounds/playground-prometheus-with-helm",
+    title: "Prometheus with Helm",
+  },
+];
+
+export const revisedBlogItems = [
+  {
+    href: "https://kodekloud.com/blog/containerization/",
+    title: "What Is Containerization?",
+  },
+  {
+    href: "https://kodekloud.com/blog/top-developer-tools/",
+    title: "Top 10 Developer Tools",
+  },
+  {
+    href: "https://kodekloud.com/blog/devops-cloud-coding/",
+    title: "Does DevOps or Cloud Engineer Need Coding?",
+  },
+  {
+    href: "https://kodekloud.com/blog/how-to-become-a-devops-engineer/",
+    title: "How to Become a DevOps Engineer: Your 6-Step Guide",
+  },
+  {
+    href: "https://kodekloud.com/blog/gitops-deployment-advantages/",
+    title: "What Is GitOps? Deployment Strategies and Advantages Explained",
+  },
+  {
+    href: "https://kodekloud.com/blog/cloud-computing/",
+    title: "What Is Cloud Computing?",
+  },
+];
+
 export const blogPosts = [
   {
     id: 1,

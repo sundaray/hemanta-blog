@@ -1,5 +1,6 @@
 "use client";
 
+import { GrPowerReset } from "react-icons/gr";
 import { IoMdCloseCircle } from "react-icons/io";
 
 import { cn } from "@/lib/utils";
@@ -40,28 +41,28 @@ export function OssProjectsSearchResultsHeader({
             variant="ghost"
             size="sm"
             onClick={onResetFilters}
-            className="text-sm font-semibold text-sky-700 hover:bg-sky-100/50 hover:text-sky-700"
+            className="cursor-pointer rounded-full text-sm font-semibold text-sky-700 hover:bg-sky-100/50 hover:text-sky-700"
           >
-            <IoMdCloseCircle className="size-4" />
-            Reset
+            <GrPowerReset className="size-4" />
+            Reset all
           </Button>
         )}
       </div>
       <Button
-        variant="ghost"
+        variant="secondary"
         size="sm"
         onClick={onToggleSidebar}
-        className="text-muted-foreground text-sm"
+        className="cursor-pointer rounded-full text-sm"
       >
         {isSidebarVisible ? (
           <>
             <Icons.filterX className="size-4" />
-            Hide Filters
+            Hide filters
           </>
         ) : (
           <>
             <Icons.filter className="size-4" />
-            Show Filters
+            Show filters
           </>
         )}
       </Button>

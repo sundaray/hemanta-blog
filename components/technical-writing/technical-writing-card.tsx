@@ -42,7 +42,7 @@ export function TechnicalWritingCard({
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           className={cn(
             "object-cover",
-            "transition-transform duration-200 ease-out group-hover:scale-105",
+            "group-hover:scale-103 transition-transform duration-200 ease-out",
           )}
         />
       </div>
