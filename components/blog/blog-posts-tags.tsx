@@ -4,18 +4,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { AnimatePresence, motion } from "motion/react";
 import { useQueryStates } from "nuqs";
-import {
-  Button,
-  Tag,
-  TagGroup,
-  TagList,
-  type Selection as AriaSelection,
-} from "react-aria-components";
+import { Button, type Selection as AriaSelection } from "react-aria-components";
 
 import { blogSearchParams } from "@/lib/blog-search-params";
 import { cn } from "@/lib/utils";
 
 import { Icons } from "@/components/icons";
+import { Tag, TagGroup, TagList } from "@/components/tag-group";
 
 type BlogTagsProps = {
   tags: string[];
@@ -91,21 +86,23 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
     <div className="space-y-4">
       {/* Tag Scroller UI */}
       <div className="relative flex items-center gap-2">
-        <button
+        <motion.button
+          animate={{
+            opacity: canScrollLeft ? 1 : 0,
+            scale: canScrollLeft ? 1 : 0.8,
+          }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
           onClick={() => scroll("left")}
-          disabled={!canScrollLeft}
           aria-label="Scroll tags left"
-          className={cn(
-            "hover:bg-accent z-10 flex size-9 items-center justify-center rounded-full border shadow-xl transition-opacity",
-            "disabled:cursor-not-allowed disabled:opacity-30",
-          )}
+          disabled={!canScrollLeft}
+          className="hover:bg-accent z-10 flex size-10 items-center justify-center rounded-full border shadow-xl"
         >
           <Icons.chevronLeft className="text-muted-foreground size-6" />
-        </button>
+        </motion.button>{" "}
         <div
           className={cn(
             "relative flex-1 overflow-hidden",
-            "[mask-image:linear-gradient(to_right,transparent,black_1rem,black_calc(100%-1rem),rgba(0,0,0,0.5))]",
+            // "[mask-image:linear-gradient(to_right,transparent,black_1rem,black_calc(100%-1rem),rgba(0,0,0,0.5))]",
           )}
         >
           <div
@@ -119,19 +116,9 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
               selectedKeys={selectedTags}
               onSelectionChange={handleSelectionChange}
             >
-              <TagList className="flex items-center gap-3">
+              <TagList className="flex flex-nowrap items-center gap-3">
                 {tags.map((tag) => (
-                  <Tag
-                    key={tag}
-                    id={tag}
-                    className={cn(
-                      "cursor-pointer rounded-md bg-neutral-200 px-2 py-1 text-sm font-semibold tracking-tight text-neutral-700 outline-none transition-colors",
-                      "hover:bg-neutral-200 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2",
-                      selectedTags.includes(tag)
-                        ? "bg-sky-200 text-neutral-700"
-                        : "border-sky-200",
-                    )}
-                  >
+                  <Tag key={tag} id={tag}>
                     {tag}
                   </Tag>
                 ))}
@@ -139,17 +126,19 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
             </TagGroup>
           </div>
         </div>
-        <button
+        <motion.button
+          animate={{
+            opacity: canScrollRight ? 1 : 0,
+            scale: canScrollRight ? 1 : 0.8,
+          }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
           onClick={() => scroll("right")}
-          disabled={!canScrollRight}
           aria-label="Scroll tags right"
-          className={cn(
-            "hover:bg-accent z-10 flex size-9 shrink-0 items-center justify-center rounded-full border shadow-xl transition-opacity",
-            "disabled:cursor-not-allowed disabled:opacity-30",
-          )}
+          disabled={!canScrollRight}
+          className="hover:bg-accent z-10 flex size-10 shrink-0 items-center justify-center rounded-full border shadow-xl"
         >
           <Icons.chevronRight className="text-muted-foreground size-6" />
-        </button>
+        </motion.button>
       </div>
       {/* Display Selected Tags */}
       <AnimatePresence>
@@ -161,7 +150,6 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
             transition={{ duration: 0.2, ease: "easeOut" }}
             className="mt-8 flex flex-wrap items-center gap-3"
           >
-            {/* <span className="text-sm font-medium">Filtered by:</span> */}
             <TagGroup
               aria-label="Selected tags"
               onRemove={(keys) => {
@@ -178,15 +166,15 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
                   <Tag
                     key={tag}
                     id={tag}
-                    className="flex items-center gap-1.5 rounded-md bg-sky-200 px-2 py-1 text-sm font-semibold tracking-tight text-neutral-700 outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                    className="flex items-center justify-between gap-1 bg-sky-200 text-neutral-700"
                   >
                     {tag}
                     <Button
                       slot="remove"
                       aria-label={`Remove ${tag} filter`}
-                      className="-mr-1 rounded-full p-1 transition-colors hover:bg-sky-300/40"
+                      className="-mr-1 size-6 rounded-full transition-colors hover:bg-sky-300/40"
                     >
-                      <Icons.x className="size-4" />
+                      <Icons.x className="inline-block size-5" />
                     </Button>
                   </Tag>
                 ))}
