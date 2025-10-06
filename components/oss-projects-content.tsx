@@ -55,7 +55,6 @@ export function OssProjectsContent({
   const hasActiveFilters = hasActiveSidebarFilters || filters.query !== "";
 
   const handleClearSidebarFilters = useCallback(() => {
-    // 🔄️ Updates all relevant sidebar filters in one atomic call.
     setFilters({
       topic: null,
       language: null,
@@ -66,7 +65,6 @@ export function OssProjectsContent({
   }, [setFilters]);
 
   const handleResetAll = useCallback(() => {
-    // 🔄️ Resets everything in a single call to prevent flickering.
     setFilters({
       query: "",
       topic: null,
@@ -85,7 +83,6 @@ export function OssProjectsContent({
   };
 
   const handleTopicQueryChange = (value: string) => {
-    // 🔄️ Uses the unified setter, but overrides the transition to only show the sidebar spinner.
     setFilters(
       { "topic-query": value },
       {
@@ -96,7 +93,6 @@ export function OssProjectsContent({
   };
 
   const handleLanguageQueryChange = (value: string) => {
-    // 🔄️ Same as above, overriding the transition for a better UX.
     setFilters(
       { "language-query": value },
       {
@@ -175,9 +171,9 @@ export function OssProjectsContent({
                 <Icons.spinner className="size-8 animate-spin text-sky-700" />
               </div>
             )}
-            <div
+            <ul
               className={cn(
-                "grid grid-cols-1 gap-8 sm:grid-cols-2",
+                "grid list-none grid-cols-1 gap-8 sm:grid-cols-2",
                 isSidebarVisible ? "lg:grid-cols-3" : "lg:grid-cols-4",
                 isGridLoading
                   ? "pointer-events-none opacity-30"
@@ -187,7 +183,9 @@ export function OssProjectsContent({
             >
               {projects.length > 0 ? (
                 projects.map((project) => (
-                  <OssProjectCard key={project.id} project={project} />
+                  <li key={project.id}>
+                    <OssProjectCard key={project.id} project={project} />
+                  </li>
                 ))
               ) : (
                 <div className="col-span-full mx-auto flex h-64 w-full flex-col items-center justify-center rounded-lg border-2 border-dashed text-center">
@@ -198,7 +196,7 @@ export function OssProjectsContent({
                   </p>
                 </div>
               )}
-            </div>
+            </ul>
             <OssProjectsPagination
               totalPages={totalPages}
               startTransition={startPaginationTransition}

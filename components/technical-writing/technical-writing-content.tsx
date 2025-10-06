@@ -50,21 +50,23 @@ export function TechnicalWritingContent({
       <section>
         <AnimatePresence mode="wait" initial={false}>
           {paginatedPosts.length > 0 ? (
-            <motion.div
+            <motion.ul
               key="posts-list"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
               className={cn(
-                "mt-12 grid grid-cols-1 gap-8",
+                "mt-12 grid list-none grid-cols-1 gap-8",
                 "sm:grid-cols-2 lg:grid-cols-3",
               )}
             >
               {paginatedPosts.map((post) => (
-                <TechnicalWritingCard key={post.id} post={post} />
+                <li key={post.id}>
+                  <TechnicalWritingCard key={post.id} post={post} />
+                </li>
               ))}
-            </motion.div>
+            </motion.ul>
           ) : (
             <motion.div
               key="no-posts"

@@ -25,7 +25,7 @@ export function BlogPageContent({
       <section>
         <AnimatePresence mode="wait" initial={false}>
           {paginatedPosts.length > 0 ? (
-            <motion.div
+            <motion.ul
               key="posts-list"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -34,12 +34,14 @@ export function BlogPageContent({
                 duration: 0.2,
                 ease: "easeOut",
               }}
-              className="mt-12 space-y-6"
+              className="mt-12 list-none space-y-6"
             >
               {paginatedPosts.map((post) => (
-                <BlogPostCard key={post.slug} post={post} />
+                <li key={post.slug}>
+                  <BlogPostCard key={post.slug} post={post} />
+                </li>
               ))}
-            </motion.div>
+            </motion.ul>
           ) : (
             <motion.div
               key="no-posts"
