@@ -27,7 +27,7 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
           day: "numeric",
         })}
       </p>
-      <h2 className="mt-2 transition-colors group-hover:text-sky-700">
+      <h2 className="mt-2 group-hover:text-sky-700">
         <Link
           href={`/blog/${post.slug}`}
           className={cn(
@@ -41,8 +41,8 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
         <p className="mt-4 line-clamp-2 text-neutral-600">{post.description}</p>
       )}
       <div
-        aria-hidden="true"
         className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-sky-700"
+        aria-hidden="true"
       >
         Read More
         <AnimatedArrowIcon

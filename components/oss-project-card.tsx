@@ -21,15 +21,12 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
         "bg-gradient-to-bl from-neutral-100 to-neutral-50",
         "shadow-[inset_-2px_2px_#fff,_-4px_4px_10px_rgb(0_0_0_/_0.1)]",
         "hover:-translate-y-1",
+        "has-[_a:focus-visible]:-translate-y-1",
+        "has-[_a:focus-visible]:ring-ring has-[_a:focus-visible]:ring-2",
+        "has-[_a:focus-visible]:[&_a:focus-visible]:outline-none",
         className,
       )}
     >
-      <Link
-        href={`/oss/${project.name}`}
-        className="focus-ring absolute inset-0 z-10 rounded-lg"
-        aria-label={`View details for ${project.name}`}
-      />
-
       <div className="flex items-start justify-between gap-2">
         <h3
           className={cn(
@@ -37,7 +34,14 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
             "transition-colors group-hover:text-sky-700",
           )}
         >
-          {project.name}
+          <Link
+            href={`/oss/${project.name}`}
+            className={cn(
+              "before:absolute before:inset-0 before:z-10 before:rounded-lg before:content-['']",
+            )}
+          >
+            {project.name}
+          </Link>
         </h3>
         {project.homepage && (
           <a
@@ -46,9 +50,9 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
             tabIndex={-1}
             rel="noopener noreferrer"
             className={cn(
-              "text-muted-foreground hover:text-foreground focus-ring relative z-20",
+              "text-muted-foreground hover:text-foreground relative z-20",
               "-m-2 p-2",
-              "hover:bg-accent rounded-full transition-colors",
+              "rounded-full",
             )}
             aria-label="Visit project website"
             onClick={(e) => e.stopPropagation()}
