@@ -173,7 +173,7 @@ export function TableOfContents({ toc }: TocProps) {
                           <a
                             href={h3.url}
                             className={cn(
-                              "link-focus inline-block text-sm transition-colors",
+                              "focus-ring inline-block text-sm transition-colors",
                               activeHeading === h3.url?.split("#")[1]
                                 ? "text-sky-700"
                                 : "text-neutral-600",

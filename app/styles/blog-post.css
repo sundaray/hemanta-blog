@@ -20,7 +20,7 @@
   }
 
   .blog-post p a {
-    @apply text-sky-700 hover:underline hover:underline-offset-4;
+    @apply focus-visible:ring-ring text-sky-700 outline-none hover:underline hover:underline-offset-4 focus-visible:ring-2 focus-visible:ring-offset-2;
   }
 
   .blog-post ul,
