@@ -23,17 +23,13 @@ export function TechnicalWritingCard({
         "group relative flex flex-col overflow-hidden rounded-lg",
         "bg-gradient-to-bl from-neutral-100 to-neutral-50",
         "shadow-[inset_-2px_2px_#fff,_-4px_4px_10px_rgb(0_0_0_/_0.1)]",
+        "has-[a:focus-visible]:ring-ring has-[a:focus-visible]:ring-2",
+        "has-[a:focus-visible]:[&_a]:outline-none",
+        "has-[a:focus-visible]:-translate-y-1",
+        "hover:-translate-y-1",
         className,
       )}
     >
-      <a
-        href={post.href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="focus-ring absolute inset-0 z-10 rounded-lg"
-        aria-label={`Read more about ${post.title}`}
-      />
-
       <div className="relative aspect-[1.91/1] w-full">
         <Image
           src={`/images/kodekloud/${post.image}`}
@@ -46,7 +42,14 @@ export function TechnicalWritingCard({
 
       <div className="flex flex-1 flex-col p-4">
         <h3 className="text-pretty font-semibold transition-colors group-hover:text-sky-700">
-          {post.title}
+          <a
+            href={post.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="before:absolute before:inset-0 before:z-10 before:rounded-lg before:content-['']"
+          >
+            {post.title}
+          </a>
         </h3>
 
         <div className="mt-auto flex items-end justify-between pt-4">
@@ -57,7 +60,10 @@ export function TechnicalWritingCard({
               day: "numeric",
             })}
           </p>
-          <div className="relative z-20 inline-flex items-center gap-1.5 text-sm font-semibold text-neutral-600 transition-colors group-hover:text-sky-700">
+          <div
+            aria-hidden="true"
+            className="relative inline-flex items-center gap-1.5 text-sm font-semibold text-neutral-600 transition-colors group-hover:text-sky-700"
+          >
             Read More
             <Icons.arrowUpRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
           </div>

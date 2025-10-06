@@ -16,7 +16,7 @@ export async function MainNav({ links }: MainNavProps) {
         <Link
           href="/"
           aria-label="Go to homepage"
-          className="focus-ring hidden h-full items-center rounded-md text-lg font-bold tracking-tight md:flex"
+          className="focus-ring hidden h-full items-center text-lg font-bold tracking-tight md:flex"
         >
           Hemanta Sundaray
         </Link>
