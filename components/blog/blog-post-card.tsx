@@ -4,7 +4,7 @@ import type { BlogPost } from "@/types";
 
 import { cn } from "@/lib/utils";
 
-import { ArrowLink } from "@/components/ui/arrow-link";
+import { AnimatedArrowIcon } from "@/components/animated-arrow-icon";
 
 type BlogPostCardProps = {
   post: BlogPost;
@@ -13,13 +13,13 @@ type BlogPostCardProps = {
 export function BlogPostCard({ post }: BlogPostCardProps) {
   return (
     <article
-      className={cn("relative cursor-pointer p-4 hover:bg-neutral-200/40")}
+      className={cn(
+        "group relative rounded-lg hover:bg-neutral-200/40",
+        "-mx-4 px-4 py-4 sm:-mx-6 sm:px-6",
+        "has-[_a:focus-visible]:ring-ring has-[_a:focus-visible]:ring-2",
+        "has-[_a:focus-visible]:[&_a:focus-visible]:outline-none",
+      )}
     >
-      <Link
-        href={`/blog/${post.slug}`}
-        className="absolute inset-0 z-10 rounded-lg"
-        aria-label={`Read more about ${post.title}`}
-      />
       <p className="text-muted-foreground font-mono text-sm">
         {new Date(post.publishedAt).toLocaleDateString("en-US", {
           year: "numeric",
@@ -28,19 +28,29 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
         })}
       </p>
       <h2 className="mt-2 transition-colors group-hover:text-sky-700">
-        {post.title}
+        <Link
+          href={`/blog/${post.slug}`}
+          className={cn(
+            "before:absolute before:inset-0 before:z-10 before:rounded-lg before:content-['']",
+          )}
+        >
+          {post.title}
+        </Link>
       </h2>
       {post.description && (
-        <p className="mt-3 line-clamp-2 text-neutral-600">{post.description}</p>
+        <p className="mt-4 line-clamp-2 text-neutral-600">{post.description}</p>
       )}
-      <ArrowLink
-        tabIndex={-1}
-        href={`/blog/${post.slug}`}
-        className="mt-4 px-0 py-0 text-sm font-semibold text-sky-700"
+      <div
         aria-hidden="true"
+        className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-sky-700"
       >
         Read More
-      </ArrowLink>
+        <AnimatedArrowIcon
+          direction="right"
+          restingColor="text-sky-700/50"
+          hoverColor="text-sky-700"
+        />
+      </div>
     </article>
   );
 }
