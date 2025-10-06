@@ -55,7 +55,7 @@ export function TechnicalWritingContent({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
               className={cn(
                 "mt-12 grid grid-cols-1 gap-8",
                 "sm:grid-cols-2 lg:grid-cols-3",

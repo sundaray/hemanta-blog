@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 
+import { motion } from "motion/react";
+
 import type { SelectOssProject } from "@/db/schema";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +15,17 @@ type OssProjectCardProps = {
   className?: string;
 };
 
+const iconVariants = {
+  rest: {
+    rotate: 0,
+    transition: { duration: 0.2, ease: "easeOut" },
+  },
+  hover: {
+    rotate: 180,
+    transition: { duration: 0.2, ease: "easeOut" },
+  },
+} as const;
+
 export function OssProjectCard({ project, className }: OssProjectCardProps) {
   return (
     <div
@@ -21,9 +34,9 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
         "bg-gradient-to-bl from-neutral-100 to-neutral-50",
         "shadow-[inset_-2px_2px_#fff,_-4px_4px_10px_rgb(0_0_0_/_0.1)]",
         "hover:-translate-y-1",
-        "has-[_a:focus-visible]:-translate-y-1",
-        "has-[_a:focus-visible]:ring-ring has-[_a:focus-visible]:ring-2",
-        "has-[_a:focus-visible]:[&_a:focus-visible]:outline-none",
+        "has-[.main-link:focus-visible]:-translate-y-1",
+        "has-[.main-link:focus-visible]:ring-ring has-[.main-link:focus-visible]:ring-2",
+        "has-[.main-link:focus-visible]:[&_.main-link:focus-visible]:outline-none",
         className,
       )}
     >
@@ -37,6 +50,7 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
           <Link
             href={`/oss/${project.name}`}
             className={cn(
+              "main-link",
               "before:absolute before:inset-0 before:z-10 before:rounded-lg before:content-['']",
             )}
           >
@@ -44,21 +58,26 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
           </Link>
         </h3>
         {project.homepage && (
-          <a
+          <motion.a
             href={project.homepage}
             target="_blank"
-            tabIndex={-1}
             rel="noopener noreferrer"
             className={cn(
               "text-muted-foreground hover:text-foreground relative z-20",
               "-m-2 p-2",
               "rounded-full",
+              "focus-visible:ring-ring focus-visible:ring-2",
             )}
             aria-label="Visit project website"
             onClick={(e) => e.stopPropagation()}
+            initial="rest"
+            whileHover="hover"
+            animate="rest"
           >
-            <Icons.globe className="size-4 shrink-0" />
-          </a>
+            <motion.div variants={iconVariants}>
+              <Icons.globe className="size-4 shrink-0" />
+            </motion.div>
+          </motion.a>
         )}
       </div>
 

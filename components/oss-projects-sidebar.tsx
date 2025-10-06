@@ -44,7 +44,7 @@ export function OssProjectsSidebar({
   isLoading,
 }: OssProjectsSidebarProps) {
   return (
-    <search>
+    <search className={cn(className)}>
       <aside className="w-60 space-y-2">
         <h4>Filter OSS Projects</h4>
         <FilterSection

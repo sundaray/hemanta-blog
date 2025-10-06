@@ -40,10 +40,7 @@ export function TechnicalWritingCard({
           alt={post.title}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          className={cn(
-            "object-cover",
-            "group-hover:scale-103 transition-transform duration-200 ease-out",
-          )}
+          className={cn("object-cover")}
         />
       </div>
 
