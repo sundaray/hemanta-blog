@@ -30,7 +30,7 @@ export function TechnicalWritingCard({
         href={post.href}
         target="_blank"
         rel="noopener noreferrer"
-        className="absolute inset-0 z-10"
+        className="focus-ring absolute inset-0 z-10 rounded-lg"
         aria-label={`Read more about ${post.title}`}
       />
 

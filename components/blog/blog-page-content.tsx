@@ -1,7 +1,7 @@
 "use client";
 
 import type { BlogPost } from "@/types";
-import { AnimatePresence, LayoutGroup, motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 
 import { BlogPostCard } from "@/components/blog/blog-post-card";
 import { BlogPostsPagination } from "@/components/blog/blog-posts-pagination";

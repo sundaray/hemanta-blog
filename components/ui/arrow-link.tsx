@@ -3,7 +3,6 @@
 import React from "react";
 import Link from "next/link";
 
-import type { Route } from "next";
 import { BiSolidLeftArrow, BiSolidRightArrow } from "react-icons/bi";
 
 import { cn } from "@/lib/utils";
@@ -22,8 +21,7 @@ export function ArrowLink({
   ...props
 }: ArrowLinkProps) {
   const classes = cn(
-    "group relative inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-sky-700 dark:text-sky-400",
-    "focus-ring",
+    "bg-background focus-ring group relative inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-sky-700 dark:text-sky-400",
     className,
   );
 
@@ -55,10 +53,8 @@ export function ArrowLink({
 
   return (
     <Link className={classes} {...props} href={href}>
-      {/* 🔹 Conditionally render the arrow before the text */}
       {direction === "left" && <Arrow />}
       <span>{children}</span>
-      {/* 🔹 Or after the text (default) */}
       {direction === "right" && <Arrow />}
     </Link>
   );

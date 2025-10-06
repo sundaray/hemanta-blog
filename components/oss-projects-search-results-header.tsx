@@ -51,7 +51,7 @@ export function OssProjectsSearchResultsHeader({
       <Button
         size="sm"
         onClick={onToggleSidebar}
-        className="cursor-pointer rounded-full bg-neutral-200/40 text-sm text-neutral-700 hover:bg-neutral-200"
+        className="cursor-pointer rounded-full bg-neutral-200 text-sm text-neutral-700 hover:bg-neutral-200"
       >
         {isSidebarVisible ? (
           <>

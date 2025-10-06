@@ -9,8 +9,6 @@ import "@/app/styles/globals.css";
 
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
-import { MainNavWrapper } from "@/components/navigation/main-nav-wrapper";
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -37,7 +35,7 @@ export default function RootLayout(props: LayoutProps<"/">) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
       >
-        <NextTopLoader showSpinner={false} color="#0ea5e9" shadow={false} />
+        <NextTopLoader showSpinner={false} color="#0284c7" shadow={false} />
         <RouterProvider>
           <NuqsAdapter>{props.children}</NuqsAdapter>
         </RouterProvider>

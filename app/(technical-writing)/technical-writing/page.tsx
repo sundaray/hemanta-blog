@@ -53,7 +53,7 @@ export default async function TechnicalWritingPage({
             href="https://kodekloud.com/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-sky-700 hover:underline hover:underline-offset-4"
+            className="focus-ring inline-flex items-center gap-1 text-sky-700 hover:underline hover:underline-offset-4"
           >
             KodeKloud
             <Icons.arrowUpRight className="size-3.5" />

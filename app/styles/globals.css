@@ -130,8 +130,9 @@ code[data-theme] span {
 
 @layer base {
   * {
-    @apply border-border outline-ring;
+    @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }

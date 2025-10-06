@@ -72,7 +72,7 @@ export default async function OssProjectDetailsPage(
             rel="noopener noreferrer"
             className={cn(
               "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-semibold",
-              "bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2 transition-colors",
+              "bg-primary text-primary-foreground hover:bg-primary/90 focus-ring h-9 px-4 py-2 transition-colors",
             )}
           >
             <FaGithub className="size-4" />
@@ -85,7 +85,7 @@ export default async function OssProjectDetailsPage(
               target="_blank"
               rel="noopener noreferrer"
               className={cn(
-                "inline-flex items-center justify-center gap-2 whitespace-nowrap font-semibold",
+                "focus-ring inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-semibold",
                 "text-secondary-foreground h-9 px-4 py-2",
               )}
             >

@@ -43,9 +43,10 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
           <a
             href={project.homepage}
             target="_blank"
+            tabIndex={-1}
             rel="noopener noreferrer"
             className={cn(
-              "text-muted-foreground hover:text-foreground relative z-20",
+              "text-muted-foreground hover:text-foreground focus-ring relative z-20",
               "-m-2 p-2",
               "hover:bg-accent rounded-full transition-colors",
             )}

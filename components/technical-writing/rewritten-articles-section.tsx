@@ -22,7 +22,7 @@ export function RewrittenArticlesSection() {
               href={item.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-neutral-700 transition-colors hover:text-sky-700"
+              className="focus-ring inline-flex items-center gap-2 text-neutral-700 transition-colors hover:text-sky-700"
             >
               <Icons.arrowUpRight className="size-3.5 shrink-0 text-sky-700" />
               <span className="text-left">{item.title}</span>
