@@ -26,7 +26,7 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
     >
       <Link
         href={`/oss/${project.name}`}
-        className="absolute inset-0 z-10"
+        className="focus-ring absolute inset-0 z-10 rounded-lg"
         aria-label={`View details for ${project.name}`}
       />
 

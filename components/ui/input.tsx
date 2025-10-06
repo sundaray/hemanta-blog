@@ -12,7 +12,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
 
         "ring-1 ring-inset ring-transparent",
 
-        "focus-visible:bg-white focus-visible:ring-2 focus-visible:ring-sky-700",
+        "focus-visible:bg-white focus-visible:ring-2 focus-visible:ring-sky-600",
 
         "aria-invalid:ring-destructive/40",
         className,

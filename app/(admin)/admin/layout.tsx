@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
-import { MainNav } from "@/components/navigation/main-nav";
-import { AdminSidebar } from "@/components/admin-sidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+
 import { navbarLinks } from "@/config/navbar";
+
+import { AdminSidebar } from "@/components/admin-sidebar";
+import { MainNav } from "@/components/navigation/main-nav";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 export const metadata: Metadata = {
   title: "Admin",
@@ -21,7 +23,7 @@ export default function AdminLayout(props: LayoutProps<"/admin">) {
             <AdminSidebar />
           </aside>
           <main className="relative flex-1 px-4 py-32 md:px-8">
-            <SidebarTrigger className="absolute top-18 left-2" />
+            <SidebarTrigger className="top-18 absolute left-2" />
             <div className="mx-auto w-full max-w-xl">{props.children}</div>
           </main>
         </SidebarProvider>
