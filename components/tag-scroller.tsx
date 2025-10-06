@@ -73,7 +73,7 @@ export function TagScroller({ children, className }: TagScrollerProps) {
             transition={{ duration: 0.2, ease: "easeOut" }}
             onClick={() => scroll("left")}
             aria-label="Scroll tags left"
-            className="bg-background hover:bg-accent absolute left-0 top-1/2 z-10 flex size-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border shadow-xl backdrop-blur-sm"
+            className="bg-background hover:bg-accent absolute left-0 top-1/2 z-10 flex size-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border shadow-xl"
           >
             <Icons.chevronLeft className="text-muted-foreground size-6" />
           </motion.button>

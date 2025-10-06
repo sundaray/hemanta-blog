@@ -3,6 +3,8 @@ import Link from "next/link";
 import type { BlogPost } from "@/types";
 import { AnimatePresence, motion } from "motion/react";
 
+import { cn } from "@/lib/utils";
+
 import { ArrowLink } from "@/components/ui/arrow-link";
 
 type BlogPostCardProps = {
@@ -21,11 +23,11 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
           ease: "easeOut",
           layout: { duration: 0.2, ease: "easeOut" },
         }}
-        className="group relative cursor-pointer rounded-lg p-4 hover:bg-neutral-200/40"
+        className={cn("relative cursor-pointer p-4 hover:bg-neutral-200/40")}
       >
         <Link
           href={`/blog/${post.slug}`}
-          className="absolute inset-0 z-10"
+          className="focus-ring absolute inset-0 z-10"
           aria-label={`Read more about ${post.title}`}
         />
         <p className="text-muted-foreground font-mono text-sm">
@@ -44,8 +46,10 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
           </p>
         )}
         <ArrowLink
+          tabIndex={-1}
           href={`/blog/${post.slug}`}
           className="mt-4 px-0 py-0 text-sm font-semibold text-sky-700"
+          aria-hidden="true"
         >
           Read More
         </ArrowLink>

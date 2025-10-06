@@ -155,7 +155,7 @@ export function TableOfContents({ toc }: TocProps) {
                   <a
                     href={h2.url}
                     className={cn(
-                      "link-focus inline-block text-sm transition-colors",
+                      "focus-ring inline-block text-sm transition-colors",
                       isActiveGroup
                         ? "font-semibold text-sky-700"
                         : "text-neutral-600",

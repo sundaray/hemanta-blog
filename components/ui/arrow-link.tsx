@@ -1,13 +1,14 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import Link from "next/link";
 import React from "react";
+import Link from "next/link";
+
 import type { Route } from "next";
 import { BiSolidLeftArrow, BiSolidRightArrow } from "react-icons/bi";
 
-type ArrowLinkProps = {
-  href: Route;
+import { cn } from "@/lib/utils";
+
+type ArrowLinkProps = React.ComponentProps<typeof Link> & {
   children: React.ReactNode;
   className?: string;
   direction?: "left" | "right";
@@ -22,7 +23,7 @@ export function ArrowLink({
 }: ArrowLinkProps) {
   const classes = cn(
     "group relative inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-sky-700 dark:text-sky-400",
-    "outline-none focus-visible:ring-2 focus-visible:ring-sky-500",
+    "focus-ring",
     className,
   );
 

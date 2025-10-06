@@ -48,7 +48,7 @@ export default async function OssProjectDetailsPage(
   }
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 sm:px-6">
+    <div className="container mx-auto max-w-4xl px-4 sm:px-6">
       <ArrowLink
         href="/oss"
         className="mb-4 px-0 font-semibold text-sky-700"

@@ -169,7 +169,7 @@ function MobileNavLink({
       href={href}
       onClick={onClick}
       className={cn(
-        "link-focus block w-full rounded-md py-2 text-center text-lg font-medium transition-colors",
+        "focus-ring block w-full rounded-md py-2 text-center text-lg font-medium transition-colors",
         isActive
           ? "text-foreground font-semibold"
           : "text-tertiary-foreground hover:text-foreground",

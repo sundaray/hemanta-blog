@@ -48,7 +48,7 @@ export function KodeKloudTestimonial() {
             </p>
           </div>
         </blockquote>
-        <figcaption className="mt-6 flex flex-col border-t pt-4 text-sm text-neutral-600">
+        <figcaption className="mt-6 flex flex-col pt-4 text-sm text-neutral-600">
           <span className="font-semibold text-neutral-700">
             Benson Kuria Macharia
           </span>
