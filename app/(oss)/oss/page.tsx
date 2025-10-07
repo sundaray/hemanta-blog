@@ -43,9 +43,8 @@ export default async function OssPage({
     totalProjectsResult.isErr()
   ) {
     return (
-      <div className="container mx-auto flex h-[60vh] items-center justify-center">
-        {/* 🎨 REFACTORED: Used Empty component for consistent error display */}
-        <Empty className="bg-card rounded-lg border p-8 shadow-sm">
+      <div className="container mx-auto max-w-3xl">
+        <Empty className="rounded-lg border p-8">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <Icons.alertTriangle className="size-8 text-red-500" />
@@ -54,12 +53,12 @@ export default async function OssPage({
           <EmptyTitle className="text-2xl font-semibold">
             Error Fetching Projects
           </EmptyTitle>
-          <EmptyDescription className="max-w-md">
+          <EmptyDescription className="text-balance text-base text-neutral-600">
             An unexpected error occurred while trying to load the projects.
             Please try refreshing the page, or check back again later.
           </EmptyDescription>
           <EmptyContent>
-            <ArrowLink href="/" className="mt-4 font-semibold" direction="left">
+            <ArrowLink href="/" className="font-semibold" direction="left">
               Back to home
             </ArrowLink>
           </EmptyContent>
