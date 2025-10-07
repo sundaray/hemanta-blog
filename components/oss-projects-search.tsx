@@ -56,7 +56,7 @@ export function OssProjectsSearch({
           <div className="pointer-events-none col-start-1 row-start-1 flex items-center justify-end pr-4">
             <button
               onClick={clearSearch}
-              className="bg-background text-muted-foreground hover:bg-accent pointer-events-auto cursor-pointer rounded border px-1.5 py-0.5 text-sm transition-colors"
+              className="focus-ring bg-background text-muted-foreground hover:bg-accent pointer-events-auto cursor-pointer rounded border px-1.5 py-0.5 text-sm transition-colors"
               aria-label="Clear search"
             >
               esc

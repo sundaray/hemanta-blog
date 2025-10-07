@@ -14,6 +14,13 @@ import { OssProjectsPagination } from "@/components/oss-projects-pagination";
 import { OssProjectsSearch } from "@/components/oss-projects-search";
 import { OssProjectsSearchResultsHeader } from "@/components/oss-projects-search-results-header";
 import { OssProjectsSidebar } from "@/components/oss-projects-sidebar";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 
 type OssContentProps = {
   projects: SelectOssProject[];
@@ -188,13 +195,21 @@ export function OssProjectsContent({
                   </li>
                 ))
               ) : (
-                <div className="col-span-full mx-auto flex h-64 w-full flex-col items-center justify-center rounded-lg border-2 border-dashed text-center">
-                  <Icons.search className="text-muted-foreground size-10" />
-                  <h2 className="mt-4">No Projects Found</h2>
-                  <p className="mt-2 text-neutral-600">
-                    Try adjusting your search or filter criteria.
-                  </p>
-                </div>
+                <li className="col-span-full">
+                  <Empty className="w-full border border-dashed">
+                    <EmptyHeader>
+                      <EmptyMedia variant="icon">
+                        <Icons.search className="text-muted-foreground size-8" />
+                      </EmptyMedia>
+                    </EmptyHeader>
+                    <EmptyTitle className="text-2xl font-semibold">
+                      No Projects Found
+                    </EmptyTitle>
+                    <EmptyDescription className="text-pretty text-base text-neutral-600">
+                      Try adjusting your search or filter criteria.
+                    </EmptyDescription>
+                  </Empty>
+                </li>
               )}
             </ul>
             <OssProjectsPagination

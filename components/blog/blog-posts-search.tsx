@@ -46,9 +46,8 @@ export function BlogPostsSearch({ className }: { className?: string }) {
           value={values.query}
           onChange={(e) =>
             setValues(
-              { query: e.target.value, page: null }, // Reset to page 1 on new search
+              { query: e.target.value, page: null },
               {
-                // 📝 Debounce the URL update by 300ms to avoid excessive updates while typing
                 limitUrlUpdates:
                   e.target.value === "" ? undefined : debounce(300),
               },
@@ -63,7 +62,7 @@ export function BlogPostsSearch({ className }: { className?: string }) {
           <div className="pointer-events-none col-start-1 row-start-1 flex items-center justify-end pr-4">
             <button
               onClick={clearSearch}
-              className="bg-background text-muted-foreground hover:bg-accent pointer-events-auto cursor-pointer rounded border px-1.5 py-0.5 text-sm transition-colors"
+              className="bg-background text-muted-foreground hover:bg-accent focus-ring pointer-events-auto cursor-pointer rounded border px-1.5 py-0.5 text-sm transition-colors"
               aria-label="Clear search"
             >
               esc

@@ -12,6 +12,13 @@ import { TechnicalWritingCard } from "@/components/technical-writing/technical-w
 import { TechnicalWritingPagination } from "@/components/technical-writing/technical-writing-pagination";
 import { TechnicalWritingSearch } from "@/components/technical-writing/technical-writing-search";
 import { TechnicalWritingTags } from "@/components/technical-writing/technical-writing-tags";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 
 type TechnicalWritingContentProps = {
   paginatedPosts: KodeKloudPost[];
@@ -74,13 +81,21 @@ export function TechnicalWritingContent({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="flex flex-col items-center justify-center py-24 text-center"
+              className="mt-12 flex flex-col items-center justify-center text-center"
             >
-              <Icons.search className="text-muted-foreground size-10" />
-              <h2 className="mt-4">No Articles Found</h2>
-              <p className="mt-2 text-neutral-600">
-                Try adjusting your search or filter criteria.
-              </p>
+              <Empty className="w-full border border-dashed">
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <Icons.search className="text-muted-foreground size-8" />
+                  </EmptyMedia>
+                </EmptyHeader>
+                <EmptyTitle className="text-2xl font-semibold">
+                  No Articles Found
+                </EmptyTitle>
+                <EmptyDescription className="text-pretty text-base text-neutral-600">
+                  Try adjusting your search or filter criteria.
+                </EmptyDescription>
+              </Empty>
             </motion.div>
           )}
         </AnimatePresence>

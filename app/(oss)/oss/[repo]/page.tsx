@@ -7,6 +7,14 @@ import { cn } from "@/lib/utils";
 
 import { Icons } from "@/components/icons";
 import { ArrowLink } from "@/components/ui/arrow-link";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { TopicTagGroup } from "@/components/ui/topic-tag-group";
 
 export default async function OssProjectDetailsPage(
@@ -19,25 +27,24 @@ export default async function OssProjectDetailsPage(
 
   if (result.isErr()) {
     return (
-      <div className="container mx-auto flex h-[60vh] items-center justify-center">
-        <div
-          role="alert"
-          className="bg-card flex flex-col items-center gap-y-4 rounded-lg border p-8 text-center shadow-sm"
-        >
-          <Icons.alertTriangle className="size-8 text-red-500" />
-          <h2 className="text-red-600">Error Fetching Project Details</h2>
-          <p className="max-w-md text-pretty text-neutral-600">
-            {result.error.message}
-          </p>
-          <ArrowLink
-            href="/oss"
-            className="mt-4 font-semibold"
-            direction="left"
-          >
-            Back to all projects
+      <Empty className="mx-auto max-w-3xl rounded-lg border border-dashed p-8">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <Icons.alertTriangle className="size-8 text-red-600" />
+          </EmptyMedia>
+        </EmptyHeader>
+        <EmptyTitle className="text-2xl font-semibold">
+          Error Fetching Project Details
+        </EmptyTitle>
+        <EmptyDescription className="text-balance text-base text-neutral-600">
+          {result.error.message}
+        </EmptyDescription>
+        <EmptyContent>
+          <ArrowLink href="/oss" className="font-semibold" direction="left">
+            Back to OSS
           </ArrowLink>
-        </div>
-      </div>
+        </EmptyContent>
+      </Empty>
     );
   }
 

@@ -1,16 +1,26 @@
 import { ArrowLink } from "@/components/ui/arrow-link";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyTitle,
+} from "@/components/ui/empty";
 
 export default function NotFound() {
   return (
-    <div className="container mx-auto flex h-[60vh] flex-col items-center justify-center text-center">
-      <h1>Project Not Found</h1>
-      <p className="mt-4 max-w-md text-pretty text-neutral-700">
+    <Empty>
+      <EmptyTitle className="text-2xl font-semibold">
+        Project Not Found
+      </EmptyTitle>
+      <EmptyDescription className="max-w-2xl text-balance text-base text-neutral-600">
         Oops! We couldn't find the project you were looking for. It might have
         been moved, or the URL may be incorrect.
-      </p>
-      <ArrowLink href="/oss" className="mt-8 font-semibold" direction="left">
-        Back to projects
-      </ArrowLink>
-    </div>
+      </EmptyDescription>
+      <EmptyContent>
+        <ArrowLink href="/oss" className="font-semibold" direction="left">
+          Back to OSS
+        </ArrowLink>
+      </EmptyContent>
+    </Empty>
   );
 }
