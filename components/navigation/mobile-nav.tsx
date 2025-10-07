@@ -70,21 +70,21 @@ function MenuIcon({
                 closed: { y: "-50%", top: "25%", rotate: 0 },
                 open: { y: "-50%", top: "50%", rotate: 45 },
               }}
-              className="bg-tertiary-foreground absolute h-[1.5px] w-full rounded-full"
+              className="bg-foreground absolute h-[1.5px] w-full rounded-full"
             />
             <motion.div
               variants={{
                 closed: { opacity: 1 },
                 open: { opacity: 0 },
               }}
-              className="bg-tertiary-foreground absolute top-1/2 h-[1.5px] w-full -translate-y-1/2 rounded-full"
+              className="bg-foreground absolute top-1/2 h-[1.5px] w-full -translate-y-1/2 rounded-full"
             />
             <motion.div
               variants={{
                 closed: { y: "50%", bottom: "25%", rotate: 0 },
                 open: { y: "50%", bottom: "50%", rotate: -45 },
               }}
-              className="bg-tertiary-foreground absolute h-[1.5px] w-full rounded-full"
+              className="bg-foreground absolute h-[1.5px] w-full rounded-full"
             />
           </div>
         </div>
@@ -126,7 +126,7 @@ function MenuDrawer({ onLinkClick }: { onLinkClick: () => void }) {
       animate="open"
       exit="closed"
       variants={drawerVariants}
-      className="bg-background fixed left-0 right-0 top-20 z-40 h-[calc(100vh-5rem)] w-full border-t p-6"
+      className="bg-background fixed left-0 right-0 top-[var(--main-nav-height)] z-40 h-[calc(100vh-var(--main-nav-height))] w-full border-t p-6"
       role="dialog"
       aria-modal="true"
     >
@@ -169,10 +169,10 @@ function MobileNavLink({
       href={href}
       onClick={onClick}
       className={cn(
-        "focus-ring block w-full rounded-md py-2 text-center text-lg font-medium transition-colors",
+        "focus-ring block w-full rounded-md py-4 text-center text-lg transition-colors",
         isActive
           ? "text-foreground font-semibold"
-          : "text-tertiary-foreground hover:text-foreground",
+          : "text-foreground hover:text-foreground",
       )}
     >
       {children}

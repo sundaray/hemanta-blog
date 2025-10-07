@@ -73,14 +73,25 @@ export function TagScroller({ children, className }: TagScrollerProps) {
             transition={{ duration: 0.2, ease: "easeOut" }}
             onClick={() => scroll("left")}
             aria-label="Scroll tags left"
-            className="bg-background hover:bg-accent focus-ring absolute left-0 top-1/2 z-10 flex size-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border shadow-xl"
+            className="bg-background hover:bg-accent focus-ring absolute left-0 top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border shadow-xl"
           >
             <Icons.chevronLeft className="text-muted-foreground size-6" />
           </motion.button>
         )}
       </AnimatePresence>
 
-      <div className={cn("relative w-full overflow-hidden")}>
+      <div
+        className={cn(
+          "relative w-full overflow-hidden",
+          // Before pseudo-element for left fade
+          "before:from-background before:pointer-events-none before:absolute before:bottom-0 before:left-0 before:top-0 before:z-[1] before:w-16 before:bg-gradient-to-r before:to-transparent before:transition-opacity before:content-['']",
+          // After pseudo-element for right fade
+          "after:from-background after:pointer-events-none after:absolute after:bottom-0 after:right-0 after:top-0 after:z-[1] after:w-16 after:bg-gradient-to-l after:to-transparent after:transition-opacity after:content-['']",
+          // Conditional opacity based on state
+          canScrollLeft ? "before:opacity-100" : "before:opacity-0",
+          canScrollRight ? "after:opacity-100" : "after:opacity-0",
+        )}
+      >
         <div
           ref={scrollerRef}
           className="flex overflow-x-auto scroll-smooth whitespace-nowrap py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -98,7 +109,7 @@ export function TagScroller({ children, className }: TagScrollerProps) {
             transition={{ duration: 0.2, ease: "easeOut" }}
             onClick={() => scroll("right")}
             aria-label="Scroll tags right"
-            className="bg-background hover:bg-accent focus-ring absolute right-0 top-1/2 z-10 flex size-10 shrink-0 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full border shadow-xl"
+            className="bg-background hover:bg-accent focus-ring absolute right-0 top-1/2 z-10 flex size-10 shrink-0 -translate-y-1/2 items-center justify-center rounded-full border shadow-xl"
           >
             <Icons.chevronRight className="text-muted-foreground size-6" />
           </motion.button>

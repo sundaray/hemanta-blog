@@ -26,14 +26,12 @@ export async function MainNav({ links }: MainNavProps) {
           aria-label="Go to homepage"
           className="flex items-center font-bold tracking-tight md:hidden"
         >
-          TP
+          HS
         </Link>
-
-        <div className="md:hidden">
-          <MobileNav />
-        </div>
       </div>
-
+      <div className="ml-auto md:hidden">
+        <MobileNav />
+      </div>
       <NavLinks links={links} className="hidden h-full md:ml-6 md:flex" />
     </div>
   );
