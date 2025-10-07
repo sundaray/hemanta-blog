@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Check, Copy } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
+import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
@@ -47,7 +48,7 @@ export function CopyButton({ text }: { text: string }) {
         <button
           disabled={isCopied}
           onClick={copy}
-          className="relative flex size-8 cursor-pointer items-center justify-center rounded-md text-neutral-700 transition hover:bg-neutral-200/60 active:scale-[0.97] dark:hover:bg-neutral-800"
+          className="focus-ring relative flex size-8 cursor-pointer items-center justify-center rounded-md text-neutral-700 transition hover:bg-neutral-200/60 active:scale-[0.97] dark:hover:bg-neutral-800"
         >
           <AnimatePresence initial={false} mode="wait">
             {isCopied ? (
