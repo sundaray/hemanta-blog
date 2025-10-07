@@ -9,7 +9,7 @@ import {
   or,
   SQL,
 } from "drizzle-orm";
-import { errAsync, ResultAsync } from "neverthrow";
+import { ResultAsync } from "neverthrow";
 
 import { ossProjects, type SelectOssProject } from "@/db/schema";
 import type { OssProjectsSearchParams } from "@/lib/search-params";
@@ -65,43 +65,29 @@ export function getOssProjectsCount(
   );
 }
 
-// export function getOssProjects(
-//   filters: OssProjectsSearchParams,
-// ): ResultAsync<SelectOssProject[], DatabaseError> {
-//   const pageSize = 36;
-//   const conditions = buildConditions(filters);
-//   const whereClause = and(
-//     ...conditions.filter((c): c is SQL => c !== undefined),
-//   );
-//   const offset = (filters.page - 1) * pageSize;
-
-//   return ResultAsync.fromPromise(
-//     db
-//       .select()
-//       .from(ossProjects)
-//       .where(whereClause)
-//       .orderBy(desc(ossProjects.createdAt))
-//       .limit(pageSize)
-//       .offset(offset),
-//     (error) =>
-//       new DatabaseError({
-//         operation: "getOssProjects",
-//         message: "Failed to fetch OSS projects.",
-//         cause: error,
-//       }),
-//   );
-// }
-
 export function getOssProjects(
   filters: OssProjectsSearchParams,
 ): ResultAsync<SelectOssProject[], DatabaseError> {
-  // 🎨 ADD: Temporarily return an error to test the UI.
-  // When you're done testing, you can delete these lines.
-  return errAsync(
-    new DatabaseError({
-      operation: "getOssProjects",
-      message:
-        "This is a simulated error for testing the main projects page UI.",
-    }),
+  const pageSize = 36;
+  const conditions = buildConditions(filters);
+  const whereClause = and(
+    ...conditions.filter((c): c is SQL => c !== undefined),
+  );
+  const offset = (filters.page - 1) * pageSize;
+
+  return ResultAsync.fromPromise(
+    db
+      .select()
+      .from(ossProjects)
+      .where(whereClause)
+      .orderBy(desc(ossProjects.createdAt))
+      .limit(pageSize)
+      .offset(offset),
+    (error) =>
+      new DatabaseError({
+        operation: "getOssProjects",
+        message: "Failed to fetch OSS projects.",
+        cause: error,
+      }),
   );
 }

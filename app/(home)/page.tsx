@@ -1,10 +1,7 @@
-import { Button } from "@/components/ui/button";
-
 export default function HomePage() {
   return (
-    <>
-      <h1 className="text-4xl font-semibold tracking-tight">Home</h1>
-      <Button>Sign in</Button>
-    </>
+    <div className="container mx-auto max-w-4xl px-4 sm:px-6">
+      <h1>Welcome Home</h1>
+    </div>
   );
 }
