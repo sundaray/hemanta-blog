@@ -76,6 +76,10 @@
     @apply overflow-x-auto rounded-b-lg rounded-t-none bg-white font-mono dark:bg-transparent;
   }
 
+  .blog-post [data-rehype-pretty-code-figure] pre:focus-visible {
+    @apply ring-offset-background ring-ring outline-none ring-2 ring-offset-2;
+  }
+
   .blog-post [data-rehype-pretty-code-figure] code {
     @apply text-[14px];
   }
