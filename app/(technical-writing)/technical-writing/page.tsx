@@ -8,6 +8,7 @@ import { KodeKloudTestimonial } from "@/components/technical-writing/kodekloud-t
 import { PlaygroundsSection } from "@/components/technical-writing/playgrounds-section";
 import { RewrittenArticlesSection } from "@/components/technical-writing/rewritten-articles-section";
 import { TechnicalWritingContent } from "@/components/technical-writing/technical-writing-content";
+import { ArrowLink } from "@/components/ui/arrow-link";
 
 const POSTS_PER_PAGE = 12;
 
@@ -43,8 +44,16 @@ export default async function TechnicalWritingPage({
   );
 
   return (
-    <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+    <div className="container mx-auto max-w-6xl px-4 sm:px-6">
       <div className="text-center">
+        <ArrowLink
+          href="/"
+          className="mb-4 text-center font-mono font-semibold text-sky-700"
+          direction="left"
+        >
+          Back to home
+        </ArrowLink>
+
         <h1>Technical Writing</h1>
         <p className="mx-auto mt-6 max-w-3xl text-pretty text-center text-lg text-neutral-700">
           From November 2022 to September 2024, I worked as a Freelance

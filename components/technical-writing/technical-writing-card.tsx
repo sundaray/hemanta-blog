@@ -20,7 +20,7 @@ export function TechnicalWritingCard({
   return (
     <div
       className={cn(
-        "group relative flex flex-col overflow-hidden rounded-lg",
+        "group relative flex flex-col overflow-hidden rounded-lg transition-all",
         "bg-gradient-to-bl from-neutral-100 to-neutral-50",
         "shadow-[inset_-2px_2px_#fff,_-4px_4px_10px_rgb(0_0_0_/_0.1)]",
         "has-[a:focus-visible]:ring-ring has-[a:focus-visible]:ring-2",

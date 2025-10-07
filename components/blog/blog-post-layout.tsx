@@ -24,7 +24,7 @@ export function BlogPostLayout({
   const { title, publishedAt, author, tags } = frontmatter;
 
   return (
-    <div className="lg:grid-cols-16 mx-auto max-w-6xl px-4 lg:grid lg:gap-x-8">
+    <div className="lg:grid-cols-16 mx-auto max-w-6xl px-4 sm:px-6 lg:grid lg:gap-x-8">
       <article className="lg:contents">
         <header className="border-input lg:col-span-16 mx-auto border-b pb-12 text-center">
           <ArrowLink

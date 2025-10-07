@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import type { Metadata } from "next";
 import NextTopLoader from "nextjs-toploader";
 
+import { Footer } from "@/components/footer";
 import { RouterProvider } from "@/components/router-provider";
 
 import "@/app/styles/globals.css";
@@ -39,6 +40,7 @@ export default function RootLayout(props: LayoutProps<"/">) {
         <RouterProvider>
           <NuqsAdapter>{props.children}</NuqsAdapter>
         </RouterProvider>
+        <Footer />
       </body>
     </html>
   );

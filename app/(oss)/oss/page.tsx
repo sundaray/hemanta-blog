@@ -60,7 +60,7 @@ export default async function OssPage({
   const { uniqueTopics, uniqueLanguages } = filterOptionsResult.value;
 
   return (
-    <div className="container mx-auto max-w-7xl px-4">
+    <div className="container mx-auto max-w-7xl px-4 sm:px-6">
       <div className="text-center">
         <ArrowLink
           href="/"
