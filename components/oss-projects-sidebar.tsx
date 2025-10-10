@@ -113,7 +113,7 @@ function FilterSection({
   return (
     <div className="space-y-2">
       <button
-        className="hover:bg-accent focus-ring flex h-12 w-full items-center gap-x-2 text-left"
+        className="hover:bg-accent focus-ring flex h-12 w-full items-center gap-x-2 rounded-md px-2 text-left"
         onClick={() => setIsOpen(!isOpen)}
       >
         <motion.div

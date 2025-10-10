@@ -5,7 +5,6 @@ import { useQueryStates } from "nuqs";
 import { Button, type Selection as AriaSelection } from "react-aria-components";
 
 import { blogSearchParams } from "@/lib/blog-search-params";
-import { cn } from "@/lib/utils";
 
 import { Icons } from "@/components/icons";
 import { Tag, TagGroup, TagList } from "@/components/tag-group";

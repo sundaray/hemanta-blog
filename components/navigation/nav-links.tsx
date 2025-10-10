@@ -160,12 +160,12 @@ export function NavLinks({
                   </span>
                 </div>
               </Link>
-              {/* <div
+              <div
                 className={cn(
                   "gsap-underline pointer-events-none absolute bottom-5 left-0 h-[1.5px] w-full origin-left scale-x-0",
                   isActive ? "bg-sky-700" : "bg-neutral-600",
                 )}
-              /> */}
+              />
             </motion.li>
           );
         })}

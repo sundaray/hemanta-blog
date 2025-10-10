@@ -91,7 +91,7 @@ export function TagScroller({ children, className }: TagScrollerProps) {
           canScrollLeft ? "before:opacity-100" : "before:opacity-0",
           canScrollRight ? "after:opacity-100" : "after:opacity-0",
         )}
-      >
+      > 
         <div
           ref={scrollerRef}
           className="flex overflow-x-auto scroll-smooth whitespace-nowrap py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
