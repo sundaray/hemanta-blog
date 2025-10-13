@@ -1,0 +1,53 @@
+---
+title: "What is Record<Keys, Value> Type in TypeScript? "
+description: "Learn how to use Record types to keep related values and types synchronized."
+author: "Hemanta Sundaray"
+publishedAt: "2025-10-26"
+tags: ["TypeScript"]
+isPublished: true
+---
+
+Record is **a built-in utility type** in TypeScript. It’s a shorthand for creating an object type where the keys come from a specific set (Keys) and all the values are of the same type (Value).
+
+## Syntax
+
+It’s syntax is: `Record<Keys, Type>`:
+
+- `Keys`: This is typically a union of string literals (e.g., `"admin" | "editor" | "viewer"`).
+- `Type`: This is the type every value in the object must have. (e.g., `string`, `boolean` or a more complex `{permissionLevel: number}`)
+
+## Core Benefit
+
+**The core benefit of `Record` is it keeps related values and types synchronized.**
+
+Below, we have a `UserRole` type and an object called `roleDescriptions` that maps each role to a description.
+
+```ts title="TypeScript"
+type UserRole = "admin" | "editor" | "viewer";
+
+const roleDescriptions: Record<UserRole, { description: string }> = {
+  admin: { description: "Can access and modify everything." },
+  editor: { description: "Can create and edit content." },
+  viewer: { description: "Can only view content." },
+};
+```
+
+Because of `Record`, there is a contract between the `UserRole` type and the `roleDescriptions` object. In other words, the object is now required to have a key for every member of the `UserRole` type.
+
+Let's see what happens when we try to break this contract. Imagine a new requirement comes in for a `guest` role. We update the `UserRole` type but forget to update our object:
+
+```ts title="TypeScript"
+type UserRole = "admin" | "editor" | "viewer" | "guest";
+
+const roleDescriptions: Record<UserRole, { description: string }> = {
+  admin: { description: "Can access and modify everything." },
+  editor: { description: "Can create and edit content." },
+  viewer: { description: "Can only view content." },
+};
+```
+
+TypeScript will immediately throw an error on the `roleDescriptions` object:
+
+Error Message
+
+This error tells the developer, "Hey, your source of truth (`UserRole`) changed. You must update this object to match it." It forces synchronization and prevents the bug before it ever happens.
