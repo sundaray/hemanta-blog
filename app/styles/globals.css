@@ -4,20 +4,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* --- Unchanged Shiki Dynamic Styles --- */
-pre.shiki {
-  background-color: var(--shiki-light-bg);
-}
-.dark pre.shiki {
-  background-color: var(--shiki-dark-bg);
-}
-code[data-theme] span {
-  color: var(--shiki-light);
-}
-.dark code[data-theme] span {
-  color: var(--shiki-dark);
-}
-
 @theme inline {
   --main-nav-height: 4rem;
   --color-background: var(--background);

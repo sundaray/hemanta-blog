@@ -105,6 +105,10 @@
     content: counter(line);
   }
 
+  .blog-post [data-rehype-pretty-code-figure] [data-highlighted-chars] {
+    @apply rounded bg-purple-400/30 px-1 py-0.5;
+  }
+
   /* --- Shiki dynamic styles --- */
   pre.shiki {
     background-color: var(--shiki-light-bg);
