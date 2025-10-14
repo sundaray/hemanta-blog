@@ -17,7 +17,7 @@ function extractText(node: ReactNode): string {
   return "";
 }
 
-const ICON_ONLY_TITLES = ["Terminal", "Shell", "Bash", "TypeScript"];
+const ICON_ONLY_TITLES = ["Terminal", "Shell", "Bash"];
 
 export function CodeBlockWrapper({ children }: { children: React.ReactNode }) {
   const childrenArray = React.Children.toArray(children);
