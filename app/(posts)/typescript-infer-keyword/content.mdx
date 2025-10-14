@@ -1,0 +1,76 @@
+---
+title: "Understanding the infer Keyword in TypeScript "
+description: "Learn how to extract and capture types within conditional types using the infer keyword."
+author: "Hemanta Sundaray"
+publishedAt: "2025-10-26"
+tags: ["TypeScript"]
+isPublished: true
+---
+
+import { Note } from "@/components/blog/note";
+
+In TypeScript, the `infer` keyword lets you extract a subtype from a complex type by pattern matching against it.
+
+<Note>
+
+The `infer` keyword can only be used within the `extends` clause of conditional types.
+
+</Note>
+
+Let’s break this down from the ground up.
+
+## Conditional Types
+
+A conditional type is like a ternary operator (`condition ? trueValue : falseValue`) but for types.
+
+```ts twoslash title="TypeScript"
+type IsString<T> = T extends string ? "Yes" : "No";
+
+type A = IsString<"hello">;
+//   ^?
+
+type B = IsString<123>;
+//   ^?
+```
+
+Here, we check if the type `T` can be assigned to string. It's a simple check. But what if we wanted to extract a part of the type `T` during the check?
+
+## The infer Keyword
+
+`infer` lets you introduce a new, temporary type variable right at the point of comparison. Think of it as "inferring" or "deducing" a type from a given structure.
+
+**The syntax is `... infer R ...` where `R` is the new type variable you are declaring on the fly**.
+
+Let's look at an example.
+
+Let's create a utility type `GetFirstArg<T>` that gets the type of the first argument of a function. If the type is not a function or has no arguments, it should resolve to `never`.
+
+```ts twoslash title="TypeScript"
+type GetFirstArg<T> = T extends (firstArg: infer A, ...rest: any[]) => any
+  ? A
+  : never;
+```
+
+1. `T extends (firstArg: infer A, ...rest: any[]) => any`: We check if `T` matches the shape of a function.
+
+2. `firstArg: infer A`: This is the key part. We tell TypeScript:
+
+- "Match the first argument of the function."
+
+- "Infer the type of that first argument and put it into a new type variable called `A`."
+
+3. `...rest: any[]`: This handles any remaining arguments so the pattern can match functions with more than one parameter.
+
+4. `=> any`: This matches any return type.
+
+5. `? A : never`: If `T` is a function that has at least one argument, the type resolves to `A` (the inferred type of that first argument). Otherwise, it resolves to `never`.
+
+```ts twoslash title="TypeScript"
+type MyFunc = (user: { name: string; age: number }, id: string) => void;
+
+type FirstArgType = GetFirstArg<MyFunc>;
+//   ^?
+
+type ArgFromFuncWithNoArgs = GetFirstArg<() => void>;
+//   ^?
+```
