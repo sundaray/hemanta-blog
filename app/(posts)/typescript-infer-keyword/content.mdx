@@ -54,10 +54,8 @@ type GetFirstArg<T> = T extends (firstArg: infer A, ...rest: any[]) => any
 1. `T extends (firstArg: infer A, ...rest: any[]) => any`: We check if `T` matches the shape of a function.
 
 2. `firstArg: infer A`: This is the key part. We tell TypeScript:
-
-- "Match the first argument of the function."
-
-- "Infer the type of that first argument and put it into a new type variable called `A`."
+   - "Match the first argument of the function.
+   - "Infer the type of that first argument and put it into a new type variable called `A`."
 
 3. `...rest: any[]`: This handles any remaining arguments so the pattern can match functions with more than one parameter.
 
@@ -66,6 +64,10 @@ type GetFirstArg<T> = T extends (firstArg: infer A, ...rest: any[]) => any
 5. `? A : never`: If `T` is a function that has at least one argument, the type resolves to `A` (the inferred type of that first argument). Otherwise, it resolves to `never`.
 
 ```ts twoslash title="TypeScript"
+type GetFirstArg<T> = T extends (firstArg: infer A, ...rest: any[]) => any
+  ? A
+  : never;
+// ---cut---
 type MyFunc = (user: { name: string; age: number }, id: string) => void;
 
 type FirstArgType = GetFirstArg<MyFunc>;
@@ -73,4 +75,17 @@ type FirstArgType = GetFirstArg<MyFunc>;
 
 type ArgFromFuncWithNoArgs = GetFirstArg<() => void>;
 //   ^?
+```
+
+## Summary
+
+The `infer` keyword is the cornerstone of type-level programming (metaprogramming) in TypeScript.
+
+It allows you to:
+
+- Pull types apart to get at their constituent pieces (e.g., the inner type of a Promise, an array element type, a function parameter)
+- Write types that transform other types in complex ways based on their internal structure, not just their top-level name.
+
+```
+
 ```

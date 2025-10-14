@@ -19,13 +19,22 @@
     @apply mb-6 leading-7 text-neutral-700 last:mb-0;
   }
 
+  .blog-post li:has(> ul) > p {
+    @apply mb-3;
+  }
+
   .blog-post p a {
     @apply focus-visible:ring-ring text-sky-700 outline-none hover:underline hover:underline-offset-4 focus-visible:ring-2 focus-visible:ring-offset-2;
   }
 
   .blog-post ul,
   .blog-post ol {
-    @apply marker:text-muted-foreground mb-6 space-y-3 pl-8 last:mb-0;
+    @apply marker:text-muted-foreground mb-6 space-y-3 pl-8 text-neutral-700 last:mb-0;
+  }
+
+  .blog-post ol ul,
+  .blog-post ul ul {
+    @apply pl-4 text-neutral-700;
   }
 
   .blog-post ul {
