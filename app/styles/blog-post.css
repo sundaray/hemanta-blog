@@ -125,13 +125,16 @@
 }
 
 .blog-post .twoslash-popup-container {
-  @apply translate-y-[10px] rounded-md border bg-white shadow-lg;
+  @apply bg-accent translate-y-[10px] rounded-md border shadow-lg;
 }
 .blog-post .twoslash-popup-container .twoslash-popup-code {
-  @apply rounded-md border-none bg-white;
+  @apply bg-accent rounded-md border-0;
+}
+.blog-post .twoslash-popup-container .twoslash-popup-code pre {
+  @apply bg-accent rounded-md;
 }
 .blog-post .twoslash-popup-container .twoslash-popup-docs {
-  @apply rounded-b-md bg-white;
+  @apply rounded-b-md border-t bg-none;
 }
 
 .blog-post .twoslash-popup-container .twoslash-popup-code [data-line] {
@@ -140,4 +143,16 @@
 
 .blog-post .twoslash-hover.twoslash-query-presisted {
   @apply mb-8 inline-block;
+}
+
+.blog-post .twoslash-hover.twoslash-query-presisted .twoslash-popup-arrow {
+  @apply bg-accent;
+}
+
+.blog-post .twoslash-highlighted {
+  @apply rounded border-none bg-purple-400/30 px-1 py-0.5;
+}
+
+.blog-post .twoslash-completion-list {
+  @apply rounded-md border bg-red-400;
 }
