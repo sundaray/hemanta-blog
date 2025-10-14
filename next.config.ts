@@ -1,4 +1,5 @@
 import createMDX from "@next/mdx";
+import { transformerTwoslash } from "@shikijs/twoslash";
 import type { NextConfig } from "next";
 import rehypePrettyCode from "rehype-pretty-code";
 import remarkFrontmatter from "remark-frontmatter";
@@ -19,6 +20,11 @@ const options = {
     light: "github-light",
   },
   keepBackground: false,
+  transformers: [
+    transformerTwoslash({
+      explicitTrigger: true,
+    }),
+  ],
 };
 
 const withMDX = createMDX({

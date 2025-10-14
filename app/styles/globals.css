@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "@shikijs/twoslash/style-rich.css";
 @import "./blog-post.css";
 
 @custom-variant dark (&:is(.dark *));

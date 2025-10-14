@@ -22,7 +22,7 @@ It’s syntax is: `Record<Keys, Type>`:
 
 Below, we have a `UserRole` type and an object called `roleDescriptions` that maps each role to a description.
 
-```ts title="TypeScript"
+```ts twoslash title="TypeScript"
 type UserRole = "admin" | "editor" | "viewer";
 
 const roleDescriptions: Record<UserRole, { description: string }> = {
@@ -36,7 +36,8 @@ Because of `Record`, there is a contract between the `UserRole` type and the `ro
 
 Let's see what happens when we try to break this contract. Imagine a new requirement comes in for a `guest` role. We update the `UserRole` type but forget to update our object:
 
-```ts title="TypeScript" {/guest/}
+```ts twoslash title="TypeScript"
+// @errors: 2741
 type UserRole = "admin" | "editor" | "viewer" | "guest";
 
 const roleDescriptions: Record<UserRole, { description: string }> = {
