@@ -123,3 +123,17 @@
     color: var(--shiki-dark);
   }
 }
+
+.blog-post .twoslash-popup-container {
+  @apply translate-y-[10px] rounded-md border bg-white shadow-xl;
+}
+.blog-post .twoslash-popup-container .twoslash-popup-code {
+  @apply border-none bg-white;
+}
+.blog-post .twoslash-popup-container .twoslash-popup-docs {
+  @apply rounded-b-md bg-white;
+}
+
+.blog-post .twoslash-popup-container .twoslash-popup-code [data-line] {
+  @apply inline;
+}

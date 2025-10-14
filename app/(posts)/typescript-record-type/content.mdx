@@ -34,7 +34,9 @@ const roleDescriptions: Record<UserRole, { description: string }> = {
 
 Because of `Record`, there is a contract between the `UserRole` type and the `roleDescriptions` object. In other words, the object is now required to have a key for every member of the `UserRole` type.
 
-Let's see what happens when we try to break this contract. Imagine a new requirement comes in for a `guest` role. We update the `UserRole` type but forget to update our object:
+Let's see what happens when we try to break this contract.
+
+Imagine a new requirement comes in for a `guest` role. We update the `UserRole` type but forget to update our object. TypeScript will immediately throw an error on the `roleDescriptions` object:
 
 ```ts twoslash title="TypeScript"
 // @errors: 2741
@@ -47,8 +49,4 @@ const roleDescriptions: Record<UserRole, { description: string }> = {
 };
 ```
 
-TypeScript will immediately throw an error on the `roleDescriptions` object:
-
-Error Message
-
-This error tells the developer, "Hey, your source of truth (`UserRole`) changed. You must update this object to match it." It forces synchronization and prevents the bug before it ever happens.
+This error tells, "Hey, your source of truth (`UserRole`) changed. You must update this object to match it." It forces synchronization and prevents the bug before it ever happens.
