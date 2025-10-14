@@ -150,9 +150,9 @@
 }
 
 .blog-post .twoslash-highlighted {
-  @apply rounded border-none bg-purple-400/30 px-1 py-0.5;
+  @apply rounded border-0 bg-green-200 p-0.5;
 }
 
-.blog-post .twoslash-completion-list {
-  @apply rounded-md border bg-red-400;
+.blog-post .twoslash-completion-cursor .twoslash-completion-list {
+  @apply bg-accent rounded-md border;
 }

@@ -43,6 +43,7 @@ Imagine a new requirement comes in for a `guest` role. We update the `UserRole` 
 ```ts twoslash title="TypeScript"
 // @errors: 2741
 type UserRole = "admin" | "editor" | "viewer" | "guest";
+//                                              ^^^^^^^
 
 const roleDescriptions: Record<UserRole, { description: string }> = {
   admin: { description: "Can access and modify everything." },
@@ -52,17 +53,3 @@ const roleDescriptions: Record<UserRole, { description: string }> = {
 ```
 
 This error tells us, "Hey, your source of truth (`UserRole`) changed. You must update this object to match it." It forces synchronization and prevents the bug before it ever happens.
-
-```ts twoslash title="TypeScript"
-type UserRole = "admin" | "editor" | "viewer";
-
-const roleDescriptions: Record<UserRole, { description: string }> = {
-  admin: { description: "Can access and modify everything." },
-  editor: { description: "Can create and edit content." },
-  viewer: { description: "Can only view content." },
-};
-
-// @noErrors
-roleDescriptions.
-//               ^|
-```
