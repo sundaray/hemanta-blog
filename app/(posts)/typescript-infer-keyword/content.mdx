@@ -71,10 +71,8 @@ type GetFirstArg<T> = T extends (firstArg: infer A, ...rest: any[]) => any
 type MyFunc = (user: { name: string; age: number }, id: string) => void;
 
 type FirstArgType = GetFirstArg<MyFunc>;
-//   ^?
 
 type ArgFromFuncWithNoArgs = GetFirstArg<() => void>;
-//   ^?
 ```
 
 ## Summary
@@ -85,7 +83,3 @@ It allows you to:
 
 - Pull types apart to get at their constituent pieces (e.g., the inner type of a Promise, an array element type, a function parameter)
 - Write types that transform other types in complex ways based on their internal structure, not just their top-level name.
-
-```
-
-```
