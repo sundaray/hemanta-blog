@@ -77,7 +77,7 @@ export function NavLinks({
 
     const originalText = targetLi.querySelector(".gsap-text-original");
     const cloneText = targetLi.querySelector(".gsap-text-clone");
-    // const underline = targetLi.querySelector(".gsap-underline");
+    const underline = targetLi.querySelector(".gsap-underline");
 
     const split = new SplitText(cloneText, {
       type: "chars",
@@ -96,7 +96,7 @@ export function NavLinks({
       // 1. Animate the original text up and out of view
       .to(originalText, { yPercent: -120 })
       // 2. Animate the underline in at the same time
-      // .to(underline, { scaleX: 1 }, "<")
+      .to(underline, { scaleX: 1 }, "<")
       // 3. Animate the clone text up into view, starting just before the original has finished
       .to(cloneText, { yPercent: -100 }, "-=0.4")
       // 4. Stagger-reveal the characters inside the clone as it moves
