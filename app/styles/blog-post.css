@@ -125,10 +125,10 @@
 }
 
 .blog-post .twoslash-popup-container {
-  @apply translate-y-[10px] rounded-md border bg-white shadow-xl;
+  @apply translate-y-[10px] rounded-md border bg-white shadow-lg;
 }
 .blog-post .twoslash-popup-container .twoslash-popup-code {
-  @apply border-none bg-white;
+  @apply rounded-md border-none bg-white;
 }
 .blog-post .twoslash-popup-container .twoslash-popup-docs {
   @apply rounded-b-md bg-white;
@@ -136,4 +136,8 @@
 
 .blog-post .twoslash-popup-container .twoslash-popup-code [data-line] {
   @apply inline;
+}
+
+.blog-post .twoslash-hover.twoslash-query-presisted {
+  @apply mb-8 inline-block;
 }

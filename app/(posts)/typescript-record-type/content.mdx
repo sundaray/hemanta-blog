@@ -16,14 +16,17 @@ It’s syntax is: `Record<Keys, Type>`:
 - `Keys`: This is typically a union of string literals (e.g., `"admin" | "editor" | "viewer"`).
 - `Type`: This is the type every value in the object must have. (e.g., `string`, `boolean` or a more complex `{permissionLevel: number}`)
 
-## Core Benefit
+## Key Benefit
 
 **The core benefit of `Record` is it keeps related values and types synchronized.**
+
+Let's see this in action.
 
 Below, we have a `UserRole` type and an object called `roleDescriptions` that maps each role to a description.
 
 ```ts twoslash title="TypeScript"
 type UserRole = "admin" | "editor" | "viewer";
+//      ^?
 
 const roleDescriptions: Record<UserRole, { description: string }> = {
   admin: { description: "Can access and modify everything." },
@@ -36,7 +39,7 @@ Because of `Record`, there is a contract between the `UserRole` type and the `ro
 
 Let's see what happens when we try to break this contract.
 
-Imagine a new requirement comes in for a `guest` role. We update the `UserRole` type but forget to update our object. TypeScript will immediately throw an error on the `roleDescriptions` object:
+Imagine a new requirement comes in for a `guest` role. We update the `UserRole` type but forget to update our object. TypeScript immediately throws an error on the `roleDescriptions` object:
 
 ```ts twoslash title="TypeScript"
 // @errors: 2741
@@ -49,4 +52,4 @@ const roleDescriptions: Record<UserRole, { description: string }> = {
 };
 ```
 
-This error tells, "Hey, your source of truth (`UserRole`) changed. You must update this object to match it." It forces synchronization and prevents the bug before it ever happens.
+This error tells us, "Hey, your source of truth (`UserRole`) changed. You must update this object to match it." It forces synchronization and prevents the bug before it ever happens.
