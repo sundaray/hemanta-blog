@@ -85,7 +85,7 @@ export function TechnicalWritingTags({ tags }: TechnicalWritingTagsProps) {
                   <Tag
                     key={tag}
                     id={tag}
-                    className="flex items-center justify-between gap-1 bg-sky-200 text-neutral-700 hover:bg-sky-200 hover:text-neutral-700"
+                    className="flex items-center justify-between gap-1 bg-sky-200/40 text-neutral-700 hover:bg-sky-200 hover:text-neutral-700"
                   >
                     {tag}
                     <Button

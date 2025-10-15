@@ -45,7 +45,7 @@ export function OssProjectsSearch({
           type="search"
           value={value}
           placeholder="Search projects by name or description…"
-          className="col-start-1 row-start-1 h-12 rounded-full bg-neutral-200/40 pl-10"
+          className="col-start-1 row-start-1 h-12 rounded-full pl-10"
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
         />

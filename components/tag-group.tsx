@@ -47,8 +47,9 @@ function Tag({ className, ref, ...props }: CustomTagProps) {
       ref={ref}
       className={cn(
         "focus-ring",
-        "border-input cursor-pointer rounded-md bg-neutral-200 px-2 py-1 text-sm font-semibold text-neutral-700 transition-colors",
-        "data-[selected]:bg-sky-200 data-[selected]:text-neutral-700",
+        "cursor-pointer rounded-full bg-neutral-200/40 px-3 py-2 text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-200",
+        "data-[selected]:bg-sky-200/40 data-[selected]:text-neutral-700",
+        "data-[selected]:hover:bg-sky-200",
         "transition-transform",
         "data-[pressed]:scale-95",
         className,
