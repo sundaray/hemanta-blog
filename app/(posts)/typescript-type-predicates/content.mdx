@@ -1,0 +1,119 @@
+---
+title: "Understanding Type Predicates in TypeScript"
+description: "Learn to use type predicates as user-defined type guards to narrow down types."
+author: "Hemanta Sundaray"
+publishedAt: "2025-10-26"
+tags: ["TypeScript"]
+isPublished: true
+---
+
+**A type predicate is a special function return type that acts as a user-defined type guard, allowing you to create custom logic for narrowing types. It uses the syntax `parameter is Type` to tell TypeScript that if the function returns true, the parameter should be treated as the specified type.**
+
+Type predicates solve a key limitation with regular boolean functions. (A boolean function is simply a function that returns either true or false.)
+
+Let’s break this down using an example.
+
+Below, we have two functions:
+
+1. `isPerson`: A helper function that checks if an `age` property is present inside the `item` and returns `true` or `false` accordingly.
+2. `processItem`: Processes an `item` that could be either a `Person` or a `Product`. Inside, we use `isPerson` to narrow the item's type.
+
+```ts twoslash title="TypeScript"
+// @errors: 2339
+interface Person {
+  name: string;
+  age: number;
+}
+
+interface Product {
+  name: string;
+  price: number;
+}
+
+type PersonOrProduct = Person | Product;
+
+function isPerson(item: PersonOrProduct): boolean {
+  return "age" in item;
+}
+
+function processItem(item: PersonOrProduct) {
+  if (isPerson(item)) {
+    console.log(`Person: ${item.name}, Age: ${item.age}`);
+  }
+}
+```
+
+This code produces an error, but why? The logic inside `isPerson` is perfectly sound.
+
+The problem is that to the TypeScript compiler, the `isPerson` function is a "black box." It knows the function takes a `PersonOrProduct` and returns a `boolean`, but it has no idea that the `true` or `false` value is related to the type of item.
+
+So, even inside the `if` (isPerson(item)) block, TypeScript's understanding of the `item` variable has not changed. It still thinks item is a `PersonOrProduct`, and it correctly points out that you can't safely access `.age` on a `PersonOrProduct`.
+
+So, how do we fix this?
+
+This is exactly the problem that type predicates are designed to solve.
+
+We fix it by changing only the return type of our `isPerson` function:
+
+```ts twoslash title="Typescript"
+interface Person {
+  name: string;
+  age: number;
+}
+
+interface Product {
+  name: string;
+  price: number;
+}
+
+type PersonOrProduct = Person | Product;
+// ---cut---
+function isPerson(item: PersonOrProduct): item is Person {
+  //                                      ^^^^^^^^^^^^^^
+  return "age" in item;
+}
+```
+
+The only difference is the return type: `item is Person`. This is the type predicate.
+
+It's a special signature that makes a direct promise to the TypeScript compiler:
+
+<blockquote>
+  "Hey, TypeScript! This function returns a `boolean`. If it returns `true`, I
+  personally guarantee that the argument passed is of type `Person`."
+</blockquote>
+
+Now, TypeScript can use this extra information to perform type narrowing, and our `processItem` function works perfectly:
+
+```ts twoslash title="TypeScript"
+interface Person {
+  name: string;
+  age: number;
+}
+
+interface Product {
+  name: string;
+  price: number;
+}
+
+type PersonOrProduct = Person | Product;
+
+function isPerson(item: PersonOrProduct): item is Person {
+  return "age" in item;
+}
+// ---cut---
+function processItem(item: PersonOrProduct) {
+  if (isPerson(item)) {
+    // AT COMPILE-TIME, TypeScript sees this `if` block.
+    // It says: "The developer used a function with the promise `item is Person`.
+    // Since I'm inside the 'true' part of the `if` statement,
+    // I will honor that promise and treat `item` as a `Person` here."
+    console.log(`Person: ${item.name}, Age: ${item.age}`); // ✅ So this is allowed.
+  } else {
+    // TypeScript also says: "If the promise was not fulfilled (the function
+    // returned false), then `item` cannot be a `Person`.
+    // Since the original type was `Person | Product`, it must be a `Product`."
+    console.log(`Product: ${item.name}, Price: $${item.price}`); // ✅ So this is allowed.
+  }
+}
+```

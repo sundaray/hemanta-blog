@@ -1,12 +1,4 @@
-import { Merriweather } from "next/font/google"; // ✏️ Changed font import
-
 import { cn } from "@/lib/utils";
-
-const merriweather = Merriweather({
-  subsets: ["latin"],
-  style: ["italic", "normal"],
-  weight: ["400", "700"],
-});
 
 export function KodeKloudTestimonial() {
   return (
@@ -25,8 +17,7 @@ export function KodeKloudTestimonial() {
           </svg>
           <div
             className={cn(
-              "space-y-6 text-base text-neutral-700",
-              merriweather.className,
+              "font-merriweather space-y-6 text-base text-neutral-700",
             )}
           >
             <p>
