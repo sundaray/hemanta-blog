@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type RefObject } from "react";
 
 import { Check, Copy } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -30,16 +30,36 @@ const iconVariants = {
   },
 };
 
-export function CopyButton({ text }: { text: string }) {
+export function CopyButton({
+  preRef,
+}: {
+  preRef: RefObject<HTMLPreElement | null>;
+}) {
   const [isCopied, setIsCopied] = useState(false);
 
   const copy = async () => {
-    await navigator.clipboard.writeText(text);
-    setIsCopied(true);
+    const preElement = preRef.current;
+    if (!preElement) return;
 
-    setTimeout(() => {
-      setIsCopied(false);
-    }, 2500);
+    // ✏️ This is the key change for the definitive fix.
+    // 1. Create a deep clone of the <pre> element in memory.
+    const clone = preElement.cloneNode(true) as HTMLElement;
+
+    const popups = clone.querySelectorAll(".twoslash-popup-container");
+
+    // By removing only the popups, we leave the desired code text intact.
+    popups.forEach((el) => el.remove());
+
+    const codeText = clone.innerText;
+
+    if (codeText) {
+      await navigator.clipboard.writeText(codeText);
+      setIsCopied(true);
+
+      setTimeout(() => {
+        setIsCopied(false);
+      }, 2500);
+    }
   };
 
   return (

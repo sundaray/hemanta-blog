@@ -71,8 +71,13 @@ type GetFirstArg<T> = T extends (firstArg: infer A, ...rest: any[]) => any
 type MyFunc = (user: { name: string; age: number }, id: string) => void;
 
 type FirstArgType = GetFirstArg<MyFunc>;
+//   ^?
+
+
+
 
 type ArgFromFuncWithNoArgs = GetFirstArg<() => void>;
+//   ^?
 ```
 
 ## Summary

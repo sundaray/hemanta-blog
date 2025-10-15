@@ -1,25 +1,15 @@
-import React, { type ReactNode } from "react";
+"use client";
+
+import React, { useRef, type ReactNode } from "react";
 
 import { filenameIconMap } from "@/lib/icon-map";
 
 import { CopyButton } from "@/components/blog/copy-button";
 
-function extractText(node: ReactNode): string {
-  if (typeof node === "string") return node;
-  if (typeof node === "number") return node.toString();
-  if (node == null) return "";
-  if (Array.isArray(node)) return node.map(extractText).join("");
-
-  if (React.isValidElement(node)) {
-    const props = node.props as { children?: ReactNode };
-    return extractText(props.children);
-  }
-  return "";
-}
-
 const ICON_ONLY_TITLES = ["Terminal", "Shell", "Bash"];
 
 export function CodeBlockWrapper({ children }: { children: React.ReactNode }) {
+  const preRef = useRef<HTMLPreElement>(null);
   const childrenArray = React.Children.toArray(children);
   type ElementWithChildren = React.ReactElement<{ children: ReactNode }>;
 
@@ -35,8 +25,6 @@ export function CodeBlockWrapper({ children }: { children: React.ReactNode }) {
   if (!preElement) {
     return null;
   }
-
-  const codeText = extractText(preElement.props.children);
 
   const filename =
     titleElement?.props.children &&
@@ -61,11 +49,10 @@ export function CodeBlockWrapper({ children }: { children: React.ReactNode }) {
         </span>
 
         <div className="px-2">
-          <CopyButton text={codeText} />
+          <CopyButton preRef={preRef} />
         </div>
       </div>
-
-      {preElement}
+      <pre {...preElement.props} ref={preRef} />
     </figure>
   );
 }
