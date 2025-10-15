@@ -41,7 +41,7 @@ export function OssProjectsSearchResultsHeader({
             variant="ghost"
             size="sm"
             onClick={onResetFilters}
-            className="cursor-pointer rounded-full text-sm font-semibold text-sky-700 hover:bg-sky-100/50 hover:text-sky-700"
+            className="cursor-pointer rounded-full text-sm font-semibold text-sky-700 hover:bg-sky-100/40 hover:text-sky-700"
           >
             <GrPowerReset className="size-4" />
             Reset all
@@ -51,7 +51,7 @@ export function OssProjectsSearchResultsHeader({
       <Button
         size="sm"
         onClick={onToggleSidebar}
-        className="cursor-pointer rounded-full bg-neutral-200 text-sm text-neutral-700 hover:bg-neutral-200"
+        className="cursor-pointer rounded-full bg-neutral-200/40 text-sm text-neutral-700 transition-colors hover:bg-neutral-200"
       >
         {isSidebarVisible ? (
           <>
