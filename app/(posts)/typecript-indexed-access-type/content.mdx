@@ -1,0 +1,142 @@
+---
+title: "TypeScript Indexed Access Type Explained"
+description: "Learn how to query the type of a property from another type using the indexed access operator."
+author: "Hemanta Sundaray"
+publishedAt: "2025-10-26"
+tags: ["TypeScript"]
+isPublished: true
+---
+
+import { Note } from "@/components/blog/note";
+
+An **indexed access type** (also called a "lookup type") lets you query the type of a property from another type.
+
+To query the type, you use square brackets `[]` (called an **indexed access operator**), which works just like accessing a property on a JavaScript object, but it's done at the type level.
+
+Let's see it in action.
+
+## Accessing a Single Property's Type
+
+Below, we have a `userPermissions` object, where the keys are the user roles and the values are the specific permissions for that role. We use `as const` to tell TypeScript to infer the most specific type. This treats each string as a literal type (e.g., `"create-post"`) instead of just string, and each array as a readonly tuple.
+
+From the `userPermissions` object, we use the `typeof` operator to create the `UserPermissions` type. This is the type we will be querying in the following examples.
+
+```ts twoslash title="TypeScript"
+const userPermissions = {
+  admin: [
+    "create-post",
+    "edit-post",
+    "Delete-post",
+    "view-posts",
+    "add-comment",
+  ],
+  editor: ["create-post", "edit-post", "view-posts"],
+  viewer: ["view-posts", "add-comment"],
+} as const;
+
+type UserPermissions = typeof userPermissions;
+//   ^?
+```
+
+Let's say we want to find out the type for just the admin's permissions. We can access it using the string `'admin'` as the index:
+
+```ts twoslash title="TypeScript"
+const userPermissions = {
+  admin: [
+    "create-post",
+    "edit-post",
+    "Delete-post",
+    "view-posts",
+    "add-comment",
+  ],
+  editor: ["create-post", "edit-post", "view-posts"],
+  viewer: ["view-posts", "add-comment"],
+} as const;
+
+type UserPermissions = typeof userPermissions;
+// ---cut---
+type AdminPermissions = UserPermissions["admin"];
+//   ^?
+```
+
+## Accessing Multiple Types with a Union
+
+Now, what if we need to find out the types for two specific roles? We can pass a union of keys into the brackets to get a union of their value types.
+
+Let's get a type that could be the permissions for either an `editor` or a `viewer`:
+
+```ts twoslash title="TypeScript"
+const userPermissions = {
+  admin: [
+    "create-post",
+    "edit-post",
+    "Delete-post",
+    "view-posts",
+    "add-comment",
+  ],
+  editor: ["create-post", "edit-post", "view-posts"],
+  viewer: ["view-posts", "add-comment"],
+} as const;
+
+type UserPermissions = typeof userPermissions;
+// ---cut---
+type EditorOrViewerPermissions = UserPermissions["editor" | "viewer"];
+//   ^?
+```
+
+## The Special number Syntax
+
+When you use `number` as an index on an array/tuple type, TypeScript understands this to mean "the type of any element at any numeric index," which results in a union of all the element types.
+
+Let's say we want to find **the type for all permissions combined, from all roles**.
+
+We can do this in two steps:
+
+### 1. Get a union of all permission arrays.
+
+We can use `keyof` to get all the keys from `UserPermissions` and use that as the index:
+
+```ts twoslash title="TypeScript"
+const userPermissions = {
+  admin: [
+    "create-post",
+    "edit-post",
+    "Delete-post",
+    "view-posts",
+    "add-comment",
+  ],
+  editor: ["create-post", "edit-post", "view-posts"],
+  viewer: ["view-posts", "add-comment"],
+} as const;
+
+type UserPermissions = typeof userPermissions;
+// ---cut---
+type AllPermissionArrays = UserPermissions[keyof UserPermissions];
+//   ^?
+```
+
+### 2. Use number to get the element types from that union.
+
+Now we can apply the `number` operator to this new `AllPermissionArrays` type. This tells TypeScript to look inside each tuple in the union and pull out all of their element types into one, flat union:
+
+```ts twoslash title="TypeScript"
+const userPermissions = {
+  admin: [
+    "create-post",
+    "edit-post",
+    "Delete-post",
+    "view-posts",
+    "add-comment",
+  ],
+  editor: ["create-post", "edit-post", "view-posts"],
+  viewer: ["view-posts", "add-comment"],
+} as const;
+
+type UserPermissions = typeof userPermissions;
+type AllPermissionArrays = UserPermissions[keyof UserPermissions];
+// ---cut---
+type AllPermission = AllPermissionArrays[number];
+//   ^?
+```
+
+The final `AllPermission` type is a single union of every possible permission string from the `UserPermissions` object. Notice that TypeScript automatically handles deduplication when building this union. The type itself only cares about the possible set of values, not how many times they appeared

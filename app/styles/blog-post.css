@@ -163,7 +163,7 @@
 }
 
 .blog-post .twoslash-highlighted {
-  @apply rounded-none border-0 border-b-2 border-sky-700 bg-transparent py-1;
+  @apply rounded-none border-0 border-b-[1.5px] border-sky-700 bg-transparent py-1;
 }
 
 .blog-post .twoslash-completion-cursor .twoslash-completion-list {
