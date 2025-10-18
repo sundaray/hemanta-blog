@@ -1,0 +1,221 @@
+---
+title: "What are Mapped Types in TypeScript?"
+description: "Learn how mapped types allow you to create new types by transforming the properties of existing types."
+author: "Hemanta Sundaray"
+publishedAt: "2025-10-26"
+tags: ["TypeScript"]
+isPublished: true
+---
+
+import { Note } from "@/components/blog/note";
+
+A mapped type transforms an existing type into a new one by applying a specific rule to each property within the original type.
+
+## Mapped Type Syntax
+
+The basic syntax follows this pattern:
+
+```ts title="TypeScript"
+type MappedType<T> = {
+  [P in keyof T]: T[P];
+};
+```
+
+`P` is a type variable that represents each key of `T` during the mapping process. The `in` keyword iterates over the union of keys produced by `keyof T`. So, `P in keyof T` means "for each property name `P` in the union of keys from type `T`..."
+
+## Mapped Type Example
+
+Let’s create a generic `FormErrors` type that takes any form type `T` and converts its properties into optional strings.
+
+```ts twoslash title="TypeScript"
+const userForm = {
+  username: "john",
+  email: "john@gmail.com",
+  age: 24,
+};
+
+type UserForm = typeof userForm;
+
+type FormErrors<T> = {
+  // `?` makes the new property optional.
+  [K in keyof T]?: string;
+};
+
+type UserFormErrors = FormErrors<UserForm>;
+//   ^?
+```
+
+Notice what happened to the `age` property. Even though `age` was a number in the original `UserForm` type, our mapped type correctly transformed it into `string | undefined`.
+
+## Modifying Keys with the as Clause
+
+Let's look at the basic syntax of mapped types once again:
+
+```ts title="TypeScript"
+type MappedType<T> = {
+  [P in keyof T]: T[P];
+};
+```
+
+In this pattern, we iterate through each key `P` in keyof `T` and use that **exact same key** `P` for the new type.
+
+But what if we want to change the key `P` into something else?
+
+This is where the `as` clause comes in. It allows you to "remap" the original key to a new one. The syntax with `as` looks like this:
+
+```ts title="TypeScript"
+type MappedTypeWithRemapping<T> = {
+  // P is the original key
+  // NewKeyType is the key you want in the new type
+  [P in keyof T as NewKeyType]: T[P];
+};
+```
+
+The `as` clause is evaluated for each key in the original type. You can use conditional types, template literal types, and other type-level logic to decide what the `NewKeyType` should be.
+
+Let's go through a few examples.
+
+### Renaming keys (e.g., adding a prefix)
+
+This is a common use case. Let's say you want to create a new type where all property keys are prefixed with `on`.
+
+```ts twoslash title="TypeScript"
+type Events = {
+  click: (x: number, y: number) => void;
+  scroll: (pos: number) => void;
+};
+
+type EventListeners<T> = {
+  [K in keyof T as `on${Capitalize<string & K>}`]: T[K];
+};
+type OnClickListeners = EventListeners<Events>;
+//   ^?
+```
+
+We use template literal types inside the `as` clause.
+
+<Note>
+  `string & K` is a good practice to ensure `K` is treated as a string so it can
+  be used in a template literal.
+</Note>
+
+### Filtering keys (by remapping to never)
+
+This is the standard pattern for filtering in mapped types. If you remap a key as `never`, TypeScript simply discards that property from the resulting type.
+
+Let's create a type that only keeps properties whose values are string.
+
+```ts twoslash title="TypeScript"
+type MixedData = {
+  name: string;
+  age: number;
+  email: string;
+  isAdmin: boolean;
+};
+type StringPropertiesOnly<T> = {
+  [K in keyof T as T[K] extends string ? K : never]: T[K];
+};
+
+type StringData = StringPropertiesOnly<MixedData>;
+//   ^?
+```
+
+Here we use a conditional type in the `as` clause.
+
+### Case conversion (snake case to camel case)
+
+Often, an API or database will return keys in snake_case, but our JavaScript/TypeScript code prefers camelCase. We can use the `as` clause to perform this transformation automatically.
+
+```ts twoslash title="TypeScript"
+type SnakeToCamel<S extends string> = S extends `${infer P1}_${infer P2}`
+  ? `${Lowercase<P1>}${Capitalize<Lowercase<P2>>}`
+  : S;
+
+type DbUser = {
+  user_id: number;
+  first_name: string;
+  last_login: Date;
+};
+
+type AppUser = {
+  [K in keyof DbUser as SnakeToCamel<string & K>]: DbUser[K];
+};
+
+function convertDbUserToAppUser(dbUser: DbUser) {
+  return {
+    userId: dbUser.user_id,
+    firstName: dbUser.first_name,
+    lastLogin: dbUser.last_login,
+  };
+}
+
+const dbData: DbUser = {
+  user_id: 101,
+  first_name: "Jane",
+  last_login: new Date(),
+};
+
+const appUser = convertDbUserToAppUser(dbData);
+//    ^?
+```
+
+## Mapped Types Modifiers
+
+Mapped types support modifiers that provide fine-grained control over property characteristics. The two primary mapped type modifiers are:
+
+1. `readonly`: Makes properties immutable (read-only)
+2. `?`: Makes properties optional
+
+We can add and remove these modifiers using prefix operators:
+
+- `+`: Explicitly adds a modifier (this is the default behavior)
+- `-`: Removes an existing modifier
+
+Let's look at two examples.
+
+### Making all properties required (removing ?)
+
+Let's say you have a type where all properties are optional, and you want to create a new type where all properties are required.
+
+We can create a generic `MakeRequired<T>` utility type:
+
+```ts twoslash title="TypeScript"
+type MakeRequired<T> = {
+  // We use '-?' to remove the optional modifier
+  [K in keyof T]-?: T[K];
+};
+
+type PartialConfig = {
+  apiUrl?: string;
+  timeout?: number;
+  apiKey?: string;
+};
+
+type CompleteConfig = MakeRequired<PartialConfig>;
+//   ^?
+```
+
+Here, we use the `-?` modifier to remove the optional (?) marker from each property. This is exactly how TypeScript's built-in `Required<T>` utility type works.
+
+### Making properties writable (removing readonly)
+
+Conversely, you might have a read-only object and need to create a "writable" version of it.
+
+We can create a generic `MakeMutable<T>` utility type:
+
+```ts twoslash title="TypeScript"
+type MakeMutable<T> = {
+  // We use '-readonly' to remove the readonly modifier
+  -readonly [K in keyof T]: T[K];
+};
+
+type LockedData = {
+  readonly id: number;
+  readonly name: string;
+};
+
+type UnlockedData = MakeMutable<LockedData>;
+//   ^?
+```
+
+By using `-readonly`, we've created a new `UnlockedData` type where all properties are mutable (writable).
