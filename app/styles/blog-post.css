@@ -82,11 +82,11 @@
   }
 
   .blog-post [data-rehype-pretty-code-figure] [data-rehype-pretty-code-title] {
-    @apply text-foreground dark:text-muted-foreground flex-1 rounded-t-lg py-3.5 pl-5 text-xs;
+    @apply text-foreground flex-1 rounded-t-lg py-3.5 pl-5 text-xs;
   }
 
   .blog-post [data-rehype-pretty-code-figure] pre {
-    @apply overflow-x-auto rounded-b-lg rounded-t-none bg-white font-mono dark:bg-transparent;
+    @apply overflow-x-auto rounded-b-lg rounded-t-none bg-white font-mono;
   }
 
   .blog-post [data-rehype-pretty-code-figure] pre:focus-visible {

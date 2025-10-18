@@ -21,7 +21,7 @@ Below, we have a `userPermissions` object, where the keys are the user roles and
 
 From the `userPermissions` object, we use the `typeof` operator to create the `UserPermissions` type. This is the type we will be querying in the following examples.
 
-```ts twoslash title="TypeScript"
+```ts twoslash title="TypeScript" showLineNumbers
 const userPermissions = {
   admin: [
     "create-post",
@@ -35,7 +35,6 @@ const userPermissions = {
 } as const;
 
 type UserPermissions = typeof userPermissions;
-//   ^?
 ```
 
 Let's say we want to find out the type for just the admin's permissions. We can access it using the string `'admin'` as the index:
@@ -56,7 +55,6 @@ const userPermissions = {
 type UserPermissions = typeof userPermissions;
 // ---cut---
 type AdminPermissions = UserPermissions["admin"];
-//   ^?
 ```
 
 ## Accessing Multiple Types with a Union
@@ -81,7 +79,6 @@ const userPermissions = {
 type UserPermissions = typeof userPermissions;
 // ---cut---
 type EditorOrViewerPermissions = UserPermissions["editor" | "viewer"];
-//   ^?
 ```
 
 ## The Special number Syntax
@@ -112,14 +109,13 @@ const userPermissions = {
 type UserPermissions = typeof userPermissions;
 // ---cut---
 type AllPermissionArrays = UserPermissions[keyof UserPermissions];
-//   ^?
 ```
 
 ### 2. Use number to get the element types from that union.
 
 Now we can apply the `number` operator to this new `AllPermissionArrays` type. This tells TypeScript to look inside each tuple in the union and pull out all of their element types into one, flat union:
 
-```ts twoslash title="TypeScript"
+```ts twoslash title="TypeScript" showLineNumbers
 const userPermissions = {
   admin: [
     "create-post",
@@ -136,7 +132,6 @@ type UserPermissions = typeof userPermissions;
 type AllPermissionArrays = UserPermissions[keyof UserPermissions];
 // ---cut---
 type AllPermission = AllPermissionArrays[number];
-//   ^?
 ```
 
 The final `AllPermission` type is a single union of every possible permission string from the `UserPermissions` object. Notice that TypeScript automatically handles deduplication when building this union. The type itself only cares about the possible set of values, not how many times they appeared
