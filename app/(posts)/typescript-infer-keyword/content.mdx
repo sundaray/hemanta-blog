@@ -23,7 +23,7 @@ Let’s break this down from the ground up.
 
 A conditional type is like a ternary operator (`condition ? trueValue : falseValue`) but for types.
 
-```ts twoslash title="TypeScript"
+```ts twoslash title="TypeScript" showLineNumbers=false
 type IsString<T> = T extends string ? "Yes" : "No";
 
 type A = IsString<"hello">;
@@ -45,7 +45,7 @@ Let's look at an example.
 
 Let's create a utility type `GetFirstArg<T>` that gets the type of the first argument of a function. If the type is not a function or has no arguments, it should resolve to `never`.
 
-```ts twoslash title="TypeScript"
+```ts twoslash title="TypeScript" showLineNumbers=false
 type GetFirstArg<T> = T extends (firstArg: infer A, ...rest: any[]) => any
   ? A
   : never;
@@ -63,7 +63,7 @@ type GetFirstArg<T> = T extends (firstArg: infer A, ...rest: any[]) => any
 
 5. `? A : never`: If `T` is a function that has at least one argument, the type resolves to `A` (the inferred type of that first argument). Otherwise, it resolves to `never`.
 
-```ts twoslash title="TypeScript"
+```ts twoslash title="TypeScript" showLineNumbers=false
 type GetFirstArg<T> = T extends (firstArg: infer A, ...rest: any[]) => any
   ? A
   : never;
@@ -72,9 +72,6 @@ type MyFunc = (user: { name: string; age: number }, id: string) => void;
 
 type FirstArgType = GetFirstArg<MyFunc>;
 //   ^?
-
-
-
 
 type ArgFromFuncWithNoArgs = GetFirstArg<() => void>;
 //   ^?

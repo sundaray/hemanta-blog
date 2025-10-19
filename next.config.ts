@@ -23,12 +23,22 @@ const rehypeExpressiveCodeOptions: RehypeExpressiveCodeOptions = {
     borderColor: "var(--input)",
     borderRadius: "8px",
     uiPaddingBlock: "0.5rem",
+    uiFontFamily: "var(--font-mono)",
+    gutterBorderColor: "var(--input)",
     frames: {
       frameBoxShadowCssValue: "none",
+      editorTabBarBorderBottomColor: "var(--input)",
       editorActiveTabIndicatorTopColor: "transparent",
       editorActiveTabIndicatorBottomColor: "var(--input)",
       editorActiveTabBackground: "transparent",
       editorTabBarBackground: "transparent",
+      inlineButtonBorder: "transparent",
+      inlineButtonBackground: "var(--input)",
+      inlineButtonForeground: "#404040",
+      inlineButtonBackgroundHoverOrFocusOpacity: "0.4",
+    },
+    lineNumbers: {
+      foreground: "#a3a3a3",
     },
   },
 };
