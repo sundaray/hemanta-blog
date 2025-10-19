@@ -102,7 +102,7 @@
   }
 
   .blog-post [data-rehype-pretty-code-figure] [data-highlighted-line] {
-    @apply border-l-2 border-l-sky-500 bg-sky-50 dark:border-l-sky-500 dark:bg-sky-500/10;
+    @apply border-l-2 border-l-sky-600 bg-sky-100/80;
   }
 
   .blog-post [data-rehype-pretty-code-figure] code[data-line-numbers] {
@@ -113,7 +113,7 @@
     [data-rehype-pretty-code-figure]
     code[data-line-numbers]
     [data-line]::before {
-    @apply pr-4 text-neutral-400;
+    @apply border-input mr-4 inline-block w-[2rem] border-r pr-4 text-right text-neutral-400;
     counter-increment: line;
     content: counter(line);
   }
@@ -140,6 +140,7 @@
 .blog-post .twoslash-popup-container {
   @apply bg-accent translate-y-[10px] rounded-md border shadow-lg;
 }
+
 .blog-post .twoslash-popup-container .twoslash-popup-code {
   @apply bg-accent rounded-md border-0;
 }

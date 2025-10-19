@@ -39,7 +39,7 @@ type UserPermissions = typeof userPermissions;
 
 Let's say we want to find out the type for just the admin's permissions. We can access it using the string `'admin'` as the index:
 
-```ts twoslash title="TypeScript"
+```ts twoslash title="TypeScript" showLineNumbers
 const userPermissions = {
   admin: [
     "create-post",
@@ -63,7 +63,7 @@ Now, what if we need to find out the types for two specific roles? We can pass a
 
 Let's get a type that could be the permissions for either an `editor` or a `viewer`:
 
-```ts twoslash title="TypeScript"
+```ts twoslash title="TypeScript" showLineNumbers
 const userPermissions = {
   admin: [
     "create-post",
@@ -93,7 +93,7 @@ We can do this in two steps:
 
 We can use `keyof` to get all the keys from `UserPermissions` and use that as the index:
 
-```ts twoslash title="TypeScript"
+```ts twoslash title="TypeScript" showLineNumbers
 const userPermissions = {
   admin: [
     "create-post",
