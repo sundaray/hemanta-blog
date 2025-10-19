@@ -88,6 +88,7 @@ type Events = {
 type EventListeners<T> = {
   [K in keyof T as `on${Capitalize<string & K>}`]: T[K];
 };
+
 type OnClickListeners = EventListeners<Events>;
 //   ^?
 ```

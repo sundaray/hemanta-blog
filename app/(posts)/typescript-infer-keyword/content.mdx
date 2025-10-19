@@ -45,7 +45,7 @@ Let's look at an example.
 
 Let's create a utility type `GetFirstArg<T>` that gets the type of the first argument of a function. If the type is not a function or has no arguments, it should resolve to `never`.
 
-```ts twoslash title="TypeScript" showLineNumbers=false
+```ts twoslash title="TypeScript" showLineNumbers
 type GetFirstArg<T> = T extends (firstArg: infer A, ...rest: any[]) => any
   ? A
   : never;

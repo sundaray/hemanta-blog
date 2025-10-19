@@ -8,6 +8,8 @@ import rehypeExpressiveCode, {
 import remarkFrontmatter from "remark-frontmatter";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 
+import { pluginTrimTrailingTwoslashSpacer } from "@/lib/plugin-trim-twoslash-spacer";
+
 /** @type {import('next').NextConfig} */
 const nextConfig: NextConfig = {
   experimental: {
@@ -18,7 +20,11 @@ const nextConfig: NextConfig = {
 
 const rehypeExpressiveCodeOptions: RehypeExpressiveCodeOptions = {
   themes: ["github-dark", "github-light"],
-  plugins: [ecTwoSlash(), pluginLineNumbers()],
+  plugins: [
+    ecTwoSlash(),
+    pluginLineNumbers(),
+    pluginTrimTrailingTwoslashSpacer(),
+  ],
   styleOverrides: {
     borderColor: "var(--input)",
     borderRadius: "8px",

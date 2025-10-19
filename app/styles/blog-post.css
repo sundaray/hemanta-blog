@@ -71,4 +71,8 @@
   .blog-post :where(h1, h2, h3, h4, h5, h6):hover .anchor {
     @apply translate-x-0 opacity-100;
   }
+
+  .blog-post .expressive-code .twoslash-highlighted > span {
+    @apply rounded-none border-0 border-b-[1.5px] border-sky-700 bg-transparent py-1;
+  }
 }
