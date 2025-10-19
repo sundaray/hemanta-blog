@@ -22,11 +22,13 @@ const rehypeExpressiveCodeOptions: RehypeExpressiveCodeOptions = {
   styleOverrides: {
     borderColor: "var(--input)",
     borderRadius: "8px",
+    uiPaddingBlock: "0.5rem",
     frames: {
       frameBoxShadowCssValue: "none",
       editorActiveTabIndicatorTopColor: "transparent",
       editorActiveTabIndicatorBottomColor: "var(--input)",
       editorActiveTabBackground: "transparent",
+      editorTabBarBackground: "transparent",
     },
   },
 };
