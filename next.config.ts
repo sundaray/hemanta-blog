@@ -38,7 +38,7 @@ const rehypeExpressiveCodeOptions: RehypeExpressiveCodeOptions = {
       inlineButtonBackgroundHoverOrFocusOpacity: "0.4",
     },
     lineNumbers: {
-      foreground: "#a3a3a3",
+      foreground: "#737373",
     },
   },
 };
