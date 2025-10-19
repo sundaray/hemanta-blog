@@ -18,6 +18,16 @@ export type BlogPost = Frontmatter & {
   slug: string;
 };
 
+export type Item = {
+  title: string;
+  url: string;
+  items?: Item[];
+};
+
+export type Items = {
+  items?: Item[];
+};
+
 export type KodeKloudPost = {
   id: number;
   title: string;

@@ -31,8 +31,8 @@ export default function GlobalNotFound() {
               404 - Page Not Found
             </EmptyTitle>
             <EmptyDescription className="text-base text-neutral-600">
-              Oops! The page you're looking for seems to have gone on a little
-              adventure.
+              Oops! The page you&apos;re looking for seems to have gone on a
+              little adventure.
             </EmptyDescription>
             <EmptyContent>
               <ArrowLink href="/">Return to home</ArrowLink>

@@ -1,10 +1,11 @@
 import * as React from "react";
+
 import { MoreHorizontalIcon } from "lucide-react";
-import { BiSolidLeftArrow, BiSolidRightArrow } from "react-icons/bi";
 
 import { cn } from "@/lib/utils";
-import { Button, buttonVariants } from "@/components/ui/button";
+
 import { AnimatedArrowIcon } from "@/components/animated-arrow-icon";
+import { Button, buttonVariants } from "@/components/ui/button";
 
 function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
   return (

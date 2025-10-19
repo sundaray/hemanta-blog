@@ -58,7 +58,7 @@ export function AddOssProjectForm({ className }: { className?: string }) {
     if (state.ok) {
       form.reset();
     }
-  }, [state]);
+  }, [state, form]);
 
   const showSpinner = useSpinDelay(isPending, {
     delay: 200, // wait 200ms before showing spinner

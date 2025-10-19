@@ -10,8 +10,8 @@ export function RewrittenArticlesSection() {
         <p className="mt-4 text-pretty text-lg text-neutral-700">
           I also rewrote the following articles to improve their clarity,
           readability, and technical accuracy. Please note that these are
-          credited under the original author's name to acknowledge his initial
-          contribution.
+          credited under the original author&apos;s name to acknowledge his
+          initial contribution.
         </p>
       </div>
 

@@ -13,8 +13,8 @@ export default function NotFound() {
         Project Not Found
       </EmptyTitle>
       <EmptyDescription className="max-w-2xl text-balance text-base text-neutral-600">
-        Oops! We couldn't find the project you were looking for. It might have
-        been moved, or the URL may be incorrect.
+        Oops! We couldn&apos;t find the project you were looking for. It might
+        have been moved, or the URL may be incorrect.
       </EmptyDescription>
       <EmptyContent>
         <ArrowLink href="/oss" className="font-semibold" direction="left">

@@ -1,5 +1,3 @@
-import type { SearchParams } from "nuqs/server";
-
 import { getOssProjectFilterOptions } from "@/lib/get-oss-project-filters-options";
 import { getOssProjects, getOssProjectsCount } from "@/lib/get-oss-projects";
 import { searchParamsCache } from "@/lib/search-params";
@@ -18,13 +16,10 @@ import {
 
 const PROJECTS_PER_PAGE = 36;
 
-export default async function OssPage({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
-  // 🔹 Parse filters from URL search params
-  const filters = await searchParamsCache.parse(searchParams);
+export default async function OssPage(props: PageProps<"/oss">) {
+  const resolvedSearchParams = await props.searchParams;
+
+  const filters = await searchParamsCache.parse(resolvedSearchParams);
 
   // 🔹 Fetch filter options and filtered projects in parallel
   const [filterOptionsResult, projectsResult, totalProjectsResult] =

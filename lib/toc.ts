@@ -1,53 +1,65 @@
+import { Item, Items } from "@/types";
+import type {
+  Link,
+  List,
+  ListItem,
+  Literal,
+  Node,
+  Paragraph,
+  Parent,
+  Root,
+} from "mdast";
 import { toc } from "mdast-util-toc";
 import { remark } from "remark";
 import { visit } from "unist-util-visit";
+import type { VFile } from "vfile";
 
 const textTypes = ["text", "emphasis", "strong", "inlineCode"];
 
-function flattenNode(node: any) {
-  const p: any[] = [];
-  visit(node, (node) => {
-    if (!textTypes.includes(node.type)) return;
-    p.push(node.value);
+function flattenNode(node: Parent): string {
+  const p: string[] = [];
+  visit(node, (visitedNode: Node) => {
+    if (textTypes.includes(visitedNode.type) && "value" in visitedNode) {
+      p.push(String((visitedNode as Literal).value));
+    }
   });
-  return p.join(``);
+  return p.join("");
 }
 
-interface Item {
-  title: string;
-  url: string;
-  items?: Item[];
-}
-
-interface Items {
-  items?: Item[];
-}
-
-function getItems(node: any, current: any): Items {
+function getItems(
+  node: Node | null | undefined,
+  current: Partial<Item>,
+): Partial<Item> {
   if (!node) {
     return {};
   }
 
   if (node.type === "paragraph") {
-    visit(node, (item) => {
-      if (item.type === "link") {
-        current.url = item.url;
-        current.title = flattenNode(node);
+    visit(node as Paragraph, (itemNode: Node) => {
+      if (itemNode.type === "link") {
+        current.url = (itemNode as Link).url;
+        current.title = flattenNode(node as Paragraph);
       }
-      if (item.type === "text") {
-        current.title = flattenNode(node);
+      if (itemNode.type === "text" && !current.url) {
+        current.title = flattenNode(node as Paragraph);
       }
     });
     return current;
   }
 
   if (node.type === "list") {
-    current.items = node.children.map((i: any) => getItems(i, {}));
+    current.items = (node as List).children
+      .map((listItem: ListItem) => getItems(listItem, {}))
+      .filter(
+        (item): item is Item =>
+          item.title !== undefined && item.url !== undefined,
+      );
     return current;
   } else if (node.type === "listItem") {
-    const heading = getItems(node.children[0], {});
-    if (node.children.length > 1) {
-      getItems(node.children[1], heading);
+    const listItemChildren = (node as ListItem).children;
+    const heading = getItems(listItemChildren[0], {});
+    if (listItemChildren.length > 1) {
+      getItems(listItemChildren[1], heading);
     }
     return heading;
   }
@@ -55,10 +67,9 @@ function getItems(node: any, current: any): Items {
   return {};
 }
 
-const getToc = () => (node: any, file: any) => {
-  // Only consider h2 and h3 headings
+const getToc = () => (node: Root, file: VFile) => {
   const table = toc(node, { maxDepth: 3, tight: true });
-  file.data = getItems(table.map, {});
+  file.data.toc = table.map ? getItems(table.map, {}) : {};
 };
 
 export type TableOfContents = Items;
@@ -67,5 +78,5 @@ export async function getTableOfContents(
   content: string,
 ): Promise<TableOfContents> {
   const result = await remark().use(getToc).process(content);
-  return result.data as TableOfContents;
+  return (result.data.toc || {}) as TableOfContents;
 }

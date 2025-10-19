@@ -12,11 +12,9 @@ import { ArrowLink } from "@/components/ui/arrow-link";
 
 const POSTS_PER_PAGE = 12;
 
-export default async function TechnicalWritingPage({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
+export default async function TechnicalWritingPage(
+  props: PageProps<"/technical-writing">,
+) {
   const allCategories = blogPosts.flatMap((post) => post.category);
   const uniqueTags = [...new Set(allCategories)].sort();
   const blogPostCount = blogPosts.length;
@@ -24,11 +22,15 @@ export default async function TechnicalWritingPage({
     (a, b) =>
       new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
   );
+
+  const resolvedSearchParams = await props.searchParams;
+
   const {
     query,
     page,
     tag: selectedTags,
-  } = await technicalWritingSearchParamsCache.parse(searchParams);
+  } = await technicalWritingSearchParamsCache.parse(resolvedSearchParams);
+
   const filteredPosts = sortedPosts.filter((post) => {
     const queryMatch =
       !query || post.title.toLowerCase().includes(query.toLowerCase());

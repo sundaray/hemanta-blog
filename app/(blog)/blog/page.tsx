@@ -1,5 +1,3 @@
-import type { SearchParams } from "nuqs/server";
-
 import { blogSearchParamsCache } from "@/lib/blog-search-params";
 import { getBlogPosts } from "@/lib/get-blog-posts";
 import { getBlogPostsTags } from "@/lib/get-blog-posts-tags";
@@ -10,20 +8,18 @@ import { ArrowLink } from "@/components/ui/arrow-link";
 
 const POSTS_PER_PAGE = 5;
 
-export default async function BlogPage({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
+export default async function BlogPage(props: PageProps<"/blog">) {
   const allPosts = getBlogPosts();
   const allTagsWithCounts = getBlogPostsTags();
   const uniqueTags = allTagsWithCounts.map((tag) => tag.name);
+
+  const resolvedSearchParams = await props.searchParams;
 
   const {
     query,
     page,
     tag: selectedTags,
-  } = await blogSearchParamsCache.parse(searchParams);
+  } = await blogSearchParamsCache.parse(resolvedSearchParams);
 
   const filteredPosts = allPosts.filter((post) => {
     const queryMatch =

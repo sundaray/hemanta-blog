@@ -1,11 +1,3 @@
-/**
- * Calculates an array representing the pagination range to display
- *
- * @param currentPage - The currently active page
- * @param totalPages - The total number of pages
- * @param siblingCount - Number of sibling pages to show on each side of current page
- * @returns Array of page numbers and ellipsis indicators
- */
 export function calculatePaginationRange(
   currentPage: number,
   totalPages: number,

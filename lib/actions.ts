@@ -9,7 +9,7 @@ import { saveRepoDetails } from "@/lib/save-repo-details";
 import { AddOssProjectFormSchema } from "@/lib/schema";
 
 export async function addOssProject(
-  prevState: any,
+  prevState: AddOssProjectState,
   formData: FormData,
 ): Promise<AddOssProjectState> {
   const data = {

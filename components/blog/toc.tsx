@@ -2,6 +2,7 @@
 
 import * as React from "react";
 
+import { Item } from "@/types";
 import { motion } from "motion/react";
 
 import { type TableOfContents as TOCType } from "@/lib/toc";
@@ -18,7 +19,7 @@ export function TableOfContents({ toc }: TocProps) {
   const { itemIds, parentMap, topLevel } = React.useMemo(() => {
     const ids: string[] = [];
     const map: Record<string, string> = {};
-    const top: { title: string; url: string; items?: any[] }[] = [];
+    const top: Item[] = [];
 
     if (!toc?.items) return { itemIds: ids, parentMap: map, topLevel: top };
 
@@ -65,20 +66,35 @@ export function TableOfContents({ toc }: TocProps) {
 
   React.useLayoutEffect(() => {
     const containerElement = containerRef.current;
+
     if (!containerElement || !activeHeading) {
       setIndicator((prev) => ({ ...prev, visible: false }));
       return;
     }
-    const escapeCssSelector = (str: string) =>
-      (window as any).CSS?.escape ? (window as any).CSS.escape(str) : str;
+
+    const escapeCssSelector = (str: string): string => {
+      if (
+        typeof window !== "undefined" &&
+        window.CSS &&
+        typeof window.CSS.escape === "function"
+      ) {
+        return window.CSS.escape(str);
+      }
+      return str.replace(/[^a-zA-Z0-9_-]/g, (match) => `\\${match}`);
+    };
+
     const selector = `a[href="#${escapeCssSelector(activeHeading)}"]`;
+
     const linkElement =
       containerElement.querySelector<HTMLAnchorElement>(selector);
+
     if (!linkElement) {
       setIndicator((prev) => ({ ...prev, visible: false }));
       return;
     }
+
     let animationFrameId: number | null = null;
+
     const scheduleUpdate = () => {
       if (animationFrameId != null) cancelAnimationFrame(animationFrameId);
       animationFrameId = requestAnimationFrame(() => {

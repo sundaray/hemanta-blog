@@ -1,7 +1,6 @@
 import { playgroundItems } from "@/data/kodekloud";
 
 import { Icons } from "@/components/icons";
-import { Separator } from "@/components/ui/separator";
 
 export function PlaygroundsSection() {
   return (

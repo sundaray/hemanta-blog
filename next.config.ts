@@ -8,6 +8,8 @@ import rehypeExpressiveCode, {
 import remarkFrontmatter from "remark-frontmatter";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 
+import { pluginRemoveLastBlankLine } from "@/lib/rehype-expressive-code-remove-last-blank-twoslash-line-number.mjs";
+
 /** @type {import('next').NextConfig} */
 const nextConfig: NextConfig = {
   experimental: {
@@ -17,14 +19,20 @@ const nextConfig: NextConfig = {
 };
 
 const rehypeExpressiveCodeOptions: RehypeExpressiveCodeOptions = {
-  themes: ["github-dark", "github-light"],
-  plugins: [ecTwoSlash(), pluginLineNumbers()],
+  themes: ["github-light"],
+  plugins: [ecTwoSlash(), pluginLineNumbers(), pluginRemoveLastBlankLine()],
   styleOverrides: {
     borderColor: "var(--input)",
     borderRadius: "8px",
     uiPaddingBlock: "0.5rem",
     uiFontFamily: "var(--font-mono)",
     gutterBorderColor: "var(--input)",
+
+    textMarkers: {
+      markBackground: "rgb(186 230 253 / 40%)",
+      markBorderColor: "rgb(2 132 199)",
+    },
+
     frames: {
       frameBoxShadowCssValue: "none",
       editorTabBarBorderBottomColor: "var(--input)",

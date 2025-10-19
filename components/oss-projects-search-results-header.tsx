@@ -1,7 +1,6 @@
 "use client";
 
 import { GrPowerReset } from "react-icons/gr";
-import { IoMdCloseCircle } from "react-icons/io";
 
 import { cn } from "@/lib/utils";
 
