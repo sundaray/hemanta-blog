@@ -21,7 +21,7 @@ Below, we have a `userPermissions` object, where the keys are the user roles and
 
 From the `userPermissions` object, we use the `typeof` operator to create the `UserPermissions` type. This is the type we will be querying in the following examples.
 
-```ts twoslash title="TypeScript" showLineNumbers
+```ts twoslash title="TypeScript" showLineNumbers=false
 const userPermissions = {
   admin: [
     "create-post",
@@ -39,7 +39,7 @@ type UserPermissions = typeof userPermissions;
 
 Let's say we want to find out the type for just the admin's permissions. We can access it using the string `'admin'` as the index:
 
-```ts twoslash title="TypeScript" showLineNumbers
+```ts twoslash title="TypeScript" showLineNumbers=false
 const userPermissions = {
   admin: [
     "create-post",
@@ -55,7 +55,6 @@ const userPermissions = {
 type UserPermissions = typeof userPermissions;
 // ---cut---
 type AdminPermissions = UserPermissions["admin"];
-//   ^?
 ```
 
 ## Accessing Multiple Types with a Union
@@ -64,7 +63,7 @@ Now, what if we need to find out the types for two specific roles? We can pass a
 
 Let's get a type that could be the permissions for either an `editor` or a `viewer`:
 
-```ts twoslash title="TypeScript" showLineNumbers
+```ts twoslash title="TypeScript" showLineNumbers=false
 const userPermissions = {
   admin: [
     "create-post",
@@ -94,7 +93,7 @@ We can do this in two steps:
 
 We can use `keyof` to get all the keys from `UserPermissions` and use that as the index:
 
-```ts twoslash title="TypeScript" showLineNumbers
+```ts twoslash title="TypeScript" showLineNumbers=false
 const userPermissions = {
   admin: [
     "create-post",
@@ -116,7 +115,7 @@ type AllPermissionArrays = UserPermissions[keyof UserPermissions];
 
 Now we can apply the `number` operator to this new `AllPermissionArrays` type. This tells TypeScript to look inside each tuple in the union and pull out all of their element types into one, flat union:
 
-```ts twoslash title="TypeScript" showLineNumbers
+```ts twoslash title="TypeScript" showLineNumbers=false
 const userPermissions = {
   admin: [
     "create-post",

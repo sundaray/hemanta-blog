@@ -1,3 +1,4 @@
+import { pluginLineNumbers } from "@expressive-code/plugin-line-numbers";
 import createMDX from "@next/mdx";
 import ecTwoSlash from "expressive-code-twoslash";
 import type { NextConfig } from "next";
@@ -17,7 +18,7 @@ const nextConfig: NextConfig = {
 
 const rehypeExpressiveCodeOptions: RehypeExpressiveCodeOptions = {
   themes: ["github-dark", "github-light"],
-  plugins: [ecTwoSlash()],
+  plugins: [ecTwoSlash(), pluginLineNumbers()],
 };
 
 const withMDX = createMDX({

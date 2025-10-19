@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@expressive-code/plugin-line-numbers": "^0.41.3",
     "@gsap/react": "^2.1.2",
     "@hookform/resolvers": "^5.2.2",
     "@mdx-js/loader": "^3.1.1",
