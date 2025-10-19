@@ -85,8 +85,8 @@
     @apply text-foreground flex-1 rounded-t-lg py-3.5 pl-5 text-xs;
   }
 
-  .blog-post [data-rehype-pretty-code-figure] pre {
-    @apply overflow-x-auto rounded-b-lg rounded-t-none bg-white font-mono;
+  .blog-post [data-rehype-pretty-code-figure] > pre {
+    @apply whitespace-pre-wrap rounded-b-lg rounded-t-none bg-white font-mono;
   }
 
   .blog-post [data-rehype-pretty-code-figure] pre:focus-visible {
