@@ -19,6 +19,16 @@ const nextConfig: NextConfig = {
 const rehypeExpressiveCodeOptions: RehypeExpressiveCodeOptions = {
   themes: ["github-dark", "github-light"],
   plugins: [ecTwoSlash(), pluginLineNumbers()],
+  styleOverrides: {
+    borderColor: "var(--input)",
+    borderRadius: "8px",
+    frames: {
+      frameBoxShadowCssValue: "none",
+      editorActiveTabIndicatorTopColor: "transparent",
+      editorActiveTabIndicatorBottomColor: "var(--input)",
+      editorActiveTabBackground: "transparent",
+    },
+  },
 };
 
 const withMDX = createMDX({
