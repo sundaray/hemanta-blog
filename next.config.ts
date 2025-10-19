@@ -1,4 +1,5 @@
 import createMDX from "@next/mdx";
+import ecTwoSlash from "expressive-code-twoslash";
 import type { NextConfig } from "next";
 import rehypeExpressiveCode, {
   type RehypeExpressiveCodeOptions,
@@ -16,6 +17,7 @@ const nextConfig: NextConfig = {
 
 const rehypeExpressiveCodeOptions: RehypeExpressiveCodeOptions = {
   themes: ["github-dark", "github-light"],
+  plugins: [ecTwoSlash()],
 };
 
 const withMDX = createMDX({
