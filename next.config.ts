@@ -1,7 +1,8 @@
 import createMDX from "@next/mdx";
-import { transformerTwoslash } from "@shikijs/twoslash";
 import type { NextConfig } from "next";
-import rehypePrettyCode from "rehype-pretty-code";
+import rehypeExpressiveCode, {
+  type RehypeExpressiveCodeOptions,
+} from "rehype-expressive-code";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 
@@ -10,27 +11,17 @@ const nextConfig: NextConfig = {
   experimental: {
     globalNotFound: true,
   },
-  // typedRoutes: true,
   pageExtensions: ["js", "jsx", "ts", "tsx", "md", "mdx"],
 };
 
-const options = {
-  theme: {
-    dark: "github-dark",
-    light: "github-light",
-  },
-  keepBackground: false,
-  transformers: [
-    transformerTwoslash({
-      explicitTrigger: true,
-    }),
-  ],
+const rehypeExpressiveCodeOptions: RehypeExpressiveCodeOptions = {
+  themes: ["github-dark", "github-light"],
 };
 
 const withMDX = createMDX({
   options: {
     remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter],
-    rehypePlugins: [[rehypePrettyCode, options]],
+    rehypePlugins: [[rehypeExpressiveCode, rehypeExpressiveCodeOptions]],
   },
 });
 

@@ -6,7 +6,6 @@ import type { Route } from "next";
 
 import { slugify } from "@/lib/utils";
 
-import { CodeBlockWrapper } from "@/components/blog/code-block-wrapper";
 import { Icons } from "@/components/icons";
 
 type CustomLinkProps = React.HTMLAttributes<HTMLAnchorElement> &
@@ -91,7 +90,6 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
     ...components,
     ...headingComponents,
-    figure: CodeBlockWrapper,
     a: CustomLink,
   };
 }
