@@ -69,7 +69,6 @@ interface Product {
 type PersonOrProduct = Person | Product;
 // ---cut---
 function isPerson(item: PersonOrProduct): item is Person {
-  //                                      ^^^^^^^^^^^^^^
   return "age" in item;
 }
 ```
