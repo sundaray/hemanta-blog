@@ -1,0 +1,53 @@
+---
+title: "What is Exhaustiveness Checking in TypeScript?"
+description: "Learn how to use the never type to catch missing cases at compile time."
+author: "Hemanta Sundaray"
+publishedAt: "2025-10-26"
+tags: ["TypeScript"]
+isPublished: true
+---
+
+Exhaustiveness checking in TypeScript is a technique to ensure you've handled all possible cases in union types or discriminated unions.
+
+The most common place to use exhaustiveness check is within a `switch` statement or a series of `if...else if` blocks.
+
+The pattern is simple: after you think you've handled every possible case, you add a `default` case (or final `else` block). Inside that block, you pass the variable to a helper function that accepts an argument of type `never` and throws an error.
+
+This forces the compiler to prove that every case was handled. If you miss a case, the variable's type won't be `never`, and you'll get a compile-time error.
+
+Let’s understand this using an example.
+
+Below, we have a discriminated union type `ApiState`, an `assertUnreachable` helper function, and a `displayData` function that intentionally misses one of the cases:
+
+```ts twoslash title="TypeScript" showLineNumbers
+// @errors: 2345
+type ApiState<T> =
+  | { status: "loading" }
+  | { status: "success"; data: T }
+  | { status: "error"; error: Error };
+
+function assertUnreachable(x: never): never {
+  throw new Error(`Unhandled state: ${JSON.stringify(x)}`);
+}
+
+type User = { id: number; name: string };
+
+function displayData(state: ApiState<User>): string {
+  switch (state.status) {
+    case "loading":
+      return "Loading user...";
+
+    case "success":
+      return `Welcome, ${state.data.name}!`;
+
+    default:
+      return assertUnreachable(state);
+  }
+}
+```
+
+Notice how we get a compile-time error. The TypeScript compiler reminds us that we have forgotten to handle the `error` case.
+
+Inside the `default` block, TypeScript correctly narrows the type of state to `{ status: "error"; error: Error }`. Since this type is not `never`, passing it to our `assertUnreachable` function (which only accepts `never`) fails, triggering the error.
+
+This is extremely useful and prevents runtime errors from unhandled cases
