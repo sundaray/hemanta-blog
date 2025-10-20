@@ -24,9 +24,11 @@ const rehypeExpressiveCodeOptions: RehypeExpressiveCodeOptions = {
   styleOverrides: {
     borderColor: "var(--input)",
     borderRadius: "8px",
-    uiPaddingBlock: "0.5rem",
+    borderWidth: "1px",
+    uiPaddingBlock: "0.75rem",
     uiFontFamily: "var(--font-mono)",
     gutterBorderColor: "var(--input)",
+    gutterBorderWidth: "1px",
 
     textMarkers: {
       markBackground: "rgb(186 230 253 / 40%)",
