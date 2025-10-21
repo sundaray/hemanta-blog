@@ -1,0 +1,148 @@
+---
+title: "How branded Types Work in TypeScript"
+description: "Learn how to use assertion functions for type narrowing and runtime validation."
+author: "Hemanta Sundaray"
+publishedAt: "2025-10-26"
+tags: ["TypeScript"]
+isPublished: true
+---
+
+Before we understand what branded types are and why we need them, we must understand the meaning of the term "structural type system."
+
+TypeScript is a **structural type system**. This means that two types are considered compatible if they have the same _shape_ or _structure_, regardless of their declared names. TypeScript focuses on _what properties a type has_ rather than _what it's called_.
+
+## The Problem with Structural Typing
+
+Structural typing is flexible, but can lead to subtle bugs. For example, below we have two type aliases, `UserId` and `ProductId`. Both are just aliases for the `string` type, but in our application, they represent two very different concepts. A function `fetchUserDetails` requires a `UserId` to be passed.
+
+```ts twoslash title="TypeScript" showLineNumbers
+type UserId = string;
+type ProductId = string;
+
+function fetchUserDetails(id: UserId) {
+  console.log(`Fetching details for User ID: ${id}`);
+}
+
+const myUserId: UserId = "user-abc-123";
+const myProductId: ProductId = "prod-xyz-789";
+
+// ❌ This is the logical bug
+fetchUserDetails(myProductId);
+```
+
+Notice what happened in that last line: we passed `myProductId` to the `fetchUserDetails` function—a function that we intended to only accept a `UserId`—and TypeScript allowed it without any error.
+
+This is the core problem with structural typing. Even though our intent is for `UserId` and `ProductId` to be completely different things, TypeScript sees them both as just `string`. From its point of view, their "structure" is identical, and they are therefore interchangeable.
+
+To prevent this from happening and to make TypeScript recognize these two types as two different types, we can make use of the concept called **Branded Types**.
+
+## What is a Branded Type?
+
+A branded type is a technique to simulate nominal typing (typing based on names) within TypeScript's structural system.
+
+We "tag" or "brand" a base type (like string) with a unique, compile-time-only property. This "brand" doesn't exist at runtime, but it makes the type structurally unique from other types, even those with the same base type.
+
+By doing this, `UserId` is no longer just a `string`; it becomes a `string` plus a `"UserId"` brand. And `ProductId` becomes a `string` plus a `"ProductId"` brand. Since their brands differ, TypeScript no longer sees them as the same.
+
+## Creating Branded Types
+
+There are two primary ways we can create branded types.
+
+### 1. Branded types using generics
+
+We define a generic `Branded` type that can `"tag"` any type (`T`) with any brand (`Brand`):
+
+```ts twoslash title="TypeScript" showLineNumbers
+type Branded<T, Brand> = T & {
+  __brand: Brand;
+};
+```
+
+Now, let's rewrite our initial example using this pattern.
+
+```ts twoslash title="TypeScript" showLineNumbers
+// @errors: 2345
+type Branded<T, Brand> = T & {
+  __brand: Brand;
+};
+
+type UserId = Branded<string, "UserId">;
+type ProductId = Branded<string, "ProductId">;
+
+// Create "constructor" helper functions to safely create branded values
+// (We use type assertion here to "brand" the plain string)
+function UserId(id: string): UserId {
+  return id as UserId;
+}
+
+function ProductId(id: string): ProductId {
+  return id as ProductId;
+}
+
+function fetchUserDetails(id: UserId) {
+  console.log(`Fetching details for User ID: ${id}`);
+}
+
+const myUserId = UserId("user-abc-123");
+const myProductId = ProductId("prod-xyz-789");
+
+fetchUserDetails(myUserId);
+
+fetchUserDetails(myProductId);
+```
+
+Notice how TypeScript is now able to differentiate between these two types! Because we typed the `fetchUserDetails` function to only accept `UserId`, and we passed a `ProductId`, we get a type error.
+
+### 2. Branded types using symbols
+
+Let's first clarify what a symbol is. You might know `Symbol()` as a JavaScript feature (from ES2015) that, when called, creates a guaranteed-unique value. This runtime value is not equal to any other value, even one with the same description (e.g., `Symbol('a') !== Symbol('a')`).
+
+In TypeScript, the type of one of these values is `symbol` (all lowercase). This is a general type, just like `string` or `number`.
+
+However, for branding, this general symbol type isn't specific enough. We need a way to represent a _specific, one-of-a-kind_ symbol at the type level, much like `"UserId"` is a specific `string` type, not just `string`.
+
+This is where the special TypeScript-only type `unique symbol` comes in. Think of it as a compile-time "fingerprint" that is guaranteed to be absolutely unique to its declaration. No other `unique symbol` is ever considered equal to it.
+
+When we use this unforgeable type as the key for our brand property, we create a structure that is impossible to replicate elsewhere.
+
+Here's how it looks in practice:
+
+```ts {3-4} twoslash title="TypeScript" showLineNumbers
+// @errors: 2345
+// Declare unique symbols (they only exist at compile-time)
+// We DON'T export these, keeping them private to this file.
+declare const userIdBrand: unique symbol;
+declare const productIdBrand: unique symbol;
+
+// Define branded types using the symbols as computed keys
+export type UserId = string & { [userIdBrand]: "UserId" };
+export type ProductId = string & { [productIdBrand]: "ProductId" };
+
+// Create exported "constructor" functions
+export function UserId(id: string): UserId {
+  return id as UserId;
+}
+
+export function ProductId(id: string): ProductId {
+  return id as ProductId;
+}
+
+// --- In another file, we import our types and constructors ---
+
+// import { UserId, ProductId } from './types';
+
+function fetchUserDetails(id: UserId) {
+  console.log(`Fetching details for User ID: ${id}`);
+}
+
+const myUserId = UserId("user-def-456");
+const myProductId = ProductId("prod-uvw-012");
+
+fetchUserDetails(myUserId);
+
+fetchUserDetails(myProductId);
+```
+
+Notice we used the `declare` keyword to define our symbols. It tells TypeScript to pretend this const exists, only for type-checking purposes. It is not an actual JavaScript object or variable and will not exist at runtime. In essence, we create a "ghost" variable that only the type-checker can see, which is exactly what we want for branding.
+
+The key advantage here is that because the symbols themselves are not exported, no other part of our application can ever create typee that are structurally compatible with `UserId` or `ProductId`. They are forced to use our exported `UserId` and `ProductId` constructor functions, giving us complete control and maximum safety.
