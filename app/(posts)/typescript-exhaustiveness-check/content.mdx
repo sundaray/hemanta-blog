@@ -19,7 +19,7 @@ Let’s understand this using an example.
 
 Below, we have a discriminated union type `ApiState`, an `assertUnreachable` helper function, and a `displayData` function that intentionally misses one of the cases:
 
-```ts twoslash title="TypeScript" showLineNumbers
+```ts {6-8} twoslash title="TypeScript" showLineNumbers
 // @errors: 2345
 type ApiState<T> =
   | { status: "loading" }

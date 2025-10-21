@@ -1,0 +1,116 @@
+---
+title: "Understanding Assertion Functions in TypeScript"
+description: "Learn how to use assertion functions for type narrowing and runtime validation."
+author: "Hemanta Sundaray"
+publishedAt: "2025-10-26"
+tags: ["TypeScript"]
+isPublished: true
+---
+
+Assertion functions provide a powerful mechanism for type narrowing and runtime validation.
+
+An assertion function **asserts** that a certain condition is true. If the condition is false, it **throws an error**.
+
+Its only purpose is to tell TypeScript's control-flow analysis that if the function **completes without throwing an error**, then a specific variable must have a narrower, more specific type for the rest of the code block.
+
+Let's start with a function, `logModeratorPermissions`, that takes a `user` which could be a `Viewer` or a `Moderator`. We also have a helper function, `checkIfModerator`, that throws an error if the user isn't a moderator.
+
+```ts twoslash title="TypeScript" showLineNumbers
+// @errors: 2339
+interface BaseUser {
+  username: string;
+}
+
+interface Viewer extends BaseUser {
+  level: "viewer";
+}
+
+interface Moderator extends BaseUser {
+  level: "moderator";
+  permissions: string[];
+}
+
+function checkIfModerator(user: Viewer | Moderator) {
+  if (user.level !== "moderator") {
+    throw new Error("Not a moderator");
+  }
+}
+
+const logModeratorPermissions = (user: Viewer | Moderator) => {
+  checkIfModerator(user);
+  console.log(user.permissions);
+};
+```
+
+We have a type error because TypeScript doesn't analyze the inside of `checkIfModerator` to understand its effect. It just sees a function that returns void, so it doesn't narrow the type of `user`. As a result, even after `checkIfModerator` runs, TypeScript still thinks `user` could be `Viewer | Moderator`.
+
+We fix this by changing `checkIfModerator` into an assertion function. This explicitly tells TypeScript what to infer about the argument if the function completes successfully (i.e., doesn't throw).
+
+All we need to do is define the return type of the `checkIfModerator` function(the assertion function) using the `asserts` keyword. The general syntax looks like this:
+
+```ts title="TypeScript" showLineNumbers
+asserts [argumentName] is [Type]
+```
+
+Where:
+
+- `asserts`: The keyword that begins the assertion signature.
+
+- `[argumentName]`: The name of the argument from the function's parameter list that you are narrowing (e.g., `user`).
+
+- `is`: The keyword separating the argument from the type.
+
+- `[Type]`: The more specific type you are asserting the argument belongs to (e.g., `Moderator`).
+
+In our specific case, the return type is: `asserts user is Moderator`
+
+```ts {14-18} twoslash title="TypeScript" showLineNumbers
+interface BaseUser {
+  username: string;
+}
+
+interface Viewer extends BaseUser {
+  level: "viewer";
+}
+
+interface Moderator extends BaseUser {
+  level: "moderator";
+  permissions: string[];
+}
+// ---cut---
+function checkIfModerator(user: Viewer | Moderator): asserts user is Moderator {
+  if (user.level !== "moderator") {
+    throw new Error("Not a moderator");
+  }
+}
+```
+
+The `asserts user is Moderator` signature provides a direct signal to TypeScript's control-flow analysis. It says, "If you see this function call, and you don't see an error thrown, you must narrow the type of the user variable to `Moderator` for all code that follows."
+
+Now, the type error is fixed.
+
+```ts twoslash title="TypeScript" showLineNumbers
+interface BaseUser {
+  username: string;
+}
+
+interface Viewer extends BaseUser {
+  level: "viewer";
+}
+
+interface Moderator extends BaseUser {
+  level: "moderator";
+  permissions: string[];
+}
+
+function checkIfModerator(user: Viewer | Moderator): asserts user is Moderator {
+  if (user.level !== "moderator") {
+    throw new Error("Not a moderator");
+  }
+}
+
+const logModeratorPermissions = (user: Viewer | Moderator) => {
+  checkIfModerator(user);
+  console.log(user.permissions);
+};
+```
