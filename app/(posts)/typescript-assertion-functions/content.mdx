@@ -79,6 +79,7 @@ interface Moderator extends BaseUser {
 }
 // ---cut---
 function checkIfModerator(user: Viewer | Moderator): asserts user is Moderator {
+  //                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
   if (user.level !== "moderator") {
     throw new Error("Not a moderator");
   }

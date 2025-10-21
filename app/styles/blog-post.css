@@ -76,3 +76,34 @@
     @apply rounded-none border-0 border-b-[1.5px] border-sky-700 bg-transparent py-1;
   }
 }
+
+.blog-post .expressive-code .twoslash-highlighted {
+  background-color: transparent;
+  border: none;
+  padding-bottom: 2px;
+  border-bottom: 1px solid #0284c7;
+  border-radius: 0px;
+}
+
+.blog-post .expressive-code .twoslash-static-container {
+  background-color: #fafafa;
+  border-color: #e5e5e5;
+}
+
+.blog-post .expressive-code .twoslash-static-container::before {
+  background-color: #fafafa;
+  border-top-color: #e5e5e5;
+  border-right-color: #e5e5e5;
+}
+
+.blog-post .expressive-code [id^="twoslash_popup_"] {
+  box-shadow:
+    0 20px 25px -5px rgb(0 0 0 / 0.1),
+    0 8px 10px -6px rgb(0 0 0 / 0.1);
+  border-color: #e5e5e5;
+}
+
+.blog-post .expressive-code [id^="twoslash_popup_"]::before {
+  border-top-color: #e5e5e5;
+  border-right-color: #e5e5e5;
+}
