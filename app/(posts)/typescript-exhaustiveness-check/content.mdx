@@ -27,7 +27,7 @@ type ApiState<T> =
   | { status: "error"; error: Error };
 
 function assertUnreachable(x: never): never {
-  throw new Error(`Unhandled state: ${JSON.stringify(x)}`);
+  throw new Error(`Unhandled case: ${JSON.stringify(x)}`);
 }
 
 type User = { id: number; name: string };
@@ -41,7 +41,7 @@ function displayData(state: ApiState<User>): string {
       return `Welcome, ${state.data.name}!`;
 
     default:
-      return assertUnreachable(state);
+      return assertUnreachable(state.status);
   }
 }
 ```
@@ -50,4 +50,37 @@ Notice how we get a compile-time error. The TypeScript compiler reminds us that 
 
 Inside the `default` block, TypeScript correctly narrows the type of state to `{ status: "error"; error: Error }`. Since this type is not `never`, passing it to our `assertUnreachable` function (which only accepts `never`) fails, triggering the error.
 
-This is extremely useful and prevents runtime errors from unhandled cases
+This is extremely useful and prevents runtime errors from unhandled cases.
+
+Now, if we handle the error case, the error goes away:
+
+```ts twoslash title="TypeScript" showLineNumbers
+type ApiState<T> =
+  | { status: "loading" }
+  | { status: "success"; data: T }
+  | { status: "error"; error: Error };
+
+function assertUnreachable(x: never): never {
+  throw new Error(`Unhandled case: ${JSON.stringify(x)}`);
+}
+
+type User = { id: number; name: string };
+
+function displayData(state: ApiState<User>): string {
+  switch (state.status) {
+    case "loading":
+      return "Loading user...";
+
+    case "success":
+      return `Welcome, ${state.data.name}!`;
+
+    case "error":
+      return `Error: ${state.error.message}`;
+
+    default:
+      return assertUnreachable(state);
+  }
+}
+```
+
+With the `error` case added, the `state` variable is correctly narrowed to `never` in the `default` block, satisfying the `assertUnreachable` function's type signature.
