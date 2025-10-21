@@ -18,7 +18,7 @@ Below, we have two functions:
 1. `isPerson`: A helper function that checks if an `age` property is present inside the `item` and returns `true` or `false` accordingly.
 2. `processItem`: Processes an `item` that could be either a `Person` or a `Product`. Inside, we use `isPerson` to narrow the item's type.
 
-```ts twoslash title="TypeScript"
+```ts {13-15} twoslash title="TypeScript"
 // @errors: 2339
 interface Person {
   name: string;
@@ -69,6 +69,7 @@ interface Product {
 type PersonOrProduct = Person | Product;
 // ---cut---
 function isPerson(item: PersonOrProduct): item is Person {
+  //                                      ^^^^^^^^^^^^^^
   return "age" in item;
 }
 ```
