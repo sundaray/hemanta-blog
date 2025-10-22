@@ -1,0 +1,69 @@
+---
+title: "What are Parameter Properties in TypeScript?"
+description: "Learn a concise way to declare and initialize class properties directly within the constructor parameters."
+author: "Hemanta Sundaray"
+publishedAt: "2025-10-26"
+tags: ["TypeScript"]
+isPublished: true
+---
+
+TypeScript offers special syntax called **parameter properties** that provide a convenient **shorthand for declaring and initializing class properties directly within the constructor parameters**.
+
+Below, we have class named `BankAccount`, where we have:
+
+1. Declared the properties at the top of the class.
+2. Accepted the parameters in the constructor.
+3. Assigned the parameters to the properties inside the constructor.
+
+```ts twoslash title="TypeScript" showLineNumbers
+class BankAccount {
+  public accountNumber: string;
+  protected owner: string;
+  private _balance: number;
+
+  constructor(accountNumber: string, owner: string, balance: number) {
+    this.accountNumber = accountNumber;
+    this.owner = owner;
+    this._balance = balance;
+  }
+
+  public get balance(): number {
+    return this._balance;
+  }
+}
+
+const johnBankAccount = new BankAccount("12345", "John", 100);
+
+console.log(johnBankAccount.balance);
+// 100
+```
+
+We can refactor our `BankAccount` class to use parameter properties, like this:
+
+```ts {7} twoslash title="TypeScript" showLineNumbers
+class BankAccount {
+  constructor(
+    public accountNumber: string,
+    protected owner: string,
+    private _balance: number,
+  ) {
+    // No code needed in here!
+  }
+
+  public get balance(): number {
+    return this._balance;
+  }
+}
+
+const johnBankAccount = new BankAccount("12345", "John", 100);
+
+console.log(johnBankAccount.balance);
+// 100
+```
+
+**Notice how the constructor body is now completely empty!**
+
+By adding access modifiers (`public`, `protected`, or `private`) directly in front of constructor parameters, we tell TypeScript to automatically do two things:
+
+1. Create class properties with that exact name and modifier.
+2. Automatically assign the value of the incoming argument to that new property.
