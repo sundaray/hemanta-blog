@@ -111,7 +111,7 @@ type UserPermissions = typeof userPermissions;
 type AllPermissionArrays = UserPermissions[keyof UserPermissions];
 ```
 
-### 2. Use number to get the element types from that union.
+### 2. Use `number` to get the element types from that union.
 
 Now we can apply the `number` operator to this new `AllPermissionArrays` type. This tells TypeScript to look inside each tuple in the union and pull out all of their element types into one, flat union:
 
