@@ -77,6 +77,10 @@
   }
 }
 
+.blog-post :where(h1, h2, h3, h4, h5, h6) > code {
+  font-size: 0.875em;
+}
+
 .blog-post .expressive-code .twoslash-highlighted {
   background-color: transparent;
   border: none;

@@ -11,7 +11,7 @@ Before we understand what branded types are and why we need them, we must unders
 
 TypeScript is a **structural type system**. This means that two types are considered compatible if they have the same _shape_ or _structure_, regardless of their declared names. TypeScript focuses on _what properties a type has_ rather than _what it's called_.
 
-## The Problem with Structural Typing
+## The Problem with Structural Typing 
 
 Structural typing is flexible, but can lead to subtle bugs. For example, below we have two type aliases, `UserId` and `ProductId`. Both are just aliases for the `string` type, but in our application, they represent two very different concepts. A function `fetchUserDetails` requires a `UserId` to be passed.
 

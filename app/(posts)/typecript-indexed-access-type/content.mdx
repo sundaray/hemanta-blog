@@ -81,7 +81,7 @@ type UserPermissions = typeof userPermissions;
 type EditorOrViewerPermissions = UserPermissions["editor" | "viewer"];
 ```
 
-## The Special number Syntax
+## The Special `number` Syntax
 
 When you use `number` as an index on an array/tuple type, TypeScript understands this to mean "the type of any element at any numeric index," which results in a union of all the element types.
 
