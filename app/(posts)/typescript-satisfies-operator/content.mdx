@@ -1,0 +1,74 @@
+---
+title: "What is the satisfies Operator in TypeScript?"
+description: "Learn how to simulate nominal typing within TypeScript's structural type system."
+author: "Hemanta Sundaray"
+publishedAt: "2025-10-26"
+tags: ["TypeScript"]
+isPublished: true
+---
+
+The `satisfies` operator lets you **validate** that a variable **conforms to a minimum contract** (a type) while still **preserving its own specific, inferred shape**.
+
+Let's walk through an example.
+
+Below we have a `Person` type, and we've annotated the `jim` variable with that `Person` type.
+
+```ts {10} twoslash title="TypeScript" showLineNumbers
+type Person = {
+  name: string;
+  age: number;
+  address?: {
+    street: string;
+    postcode?: string;
+  };
+};
+
+const jim: Person = {
+  name: "Jim",
+  age: 43,
+};
+```
+
+If you hover over `jim` in your editor, you will see its type has been "widened" to match the `Person` type:
+
+```ts title="TypeScript" showLineNumbers
+const jim: {
+  name: string;
+  age: number;
+  address?:
+    | {
+        street: string;
+        postcode?: string | undefined;
+      }
+    | undefined;
+};
+```
+
+Notice that the inferred type contains an optional `address` property, even though our `jim` object doesn't have an `address` field. TypeScript has "forgotten" the specific shape of our object and only remembers the `Person` contract.
+
+How can we make TypeScript ensure `jim` conforms to the `Person` shape, yet not widen the type to include the `address` field?
+
+We can use the `satisfies` operator.
+
+```ts {13} twoslash title="TypeScript" showLineNumbers
+type Person = {
+  name: string;
+  age: number;
+  address?: {
+    street: string;
+    postcode?: string;
+  };
+};
+
+const jim = {
+  //   ^?
+  name: "Jim",
+  age: 43,
+} satisfies Person;
+```
+
+Now, see that the type of `jim` is just its own shape.
+
+On one hand, TypeScript still checks that `{ name: "Jim", age: 43 }` is a valid `Person`. If we misspelled `name` or made `age` a string, it would throw an error. On the other hand, the `jim` variable keeps its narrow, inferred type. TypeScript knows for a fact it only has `name` and `age`.
+
+As you saw, the `satisfies` operator is one of the key mechanisms TypeScript offers to control type widening, giving you both type safety and type precision.
