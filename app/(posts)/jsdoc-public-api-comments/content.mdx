@@ -1,0 +1,84 @@
+---
+title: "Using JSDoc for API Comments"
+description: "Learn how to use JSDoc to write public API documentation that surfaces directly in your code editor."
+author: "Hemanta Sundaray"
+publishedAt: "2025-10-26"
+tags: ["TypeScript"]
+isPublished: true
+---
+
+Let's say you're building a library with a function that calculates shipping costs.
+
+```ts twoslash title="TypeScript" showLineNumbers
+// This function calculates the shipping cost based on weight and distance
+// weight is in kilograms
+// distance is in kilometers
+// Returns the cost in dollars
+function calculateShipping(weight: number, distance: number): number {
+  const baseRate = 5.0;
+  const perKgRate = 0.5;
+  const perKmRate = 0.1;
+
+  return baseRate + weight * perKgRate + distance * perKmRate;
+}
+```
+
+You've left a clear comment describing what the function does. But when a user of your library imports and tries to use this function, they don't see your helpful comments. Instead, they just see the function signature, like this:
+
+The solution is to use **JSDoc-formatted comments**.
+
+## JSDoc-Formatted Comments
+
+JSDoc (and its TypeScript-flavored variant, TSDoc) is a documentation standard that uses specially formatted comments. These comments start with `/**` (note the double asterisk) instead of the regular `//`, and they follow a specific structure that code editors can understand.
+
+When you write JSDoc comments, your editor surfaces that documentation directly in autocomplete tooltips and on-hover information. Your users get rich, inline help without ever leaving their current file.
+
+Let's rewrite the `calculateShipping` function with JSDoc:
+
+```ts twoslash title="TypeScript" showLineNumbers
+/**
+ * Calculates shipping cost based on package weight and delivery distance.
+ *
+ * @param weight - The package weight in kilograms
+ * @param distance - The delivery distance in kilometers
+ * @returns The shipping cost in US dollars
+ *
+ */
+function calculateShipping(weight: number, distance: number): number {
+  const baseRate = 5.0;
+  const perKgRate = 0.5;
+  const perKmRate = 0.1;
+
+  return baseRate + weight * perKgRate + distance * perKmRate;
+}
+```
+
+Now, when someone hovers over `calculateShipping` anywhere in their codebase, they see the full description. They have all the context they need, right where they need it.
+
+## The JSDoc Format Breakdown
+
+A JSDoc comment typically has three parts:
+
+- **The opening delimiter**: /\*\* (a slash followed by two asterisks).
+
+- **The description**: A brief summary of what the function, class, or type does.
+
+- **Block tags**: Special annotations starting with `@` that describe specific parts of the API.
+
+Common tags you'll use all the time:
+
+- **@param**: Describes a function parameter
+- **@returns**: Describes what the function returns
+- **@example**: Shows usage examples
+- **@throws**: Documents what errors might be thrown
+- **@deprecated**: Marks something as deprecated with migration guidance
+
+## Conclusion
+
+Here's the simplest way to think about it:
+
+- Regular comments are for the implementer (you, reading your own source code).
+
+- JSDoc comments are for the consumer (everyone using your code).
+
+If you are exporting a function, class, type, or constant from a file—in other words, if you intend for someone else to import and use it—you should add a JSDoc comment. It's a small effort that dramatically improves the developer experience for everyone who uses your code.
