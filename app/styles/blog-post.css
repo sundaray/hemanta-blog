@@ -94,6 +94,18 @@
   border-color: #e5e5e5;
 }
 
+.blog-post .expressive-code .twoslash-cursor {
+  background-color: #737373;
+}
+
+.blog-post .expressive-code .twoslash-completion-container {
+  border-color: #e5e5e5;
+}
+
+.blog-post .expressive-code .twoslash-completion-item-separator {
+  border-color: #e5e5e5;
+}
+
 .blog-post .expressive-code .twoslash-static-container::before {
   background-color: #fafafa;
   border-top-color: #e5e5e5;
