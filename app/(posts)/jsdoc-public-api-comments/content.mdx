@@ -7,9 +7,9 @@ tags: ["TypeScript"]
 isPublished: true
 ---
 
-Let's say you're building a library with a function that calculates shipping costs.
+Let's say you're building a library with a function that calculates shipping costs:
 
-```ts twoslash title="TypeScript" showLineNumbers
+```ts {1-4} twoslash title="TypeScript" showLineNumbers
 // This function calculates the shipping cost based on weight and distance
 // weight is in kilograms
 // distance is in kilometers
@@ -23,19 +23,25 @@ function calculateShipping(weight: number, distance: number): number {
 }
 ```
 
-You've left a clear comment describing what the function does. But when a user of your library imports and tries to use this function, they don't see your helpful comments. Instead, they just see the function signature, like this:
+You've left a comment describing what the function does. But when a user of your library imports and tries to use this function, they don't see your helpful comments. Hovering over the function name just shows them the function signature, like this:
 
-The solution is to use **JSDoc-formatted comments**.
+![Helpful JSDoc tooltip showing function details](/images/blog/ts-regular-comment.png)
+
+The reason users don't see the comments is because regular comments get stripped away during compilation.
+
+So, is there a way to ensure the comments visible to us are also visible to users in their code editor?
+
+Yes, there is. The solution is to use **JSDoc-formatted comments**.
 
 ## JSDoc-Formatted Comments
 
-JSDoc (and its TypeScript-flavored variant, TSDoc) is a documentation standard that uses specially formatted comments. These comments start with `/**` (note the double asterisk) instead of the regular `//`, and they follow a specific structure that code editors can understand.
+[JSDoc](https://jsdoc.app/) (and its TypeScript-flavored variant, [TSDoc](https://tsdoc.org/)) is a documentation standard that uses specially formatted comments. These comments start with `/**` (note the double asterisk) instead of the regular `//`, and they follow a specific structure that code editors can understand.
 
 When you write JSDoc comments, your editor surfaces that documentation directly in autocomplete tooltips and on-hover information. Your users get rich, inline help without ever leaving their current file.
 
 Let's rewrite the `calculateShipping` function with JSDoc:
 
-```ts twoslash title="TypeScript" showLineNumbers
+```ts {1-8} twoslash title="TypeScript" showLineNumbers
 /**
  * Calculates shipping cost based on package weight and delivery distance.
  *
@@ -53,7 +59,11 @@ function calculateShipping(weight: number, distance: number): number {
 }
 ```
 
-Now, when someone hovers over `calculateShipping` anywhere in their codebase, they see the full description. They have all the context they need, right where they need it.
+Now, when someone hovers over `calculateShipping` anywhere in their codebase, they see the full description:
+
+![Helpful JSDoc tooltip showing function details](/images/blog/ts-jsdoc-comment.png)
+
+They have all the context they need, right where they need it.
 
 ## The JSDoc Format Breakdown
 
@@ -81,4 +91,4 @@ Here's the simplest way to think about it:
 
 - JSDoc comments are for the consumer (everyone using your code).
 
-If you are exporting a function, class, type, or constant from a file—in other words, if you intend for someone else to import and use it—you should add a JSDoc comment. It's a small effort that dramatically improves the developer experience for everyone who uses your code.
+If you intend for someone else to import and use your code, you should add a JSDoc comment. It's a small effort that dramatically improves the developer experience for everyone who uses your code.
