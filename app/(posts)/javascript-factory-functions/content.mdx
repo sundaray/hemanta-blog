@@ -1,0 +1,76 @@
+---
+title: "Understanding Factory Functions in JavaScript"
+description: "Learn what factory functions are in JavaScript and the key benefits they bring to your code."
+author: "Hemanta Sundaray"
+publishedAt: "2025-10-26"
+tags: ["JavaScript"]
+isPublished: true
+---
+
+If you've worked with JavaScript, you've likely come across factory functions. They are a simple but incredibly powerful pattern for creating objects. In this post, I'll break down the key benefits they bring to your code.
+
+**A factory function is any function that returns objects**. That's it.
+
+Let's look at a real-world example. Below we have a factory function named `createShoppingCart`:
+
+```js title="JavaScript" showLineNumbers
+function createShoppingCart() {
+  // This "items" array is private, hidden inside the function's scope
+  const items = [];
+
+  // We return an object with public methods
+  return {
+    addItem(item) {
+      items.push(item);
+      console.log(item.name + " was added.");
+    },
+
+    deleteItem(itemName) {
+      const index = items.findIndex((item) => item.name === itemName);
+
+      if (index !== -1) {
+        items.splice(index, 1);
+      }
+
+      console.log(itemName + " was removed.");
+    },
+
+    getTotal() {
+      return items.reduce((total, item) => total + item.price, 0);
+    },
+  };
+}
+
+// --- How to use the factory ---
+const cart = createShoppingCart();
+cart.addItem({ name: "Laptop", price: 1000 });
+cart.addItem({ name: "Mouse", price: 50 });
+console.log("Total: $" + cart.getTotal()); // "Total: $1050"
+cart.deleteItem("Mouse");
+console.log("Total: $" + cart.getTotal()); // "Total: $1000"
+
+// --- This won't work, which is good! ---
+console.log(cart.items); // undefined
+```
+
+Now that we've seen a factory function in action, let's explore two key benefits this pattern provides.
+
+## Encapsulation Through Closures
+
+Encapsulation is the practice of hiding internal details and only exposing what's necessary for the outside world to interact with your code.
+
+In our shopping cart example, the `items` array is completely private. It exists inside the function's scope and cannot be accessed directly from outside. When we try to access `cart.items`, we get `undefined` because that variable simply doesn't exist on the returned object.
+
+This privacy is achieved through closures. A closure is JavaScript's way of allowing the returned methods to "remember" and access the variables from the factory function, even after the factory function has finished executing. So `addItem`, `deleteItem`, and `getTotal` can all see and work with the `items` array, but nothing outside the factory can.
+
+This is powerful because it prevents accidental bugs. We can't accidentally add an item without a `name` or `price`. We can't accidentally corrupt the array. Every interaction with our cart data must go through the methods we've defined, which act as gatekeepers ensuring the cart always stays in a valid state.
+
+## Decoupling Object Creation from Implementation
+
+Decoupling means separating "what something does" from "how it does it." The code that uses our shopping cart doesn't need to know anything about how the cart works internally. It just calls `cart.addItem()` and trusts that it will work.
+
+We just call `createShoppingCart()` and get a fully functional cart. We don't have to initialize the `items` array ourselves. We don't have to set up any internal state. The factory handles all of that for us.
+
+This separation is valuable because it gives us flexibility to change the implementation later without breaking existing code. Imagine we wanted to save items to localStorage, or add validation to check for duplicate items. We could make all those changes inside the factory function, and the code using the cart wouldn't need to change at all. As long as `addItem`, `deleteItem`, and `getTotal` still work the same way from the outside, our cart users are happy.
+
+The client code is decoupled from the implementation details. It depends on the interface (the three methods), not on how those methods accomplish their work internally.
