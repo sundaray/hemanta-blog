@@ -1,0 +1,70 @@
+---
+title: "Understanding abstract Classes in TypeScript"
+description: ""
+author: "Hemanta Sundaray"
+publishedAt: "2025-10-26"
+tags: ["TypeScript"]
+isPublished: true
+---
+
+An abstract class is a partially implemented class that:
+
+- Can have some implemented methods (concrete methods).
+- Can have abstract methods (just signatures, no implementation).
+
+Abstract classes and methods are defined using the `abstract` keyword before the class name or method name. This keyword tells TypeScript that the class is incomplete and needs to be extended before it can be used.
+
+Here is an example:
+
+```ts twoslash title="TypeScript" showLineNumbers
+abstract class Animal {
+  // Concrete method (has implementation)
+  eat() {
+    console.log("Eating...");
+  }
+
+  // Abstract method (no implementation - just signature)
+  abstract makeSound(): void;
+}
+```
+
+Note that an abstract class can’t be instantiated directly:
+
+```ts twoslash title="TypeScript" showLineNumbers
+// @errors: 2511
+abstract class Animal {
+  // ✅ Concrete method (has implementation)
+  eat() {
+    console.log("Eating...");
+  }
+
+  // ❌ Abstract method (no implementation - just signature)
+  abstract makeSound(): void;
+}
+// ---cut---
+const animal = new Animal();
+```
+
+**It must be extended** by a concrete subclass that implements all the abstract methods:
+
+```ts twoslash title="TypeScript" showLineNumbers
+abstract class Animal {
+  // ✅ Concrete method (has implementation)
+  eat() {
+    console.log("Eating...");
+  }
+
+  // ❌ Abstract method (no implementation - just signature)
+  abstract makeSound(): void;
+}
+// ---cut---
+class Dog extends Animal {
+  makeSound() {
+    console.log("Woof!");
+  }
+}
+
+const dog = new Dog();
+dog.eat(); // "Eating..."
+dog.makeSound(); // "Woof!"
+```
