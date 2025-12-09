@@ -68,7 +68,8 @@ export const handler: Handler = async () => {
   // 🔹 1. Connect to Supabase
   const sql = postgres(process.env.DATABASE_URL!, {
     ssl: "require",
-    max: 1, // Limit connections since Lambda scales horizontally
+    max: 5,
+    prepare: false,
   });
 
   try {
@@ -80,7 +81,7 @@ export const handler: Handler = async () => {
 
     // 🔹 3. Process in Batches (Concurrency Control)
     // Processing 5 at a time prevents overwhelming GitHub or the DB
-    const BATCH_SIZE = 5;
+    const BATCH_SIZE = 20;
     const results = { success: 0, failed: 0 };
 
     for (let i = 0; i < projects.length; i += BATCH_SIZE) {

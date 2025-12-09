@@ -2178,15 +2178,15 @@ async function fetchGitHubStats(owner, repo) {
 var handler = async () => {
   const sql = src_default(process.env.DATABASE_URL, {
     ssl: "require",
-    max: 1
-    // Limit connections since Lambda scales horizontally
+    max: 5,
+    prepare: false
   });
   try {
     const projects = await sql`
       SELECT id, name, url FROM oss_projects
     `;
     console.log(`\u{1F680} Found ${projects.length} projects to update.`);
-    const BATCH_SIZE = 5;
+    const BATCH_SIZE = 20;
     const results = { success: 0, failed: 0 };
     for (let i = 0; i < projects.length; i += BATCH_SIZE) {
       const batch = projects.slice(i, i + BATCH_SIZE);
