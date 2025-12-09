@@ -33,31 +33,31 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
         "group relative flex flex-col rounded-lg p-4 transition-all",
         "bg-gradient-to-bl from-neutral-100 to-neutral-50",
         "shadow-[inset_-2px_2px_#fff,_-4px_4px_10px_rgb(0_0_0_/_0.1)]",
-        "hover:-translate-y-1",
+        "hover:scale-[1.02]",
         "has-[.main-link:focus-visible]:-translate-y-1",
         "has-[.main-link:focus-visible]:ring-ring has-[.main-link:focus-visible]:ring-2",
         "has-[.main-link:focus-visible]:[&_.main-link:focus-visible]:outline-none",
         className,
       )}
     >
-      <div className="flex items-start justify-between gap-2">
-        <h3
+      {/* <div className="flex items-start justify-between gap-2"> */}
+      <h3
+        className={cn(
+          "text-pretty",
+          "transition-colors group-hover:text-sky-700",
+        )}
+      >
+        <Link
+          href={`/oss/${project.name}`}
           className={cn(
-            "text-pretty",
-            "transition-colors group-hover:text-sky-700",
+            "main-link",
+            "before:absolute before:inset-0 before:z-10 before:rounded-lg before:content-['']",
           )}
         >
-          <Link
-            href={`/oss/${project.name}`}
-            className={cn(
-              "main-link",
-              "before:absolute before:inset-0 before:z-10 before:rounded-lg before:content-['']",
-            )}
-          >
-            {project.name}
-          </Link>
-        </h3>
-        {project.homepage && (
+          {project.name}
+        </Link>
+      </h3>
+      {/* {project.homepage && (
           <motion.a
             href={project.homepage}
             target="_blank"
@@ -66,7 +66,7 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
               "text-muted-foreground hover:text-foreground relative z-20",
               "-m-2 p-2",
               "rounded-full",
-              "focus-visible:ring-ring focus-visible:ring-2",
+              "focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2",
             )}
             aria-label="Visit project website"
             onClick={(e) => e.stopPropagation()}
@@ -78,8 +78,8 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
               <Icons.globe className="size-4 shrink-0" />
             </motion.div>
           </motion.a>
-        )}
-      </div>
+        )} */}
+      {/* </div> */}
 
       <div className="mt-4 flex flex-col gap-2 text-sm text-neutral-600">
         <StatItem icon={Icons.star} label="Stars" value={project.stars} />

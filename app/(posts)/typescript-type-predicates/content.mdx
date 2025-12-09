@@ -47,7 +47,7 @@ This code produces an error, but why? The logic inside `isPerson` is perfectly s
 
 The problem is that to the TypeScript compiler, the `isPerson` function is a "black box." It knows the function takes a `PersonOrProduct` and returns a `boolean`, but it has no idea that the `true` or `false` value is related to the type of item.
 
-So, even inside the `if` (isPerson(item)) block, TypeScript's understanding of the `item` variable has not changed. It still thinks item is a `PersonOrProduct`, and it correctly points out that you can't safely access `.age` on a `PersonOrProduct`.
+So, even inside the `if (isPerson(item))` block, TypeScript's understanding of the `item` variable has not changed. It still thinks item is a `PersonOrProduct`, and it correctly points out that you can't safely access `.age` on a `PersonOrProduct`.
 
 So, how do we fix this?
 
