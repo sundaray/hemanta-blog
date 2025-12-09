@@ -32,6 +32,10 @@ async function fetchGitHubStats(
   repo: string,
 ): Promise<GitHubRepoResponse | null> {
   try {
+    // 🔹 Add an abort controller to force a 5-second timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
     const response = await fetch(
       `https://api.github.com/repos/${owner}/${repo}`,
       {
@@ -40,8 +44,11 @@ async function fetchGitHubStats(
           "X-GitHub-Api-Version": "2022-11-28",
           "User-Agent": "oss-stats-updater",
         },
+        signal: controller.signal, // Connect the signal
       },
     );
+
+    clearTimeout(timeoutId); // Clear timeout if successful
 
     if (!response.ok) {
       console.error(

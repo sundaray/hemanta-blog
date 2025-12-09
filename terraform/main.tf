@@ -61,13 +61,13 @@ resource "aws_cloudwatch_log_group" "lambda_logs" {
 # ============================================================================
 
 resource "aws_lambda_function" "oss_updater" {
-  filename         = "${path.module}/../lambda/function.zip"
-  function_name    = "${var.project_name}-oss-updater"
-  role             = aws_iam_role.lambda_role.arn
-  handler          = "index.handler"
-  runtime          = "nodejs20.x"
-  timeout          = 300
-  memory_size      = 256
+  filename      = "${path.module}/../lambda/function.zip"
+  function_name = "${var.project_name}-oss-updater"
+  role          = aws_iam_role.lambda_role.arn
+  handler       = "index.handler"
+  runtime       = "nodejs20.x"
+  timeout       = 900
+  memory_size   = 256
 
   source_code_hash = filebase64sha256("${path.module}/../lambda/function.zip")
 

@@ -2148,6 +2148,8 @@ function parseGitHubUrl(url) {
 }
 async function fetchGitHubStats(owner, repo) {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5e3);
     const response = await fetch(
       `https://api.github.com/repos/${owner}/${repo}`,
       {
@@ -2155,9 +2157,12 @@ async function fetchGitHubStats(owner, repo) {
           Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
           "X-GitHub-Api-Version": "2022-11-28",
           "User-Agent": "oss-stats-updater"
-        }
+        },
+        signal: controller.signal
+        // Connect the signal
       }
     );
+    clearTimeout(timeoutId);
     if (!response.ok) {
       console.error(
         `GitHub API Error ${owner}/${repo}: ${response.statusText}`
