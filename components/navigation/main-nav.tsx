@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import type { NavItem as NavItemType } from "@/types";
 
+import { HireMeButton } from "@/components/navigation/hire-me-button";
 import { MobileNav } from "@/components/navigation/mobile-nav";
 import { NavLinks } from "@/components/navigation/nav-links";
 
@@ -12,27 +13,35 @@ type MainNavProps = {
 export async function MainNav({ links }: MainNavProps) {
   return (
     <div className="flex h-full w-full items-center justify-between">
-      <div className="flex items-center space-x-3">
+      {/* 🔹 LEFT GROUP: Logo + Navigation Links */}
+      <div className="flex h-full items-center gap-8">
         <Link
           href="/"
           aria-label="Go to homepage"
-          className="focus-ring hidden h-full items-center text-lg font-bold tracking-tight md:flex"
+          className="focus-ring flex items-center text-lg font-bold tracking-tight"
         >
-          Hemanta Sundaray
+          <span className="hidden md:inline">Hemanta Sundaray</span>
+          <span className="inline md:hidden">HS</span>
         </Link>
 
-        <Link
-          href="/"
-          aria-label="Go to homepage"
-          className="flex items-center font-bold tracking-tight md:hidden"
-        >
-          HS
-        </Link>
+        {/* Links: Hidden on mobile, visible on desktop */}
+        <div className="hidden h-full md:flex">
+          <NavLinks links={links} className="h-full" />
+        </div>
       </div>
-      <div className="ml-auto md:hidden">
-        <MobileNav />
+
+      {/* 🔹 RIGHT GROUP: Hire Me Button + Mobile Menu */}
+      <div className="flex items-center gap-4">
+        {/* Hire Me: Hidden on mobile, visible on desktop */}
+        <div className="hidden md:block">
+          <HireMeButton />
+        </div>
+
+        {/* Mobile Menu: Visible only on mobile */}
+        <div className="md:hidden">
+          <MobileNav />
+        </div>
       </div>
-      <NavLinks links={links} className="hidden h-full md:ml-6 md:flex" />
     </div>
   );
 }

@@ -126,7 +126,7 @@ function MenuDrawer({ onLinkClick }: { onLinkClick: () => void }) {
       animate="open"
       exit="closed"
       variants={drawerVariants}
-      className="bg-background fixed left-0 right-0 top-[var(--main-nav-height)] z-40 h-[calc(100vh-var(--main-nav-height))] w-full border-t p-6"
+      className="bg-background fixed left-0 right-0 top-[var(--main-nav-height)] z-50 h-[calc(100vh-var(--main-nav-height))] w-full border-t p-6"
       role="dialog"
       aria-modal="true"
     >
@@ -143,6 +143,11 @@ function MenuDrawer({ onLinkClick }: { onLinkClick: () => void }) {
               </MobileNavLink>
             </motion.li>
           ))}
+          <motion.li variants={itemVariants} className="w-full">
+            <MobileNavLink href="/hire-me" onClick={onLinkClick}>
+              Hire Me
+            </MobileNavLink>
+          </motion.li>
         </motion.ul>
       </nav>
     </motion.div>
