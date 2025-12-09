@@ -17,14 +17,14 @@ export function MainNavWrapper({ children }: { children: React.ReactNode }) {
   return (
     <div
       className={cn(
-        "fixed inset-x-0 top-0 z-50 mx-auto h-[var(--main-nav-height)] max-w-7xl px-4 transition-all xl:px-0",
+        "fixed inset-x-0 top-0 z-50 h-[var(--main-nav-height)] transition-all",
         {
           "bg-background/90 border-b backdrop-blur-sm": scrolled,
           "bg-background": !scrolled,
         },
       )}
     >
-      {children}
+      <div className="mx-auto h-full max-w-7xl px-4 xl:px-0">{children}</div>
     </div>
   );
 }

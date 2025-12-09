@@ -1,9 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 import { cn } from "@/lib/utils";
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -17,22 +19,9 @@ type DynamicBreadcrumbProps = {
   className?: string;
 };
 
-function unslugify(slug: string): string {
-  if (slug.toLowerCase() === "oss") {
-    return "OSS";
-  }
-  return slug
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}
-
 export function DynamicBreadcrumb({ className }: DynamicBreadcrumbProps) {
   const pathname = usePathname();
-  const segments = pathname.split("/").filter(Boolean); // ✏️ We use the full, unmodified segments array
-
-  const isOssDetailPage = segments[0] === "oss" && segments.length === 2;
-  const isBlogPostPage = segments[0] === "blog" && segments.length === 2;
+  const segments = pathname.split("/").filter(Boolean);
 
   return (
     <Breadcrumb className={cn(className)}>
@@ -41,35 +30,31 @@ export function DynamicBreadcrumb({ className }: DynamicBreadcrumbProps) {
           <BreadcrumbLink asChild>
             <Link
               href="/"
-              className="font-mono font-medium text-sky-600 hover:text-sky-600 hover:underline"
+              className="font-mono font-medium text-neutral-500 hover:text-sky-700"
             >
               Home
             </Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
         {segments.map((segment, index) => {
-          if (isBlogPostPage && index === segments.length - 1) {
-            return null;
-          }
-
           const href = `/${segments.slice(0, index + 1).join("/")}`;
           const isLast = index === segments.length - 1;
 
           return (
             <React.Fragment key={href}>
-              <BreadcrumbSeparator>/</BreadcrumbSeparator>
+              <BreadcrumbSeparator />
               <BreadcrumbItem>
                 {isLast ? (
-                  <BreadcrumbPage className="font-mono font-medium text-foreground">
-                    {isOssDetailPage ? segment : unslugify(segment)}
+                  <BreadcrumbPage className="font-mono font-medium text-neutral-500">
+                    {segment}
                   </BreadcrumbPage>
                 ) : (
                   <BreadcrumbLink asChild>
                     <Link
                       href={href}
-                      className="font-mono font-medium text-sky-700 hover:text-sky-700 hover:underline"
+                      className="font-mono font-medium text-neutral-500 hover:text-sky-700"
                     >
-                      {unslugify(segment)}
+                      {segment}
                     </Link>
                   </BreadcrumbLink>
                 )}

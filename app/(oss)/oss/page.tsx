@@ -70,13 +70,13 @@ export default async function OssPage(props: PageProps<"/oss">) {
   return (
     <div className="container mx-auto max-w-7xl px-4 sm:px-6">
       <div className="text-center">
-        <ArrowLink
+        {/* <ArrowLink
           href="/"
           className="mb-4 font-semibold text-sky-700"
           direction="left"
         >
           Back to home
-        </ArrowLink>
+        </ArrowLink> */}
         <h1>Open Source Software</h1>
         <p className="mx-auto mt-8 max-w-3xl text-balance text-lg text-neutral-600">
           A collection of open-source projects I use or find interesting. Most

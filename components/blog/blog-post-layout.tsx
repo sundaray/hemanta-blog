@@ -27,13 +27,13 @@ export function BlogPostLayout({
     <div className="lg:grid-cols-16 mx-auto max-w-6xl px-4 sm:px-6 lg:grid lg:gap-x-8">
       <article className="lg:contents">
         <header className="border-input lg:col-span-16 mx-auto border-b pb-12 text-center">
-          <ArrowLink
+          {/* <ArrowLink
             href="/blog"
             className="font-semibold text-sky-700"
             direction="left"
           >
             Back to blog
-          </ArrowLink>
+          </ArrowLink> */}
           <h1 className="mt-6 text-balance">{title}</h1>
           <div className="mt-12 flex w-full items-center justify-center space-x-4">
             <Image

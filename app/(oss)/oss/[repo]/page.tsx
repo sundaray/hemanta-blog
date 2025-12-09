@@ -56,13 +56,13 @@ export default async function OssProjectDetailsPage(
 
   return (
     <div className="container mx-auto max-w-4xl px-4 sm:px-6">
-      <ArrowLink
+      {/* <ArrowLink
         href="/oss"
         className="mb-4 px-0 font-semibold text-sky-700"
         direction="left"
       >
         Back to OSS
-      </ArrowLink>
+      </ArrowLink> */}
       <article className="flex flex-col">
         <div className="flex flex-col">
           <h1>{project.name}</h1>
