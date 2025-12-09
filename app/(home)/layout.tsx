@@ -6,8 +6,14 @@ import { MainNav } from "@/components/navigation/main-nav";
 import { MainNavWrapper } from "@/components/navigation/main-nav-wrapper";
 
 export const metadata: Metadata = {
-  title: "Hemanta Sundaray",
-  description: "",
+  title: "Home",
+  description:
+    "Welcome to Hemanta Sundaray's portfolio. Full-stack developer specializing in TypeScript, React, Node.js, and PostgreSQL.",
+  openGraph: {
+    title: "Hemanta Sundaray | Full-Stack Developer",
+    description:
+      "Welcome to Hemanta Sundaray's portfolio. Full-stack developer specializing in TypeScript, React, Node.js, and PostgreSQL.",
+  },
 };
 
 export default function HomeLayout(props: LayoutProps<"/">) {

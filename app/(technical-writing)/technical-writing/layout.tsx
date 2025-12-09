@@ -8,9 +8,14 @@ import { MainNavWrapper } from "@/components/navigation/main-nav-wrapper";
 
 export const metadata: Metadata = {
   title: "Technical Writing",
-  description: "",
+  description:
+    "Technical articles written for KodeKloud covering DevOps and Cloud Native technologies.",
+  openGraph: {
+    title: "Technical Writing | Hemanta Sundaray",
+    description:
+      "Technical articles covering DevOps and Cloud Native technologies.",
+  },
 };
-
 export default function OssPageLayout(
   props: LayoutProps<"/technical-writing">,
 ) {

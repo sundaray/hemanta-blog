@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import type { Metadata } from "next";
 import { FaGithub } from "react-icons/fa";
 
 import { getOssProjectByName } from "@/lib/get-oss-project-by-name";
@@ -16,6 +17,43 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { TopicTagGroup } from "@/components/ui/topic-tag-group";
+
+export async function generateMetadata(
+  props: PageProps<"/oss/[repo]">,
+): Promise<Metadata> {
+  const { repo } = await props.params;
+  const decodedRepoName = decodeURIComponent(repo);
+
+  const result = await getOssProjectByName(decodedRepoName);
+
+  if (result.isErr() || !result.value) {
+    return {
+      title: "Project Not Found",
+      description: "The requested open-source project could not be found.",
+    };
+  }
+
+  const project = result.value;
+
+  return {
+    title: project.name,
+    description:
+      project.description ||
+      `Explore ${project.name} – an open-source project featured in Hemanta Sundaray's OSS collection.`,
+    openGraph: {
+      title: `${project.name} | Open Source Software`,
+      description:
+        project.description ||
+        `Explore ${project.name} – an open-source project.`,
+      type: "website",
+    },
+    twitter: {
+      card: "summary",
+      title: project.name,
+      description: project.description || `Explore ${project.name}`,
+    },
+  };
+}
 
 export default async function OssProjectDetailsPage(
   props: PageProps<"/oss/[repo]">,

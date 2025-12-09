@@ -7,8 +7,14 @@ import { MainNav } from "@/components/navigation/main-nav";
 import { MainNavWrapper } from "@/components/navigation/main-nav-wrapper";
 
 export const metadata: Metadata = {
-  title: "Blog | hemantasundaray.com",
-  description: "",
+  title: "Blog",
+  description:
+    "Articles on full-stack web development covering TypeScript, React, Node.js, PostgreSQL, and modern web technologies.",
+  openGraph: {
+    title: "Blog | Hemanta Sundaray",
+    description:
+      "Articles on full-stack web development covering TypeScript, React, Node.js, PostgreSQL, and modern web technologies.",
+  },
 };
 
 export default function BlogPageLayout(props: LayoutProps<"/blog">) {

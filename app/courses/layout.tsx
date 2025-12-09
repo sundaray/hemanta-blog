@@ -7,8 +7,13 @@ import { MainNav } from "@/components/navigation/main-nav";
 import { MainNavWrapper } from "@/components/navigation/main-nav-wrapper";
 
 export const metadata: Metadata = {
-  title: "Courses | hemantasundaray.com",
-  description: "Courses by Hemanta Sundaray.",
+  title: "Courses",
+  description:
+    "Upcoming courses on full-stack web development by Hemanta Sundaray. ",
+  openGraph: {
+    title: "Courses | Hemanta Sundaray",
+    description: "Upcoming courses on full-stack web development.",
+  },
 };
 
 export default function CoursesPageLayout(props: LayoutProps<"/courses">) {

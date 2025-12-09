@@ -11,14 +11,32 @@ export async function generateMetadata(
   try {
     const { slug } = await props.params;
     const { frontmatter } = await getBlogPostBySlug(slug);
+
     return {
       title: frontmatter.title,
       description: frontmatter.description,
+      authors: [{ name: frontmatter.author }],
+      keywords: frontmatter.tags,
+      openGraph: {
+        title: frontmatter.title,
+        description: frontmatter.description,
+        type: "article",
+        publishedTime: frontmatter.publishedAt,
+        modifiedTime: frontmatter.updatedAt,
+        authors: [frontmatter.author],
+        tags: frontmatter.tags,
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: frontmatter.title,
+        description: frontmatter.description,
+      },
     };
   } catch (error) {
-    console.error("Failed to render blog post:", error);
+    console.error("Failed to generate metadata for blog post:", error);
     return {
       title: "Post Not Found",
+      description: "The requested blog post could not be found.",
     };
   }
 }
