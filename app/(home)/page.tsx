@@ -18,7 +18,7 @@ export default function HomePage() {
         {/* 🔹 2. Intro Section */}
         <div className="space-y-4">
           <h1 className="text-4xl">
-            Hello world! <span className="animate-wave inline-block">👋</span>
+            Hello! <span className="animate-wave inline-block">👋</span>
           </h1>
           <p className="text-lg leading-relaxed text-neutral-700">
             Welcome to my humble abode on the internet. I&apos;m Hemanta

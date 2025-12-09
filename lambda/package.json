@@ -1,0 +1,17 @@
+{
+  "name": "update-oss-stats",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --outfile=dist/index.js"
+  },
+  "dependencies": {
+    "postgres": "^3.4.7"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.145",
+    "@types/node": "^20",
+    "esbuild": "^0.24.0",
+    "typescript": "^5"
+  }
+}
