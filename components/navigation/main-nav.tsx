@@ -20,8 +20,7 @@ export async function MainNav({ links }: MainNavProps) {
           aria-label="Go to homepage"
           className="focus-ring flex items-center text-lg font-bold tracking-tight"
         >
-          <span className="hidden md:inline">Hemanta Sundaray</span>
-          <span className="inline md:hidden">HS</span>
+          Hemanta Sundaray
         </Link>
 
         {/* Links: Hidden on mobile, visible on desktop */}

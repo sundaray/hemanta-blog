@@ -1,6 +1,6 @@
 export default function HireMePage() {
   return (
-    <div className="container mx-auto max-w-3xl px-4 xl:px-0">
+    <div className="container mx-auto max-w-2xl px-4 xl:px-0">
       <div>
         <h1 className="text-center">Hire Me</h1>
         <div className="mt-8 space-y-6 text-lg leading-relaxed text-neutral-700">

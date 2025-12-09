@@ -19,7 +19,7 @@ export function BreadcrumbBar() {
   return (
     <div
       className={cn(
-        "fixed top-[var(--main-nav-height)] z-50 flex h-10 w-full items-center bg-neutral-100 transition-shadow",
+        "fixed top-[var(--main-nav-height)] z-50 flex h-8 w-full items-center bg-neutral-100 transition-shadow",
         scrolled && "shadow-sm",
       )}
     >

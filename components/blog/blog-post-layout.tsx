@@ -60,7 +60,7 @@ export function BlogPostLayout({
       </article>
 
       <aside className="lg:col-start-14 lg:col-end-17 mt-12 hidden lg:block">
-        <div className="sticky top-36">
+        <div className="sticky top-32">
           <TableOfContents toc={toc} />
         </div>
       </aside>

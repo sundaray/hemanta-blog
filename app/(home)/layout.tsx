@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+
+import { navbarLinks } from "@/config/navbar";
+
 import { MainNav } from "@/components/navigation/main-nav";
 import { MainNavWrapper } from "@/components/navigation/main-nav-wrapper";
-import { navbarLinks } from "@/config/navbar";
 
 export const metadata: Metadata = {
   title: "Hemanta Sundaray",
@@ -16,7 +18,9 @@ export default function HomeLayout(props: LayoutProps<"/">) {
           <MainNav links={navbarLinks.main} />
         </MainNavWrapper>
       </header>
-      <main className="flex-1 py-32">{props.children}</main>
+      <main className="flex-1 py-[var(--main-content-padding)]">
+        {props.children}
+      </main>
     </>
   );
 }
