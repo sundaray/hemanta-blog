@@ -20,7 +20,9 @@ export default function CoursesPageLayout(props: LayoutProps<"/courses">) {
         </MainNavWrapper>
         <BreadcrumbBar />
       </header>
-      <main className="flex-1 py-40">{props.children}</main>
+      <main className="flex-1 py-[var(--main-content-padding)]">
+        {props.children}
+      </main>
     </>
   );
 }

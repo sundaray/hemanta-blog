@@ -20,7 +20,9 @@ export default function OssPageLayout(props: LayoutProps<"/oss">) {
         </MainNavWrapper>
         <BreadcrumbBar />
       </header>
-      <main className="py-46 flex-1">{props.children}</main>
+      <main className="flex-1 py-[var(--main-content-padding)]">
+        {props.children}
+      </main>
     </>
   );
 }

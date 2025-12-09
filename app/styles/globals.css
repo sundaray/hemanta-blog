@@ -6,6 +6,7 @@
 
 @theme inline {
   --main-nav-height: 4rem;
+  --main-content-padding: 12rem;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
