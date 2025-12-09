@@ -34,7 +34,7 @@ export default function HomePage() {
           <p className="text-lg leading-relaxed text-neutral-700">
             I worked in the fashion industry for 13 years before pivoting in
             2022 to pursue software engineering full-time. Since then, I have
-            been learning and building projects to hone my skills.
+            been learning and building projects to improve my skill set.
           </p>
         </section>
 
