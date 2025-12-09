@@ -150,7 +150,7 @@ export function OssProjectsContent({
           <OssProjectsSidebar
             uniqueTopics={uniqueTopics}
             uniqueLanguages={uniqueLanguages}
-            className="hidden w-64 lg:sticky lg:top-24 lg:block lg:self-start"
+            className="hidden w-64 lg:sticky lg:top-36 lg:block lg:self-start"
             hasActiveSidebarFilters={hasActiveSidebarFilters}
             onClearAllFilters={handleClearSidebarFilters}
             selectedTopics={filters.topic}

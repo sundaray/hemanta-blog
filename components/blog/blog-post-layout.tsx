@@ -26,14 +26,7 @@ export function BlogPostLayout({
   return (
     <div className="lg:grid-cols-16 mx-auto max-w-6xl px-4 sm:px-6 lg:grid lg:gap-x-8">
       <article className="lg:contents">
-        <header className="border-input lg:col-span-16 mx-auto border-b pb-12 text-center">
-          {/* <ArrowLink
-            href="/blog"
-            className="font-semibold text-sky-700"
-            direction="left"
-          >
-            Back to blog
-          </ArrowLink> */}
+        <header className="border-input lg:col-span-16 w-full border-b pb-12 text-center">
           <h1 className="mt-6 text-balance">{title}</h1>
           <div className="mt-12 flex w-full items-center justify-center space-x-4">
             <Image
@@ -67,7 +60,7 @@ export function BlogPostLayout({
       </article>
 
       <aside className="lg:col-start-14 lg:col-end-17 mt-12 hidden lg:block">
-        <div className="sticky top-24">
+        <div className="sticky top-36">
           <TableOfContents toc={toc} />
         </div>
       </aside>
