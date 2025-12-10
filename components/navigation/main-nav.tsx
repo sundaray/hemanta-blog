@@ -1,21 +1,18 @@
+import { Suspense } from "react";
 import Link from "next/link";
 
 import type { NavItem as NavItemType } from "@/types";
 
-import { getSession } from "@/lib/auth/session";
-
 import { HireMeButton } from "@/components/navigation/hire-me-button";
 import { MobileNav } from "@/components/navigation/mobile-nav";
 import { NavLinks } from "@/components/navigation/nav-links";
-import { UserAccountNavClient } from "@/components/navigation/user-account-nav-client";
+import { UserAuthStatus } from "@/components/navigation/user-auth-status";
 
 type MainNavProps = {
   links: NavItemType[];
 };
 
 export async function MainNav({ links }: MainNavProps) {
-  const { user } = await getSession();
-
   return (
     <div className="flex h-full w-full items-center justify-between">
       <div className="flex h-full items-center gap-8">
@@ -34,11 +31,9 @@ export async function MainNav({ links }: MainNavProps) {
 
       <div className="flex items-center gap-4">
         <div className="hidden md:block">
-          {user?.email ? (
-            <UserAccountNavClient email={user.email} />
-          ) : (
-            <HireMeButton />
-          )}
+          <Suspense fallback={<HireMeButton />}>
+            <UserAuthStatus />
+          </Suspense>
         </div>
         <div className="md:hidden">
           <MobileNav />

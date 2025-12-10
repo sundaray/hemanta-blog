@@ -6,6 +6,8 @@ import { BreadcrumbBar } from "@/components/breadcrumb-bar";
 import { MainNav } from "@/components/navigation/main-nav";
 import { MainNavWrapper } from "@/components/navigation/main-nav-wrapper";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Sign-in",
 };
