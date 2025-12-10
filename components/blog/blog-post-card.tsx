@@ -16,8 +16,8 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
       className={cn(
         "group relative rounded-lg hover:bg-neutral-200/40",
         "-mx-4 px-4 py-4 sm:-mx-6 sm:px-6",
-        "has-[_a:focus-visible]:ring-ring has-[_a:focus-visible]:ring-2",
-        "has-[_a:focus-visible]:[&_a:focus-visible]:outline-none",
+        "has-[a:focus-visible]:ring-ring has-[a:focus-visible]:ring-2",
+        "has-[a:focus-visible]:[&_a:focus-visible]:outline-none",
       )}
     >
       <p className="text-muted-foreground font-mono text-sm">
@@ -28,14 +28,14 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
         })}
       </p>
       <h2 className="mt-2 group-hover:text-sky-700">
-        <Link
+        <a
           href={`/blog/${post.slug}`}
           className={cn(
             "before:absolute before:inset-0 before:z-10 before:rounded-lg before:content-['']",
           )}
         >
           {post.title}
-        </Link>
+        </a>
       </h2>
       {post.description && (
         <p className="mt-4 line-clamp-2 text-neutral-600">{post.description}</p>
