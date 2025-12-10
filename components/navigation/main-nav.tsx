@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import Link from "next/link";
 
 import type { NavItem as NavItemType } from "@/types";
@@ -35,13 +34,11 @@ export async function MainNav({ links }: MainNavProps) {
 
       <div className="flex items-center gap-4">
         <div className="hidden md:block">
-          <Suspense fallback={<HireMeButton />}>
-            {user?.email ? (
-              <UserAccountNavClient email={user.email} />
-            ) : (
-              <HireMeButton />
-            )}
-          </Suspense>
+          {user?.email ? (
+            <UserAccountNavClient email={user.email} />
+          ) : (
+            <HireMeButton />
+          )}
         </div>
         <div className="md:hidden">
           <MobileNav user={user} />
