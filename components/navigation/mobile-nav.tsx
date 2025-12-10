@@ -1,19 +1,24 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { signOutAction } from "@/app/actions";
+import type { User } from "lucidauth/core/types";
 import { AnimatePresence, motion, MotionConfig } from "motion/react";
 import type { Route } from "next";
 
 import { navbarLinks } from "@/config/navbar";
 import { cn } from "@/lib/utils";
 
+import { Icons } from "@/components/icons";
+import { Button } from "@/components/ui/button";
+
 // ============================================================================
 // MobileNav
 // ============================================================================
-export function MobileNav() {
+export function MobileNav({ user }: { user: User | null }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -36,7 +41,9 @@ export function MobileNav() {
     <div className="md:hidden">
       <MenuIcon isOpen={isOpen} onToggle={toggleMenu} />
       <AnimatePresence>
-        {isOpen && <MenuDrawer onLinkClick={() => setIsOpen(false)} />}
+        {isOpen && (
+          <MenuDrawer onLinkClick={() => setIsOpen(false)} user={user} />
+        )}
       </AnimatePresence>
     </div>
   );
@@ -96,8 +103,22 @@ function MenuIcon({
 // ============================================================================
 // MenuDrawer
 // ============================================================================
-function MenuDrawer({ onLinkClick }: { onLinkClick: () => void }) {
+function MenuDrawer({
+  onLinkClick,
+  user,
+}: {
+  onLinkClick: () => void;
+  user: User | null;
+}) {
   const items = navbarLinks.main;
+  const [isPending, startTransition] = useTransition();
+
+  const handleSignOut = () => {
+    startTransition(async () => {
+      await signOutAction();
+      onLinkClick();
+    });
+  };
 
   const drawerVariants = {
     closed: { opacity: 0 },
@@ -144,9 +165,32 @@ function MenuDrawer({ onLinkClick }: { onLinkClick: () => void }) {
             </motion.li>
           ))}
           <motion.li variants={itemVariants} className="w-full">
-            <MobileNavLink href="/hire-me" onClick={onLinkClick}>
-              Hire Me
-            </MobileNavLink>
+            {user?.email ? (
+              <div className="flex w-full flex-col items-center gap-4 py-4">
+                <Button
+                  onClick={handleSignOut}
+                  disabled={isPending}
+                  className="w-full"
+                  variant="default"
+                >
+                  {isPending ? (
+                    <>
+                      <Icons.spinner className="mr-2 size-4 animate-spin" />
+                      <span className="text-sm">Sign out</span>
+                    </>
+                  ) : (
+                    <>
+                      <Icons.logOut className="mr-2 size-4" />
+                      <span className="text-sm">Sign out</span>
+                    </>
+                  )}
+                </Button>{" "}
+              </div>
+            ) : (
+              <MobileNavLink href="/hire-me" onClick={onLinkClick}>
+                Hire Me
+              </MobileNavLink>
+            )}
           </motion.li>
         </motion.ul>
       </nav>

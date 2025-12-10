@@ -1,5 +1,14 @@
 "use client";
 
+import { useMemo, type TransitionStartFunction } from "react";
+
+import { useQueryStates } from "nuqs";
+
+import { calculatePaginationRange } from "@/lib/pagination";
+import { searchParams } from "@/lib/search-params";
+import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
+
 import {
   Pagination,
   PaginationContent,
@@ -9,13 +18,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { searchParams } from "@/lib/search-params";
-import { calculatePaginationRange } from "@/lib/pagination";
-import { cn } from "@/lib/utils";
-import { useQueryStates } from "nuqs";
-import { useMemo, type TransitionStartFunction } from "react";
-
-const SIBLING_COUNT = 2;
 
 type OssProjectsPaginationProps = {
   totalPages: number;
@@ -28,6 +30,8 @@ export function OssProjectsPagination({
   className,
   startTransition,
 }: OssProjectsPaginationProps) {
+  const isMobile = useIsMobile();
+
   const [filters, setFilters] = useQueryStates(searchParams, {
     startTransition,
     shallow: false,
@@ -35,8 +39,10 @@ export function OssProjectsPagination({
   });
   const currentPage = filters.page;
 
+  const siblingCount = isMobile ? 1 : 1;
+
   const paginationRange = useMemo(
-    () => calculatePaginationRange(currentPage, totalPages, SIBLING_COUNT),
+    () => calculatePaginationRange(currentPage, totalPages, siblingCount),
     [currentPage, totalPages],
   );
 

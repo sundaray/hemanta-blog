@@ -13,8 +13,13 @@ export async function proxy(request: NextRequest) {
   const isProtectedRoute = protectedRoutes.some((route) =>
     pathname.startsWith(route),
   );
-
   const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
+  const isAccessDeniedPage = pathname === "/access-denied";
+
+  // 1. Redirect Authorized Admin AWAY from Access Denied page
+  if (isAccessDeniedPage && session?.user?.email === ADMIN_EMAIL) {
+    return NextResponse.redirect(new URL("/admin", request.url));
+  }
 
   // 1. Unauthenticated users trying to access protected routes
   if (isProtectedRoute) {
@@ -27,9 +32,7 @@ export async function proxy(request: NextRequest) {
 
     // 2. Authenticated but UNAUTHORIZED users (Wrong Email)
     if (session.user.email !== ADMIN_EMAIL) {
-      return NextResponse.redirect(
-        new URL("/admin/access-denied", request.url),
-      );
+      return NextResponse.redirect(new URL("/access-denied", request.url));
     }
   }
 

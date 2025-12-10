@@ -6,12 +6,18 @@ import { BreadcrumbBar } from "@/components/breadcrumb-bar";
 import { MainNav } from "@/components/navigation/main-nav";
 import { MainNavWrapper } from "@/components/navigation/main-nav-wrapper";
 
-
 export const metadata: Metadata = {
-  title: "Sign-in",
+  title: "Access Denied",
+  description: "You do not have permission to access this page.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
-export default function SignInPageLayout(props: LayoutProps<"/signin">) {
+export default function AccessDeniedPageLayout(
+  props: LayoutProps<"/access-denied">,
+) {
   return (
     <>
       <header>
