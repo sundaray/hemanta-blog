@@ -26,7 +26,7 @@ export default function BlogPageLayout(props: LayoutProps<"/blog">) {
         </MainNavWrapper>
         <BreadcrumbBar />
       </header>
-      <main className="flex-1 py-[var(--main-content-padding)]">
+      <main className="py-(--main-content-padding) flex-1">
         {props.children}
       </main>
     </>

@@ -23,9 +23,9 @@ export default function AdminLayout(props: LayoutProps<"/admin">) {
           <MainNav links={navbarLinks.main} />
         </MainNavWrapper>
       </header>
-      <div className="container mx-auto max-w-6xl px-4 py-32 sm:px-6">
+      <div className="py-(--main-content-padding) container mx-auto max-w-6xl px-4">
         <SidebarProvider>
-          <aside className="sticky top-[var(--main-nav-height)] self-start">
+          <aside className="top-(--main-nav-height) sticky self-start">
             <AdminSidebar />
           </aside>
           <main className="relative flex-1">
