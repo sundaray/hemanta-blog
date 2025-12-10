@@ -2,8 +2,6 @@
 
 import Link from "next/link";
 
-import { motion } from "motion/react";
-
 import type { SelectOssProject } from "@/db/schema";
 import { cn } from "@/lib/utils";
 
@@ -15,16 +13,16 @@ type OssProjectCardProps = {
   className?: string;
 };
 
-const iconVariants = {
-  rest: {
-    rotate: 0,
-    transition: { duration: 0.2, ease: "easeOut" },
-  },
-  hover: {
-    rotate: 180,
-    transition: { duration: 0.2, ease: "easeOut" },
-  },
-} as const;
+// const iconVariants = {
+//   rest: {
+//     rotate: 0,
+//     transition: { duration: 0.2, ease: "easeOut" },
+//   },
+//   hover: {
+//     rotate: 180,
+//     transition: { duration: 0.2, ease: "easeOut" },
+//   },
+// } as const;
 
 export function OssProjectCard({ project, className }: OssProjectCardProps) {
   return (

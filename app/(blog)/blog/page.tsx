@@ -4,7 +4,6 @@ import { getBlogPostsTags } from "@/lib/get-blog-posts-tags";
 
 import { BlogPageContent } from "@/components/blog/blog-page-content";
 import { BlogPostsSearch } from "@/components/blog/blog-posts-search";
-import { ArrowLink } from "@/components/ui/arrow-link";
 
 const POSTS_PER_PAGE = 5;
 
@@ -44,13 +43,6 @@ export default async function BlogPage(props: PageProps<"/blog">) {
   return (
     <div className="container mx-auto max-w-4xl px-4 sm:px-6">
       <div className="text-center">
-        {/* <ArrowLink
-          href="/"
-          className="mb-4 text-center font-mono font-semibold text-sky-700"
-          direction="left"
-        >
-          Back to home
-        </ArrowLink> */}
         <h1 className="text-center">Blog</h1>
         <p className="mt-4 text-center text-lg text-neutral-700">
           Posts on full-stack web development.

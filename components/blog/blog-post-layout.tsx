@@ -8,7 +8,6 @@ import { type TableOfContents as TOCType } from "@/lib/toc";
 
 import { TagDisplayList } from "@/components/blog/tag-display-list";
 import { TableOfContents } from "@/components/blog/toc";
-import { ArrowLink } from "@/components/ui/arrow-link";
 
 type BlogPostLayoutProps = {
   frontmatter: Frontmatter;
