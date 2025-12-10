@@ -21,12 +21,12 @@ export function TechnicalWritingCard({
     <div
       className={cn(
         "group relative flex flex-col overflow-hidden rounded-lg transition-all",
-        "bg-gradient-to-bl from-neutral-100 to-neutral-50",
-        "shadow-[inset_-2px_2px_#fff,_-4px_4px_10px_rgb(0_0_0_/_0.1)]",
+        "bg-linear-to-bl from-neutral-100 to-neutral-50",
+        "shadow-[inset_-2px_2px_#fff,-4px_4px_10px_rgb(0_0_0/0.1)]",
         "has-[a:focus-visible]:ring-ring has-[a:focus-visible]:ring-2",
         "has-[a:focus-visible]:[&_a]:outline-none",
         "has-[a:focus-visible]:-translate-y-1",
-        "hover:-translate-y-1",
+        "hover:scale-[1.02]",
         className,
       )}
     >
