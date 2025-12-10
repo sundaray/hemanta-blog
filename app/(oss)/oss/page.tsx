@@ -38,7 +38,7 @@ export default async function OssPage(props: PageProps<"/oss">) {
     totalProjectsResult.isErr()
   ) {
     return (
-      <div className="container mx-auto max-w-3xl">
+      <div className="container mx-auto max-w-3xl px-4">
         <Empty className="rounded-lg border p-8">
           <EmptyHeader>
             <EmptyMedia variant="icon">
