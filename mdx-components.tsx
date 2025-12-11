@@ -91,5 +91,52 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ...components,
     ...headingComponents,
     a: CustomLink,
+    table: ({ children, ...props }: React.HTMLAttributes<HTMLTableElement>) => (
+      <div className="my-6 w-full overflow-x-auto">
+        <table className="w-full border-collapse text-sm" {...props}>
+          {children}
+        </table>
+      </div>
+    ),
+    thead: ({
+      children,
+      ...props
+    }: React.HTMLAttributes<HTMLTableSectionElement>) => (
+      <thead className="border-b" {...props}>
+        {children}
+      </thead>
+    ),
+    tbody: ({
+      children,
+      ...props
+    }: React.HTMLAttributes<HTMLTableSectionElement>) => (
+      <tbody className="divide-y" {...props}>
+        {children}
+      </tbody>
+    ),
+    tr: ({ children, ...props }: React.HTMLAttributes<HTMLTableRowElement>) => (
+      <tr className="hover:bg-muted/50 border-b transition-colors" {...props}>
+        {children}
+      </tr>
+    ),
+    th: ({
+      children,
+      ...props
+    }: React.HTMLAttributes<HTMLTableCellElement>) => (
+      <th
+        className="text-foreground px-4 py-3 text-left font-semibold"
+        {...props}
+      >
+        {children}
+      </th>
+    ),
+    td: ({
+      children,
+      ...props
+    }: React.HTMLAttributes<HTMLTableCellElement>) => (
+      <td className="px-4 py-3 text-neutral-700" {...props}>
+        {children}
+      </td>
+    ),
   };
 }

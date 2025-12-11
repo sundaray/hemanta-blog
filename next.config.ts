@@ -6,6 +6,7 @@ import rehypeExpressiveCode, {
   type RehypeExpressiveCodeOptions,
 } from "rehype-expressive-code";
 import remarkFrontmatter from "remark-frontmatter";
+import remarkGfm from "remark-gfm";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 
 import { pluginRemoveLastBlankLine } from "@/lib/rehype-expressive-code-remove-last-blank-twoslash-line-number.mjs";
@@ -55,7 +56,7 @@ const rehypeExpressiveCodeOptions: RehypeExpressiveCodeOptions = {
 
 const withMDX = createMDX({
   options: {
-    remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter],
+    remarkPlugins: [remarkGfm, remarkFrontmatter, remarkMdxFrontmatter],
     rehypePlugins: [[rehypeExpressiveCode, rehypeExpressiveCodeOptions]],
   },
 });

@@ -1,0 +1,312 @@
+---
+title: "File System Operations in Node.js Using the fs Module"
+description: "Learn how to read, write, and manage files and directories in Node.js using the built-in fs module."
+author: "Hemanta Sundaray"
+publishedAt: "2025-12-11"
+tags: ["Node.js"]
+isPublished: true
+---
+
+The `fs` (file system) module is one of Node.js's core built-in modules. It provides methods for virtually anything you'd want to do with files and directories: reading, writing, copying, deleting, renaming, checking permissions, watching for changes and more.
+
+Most methods provided by the `fs` module come in three variations: **synchronous**, **asynchronous** and **promise-based**.
+
+## Synchronous Methods
+
+Synchronous methods have names ending in `Sync`: `readFileSync`, `writeFileSync`, `mkdirSync`, etc.
+
+```js
+import { readFileSync } from "fs";
+
+try {
+  // 🛑 The program halts here until the file is fully read
+  const data = readFileSync("example.txt", "utf-8");
+  console.log(data);
+} catch (error) {
+  console.error(error);
+}
+
+console.log("This will NOT print until the file is finished reading.");
+```
+
+When you call a sync method, your entire Node.js process **stops and waits** until that operation completes. Nothing else can happen — no other code runs, no event handlers fire, no timers execute, no incoming HTTP requests get processed. The JavaScript thread is completely blocked.
+
+This is why synchronous methods are generally avoided in servers and applications that need to handle multiple operations concurrently — a single slow file read could freeze your entire server, making all users wait. However, sync methods are perfectly acceptable in certain scenarios: during application startup (before your server begins accepting requests), in CLI tools and scripts that run once and exit, or in simple automation tasks where nothing else needs to happen while the file operation completes.
+
+## Asynchronous Methods
+
+Asynchronous methods use the "**Error-First Callback**" pattern. You ask Node.js to read the file and provide a function (the callback) to run _later_ when the operation finishes:
+
+```js
+import { readFile } from "fs";
+
+readFile("example.txt", "utf-8", (err, data) => {
+  if (err) {
+    console.error("Error reading file:", err);
+    return;
+  }
+  console.log("File content:", data);
+});
+
+console.log("This prints BEFORE the file content.");
+```
+
+This is fundamentally different from sync code. The `readFile` call returns immediately — it just initiates the operation and tells Node "call this function when you're done." Meanwhile, your code continues executing. This is why "This prints BEFORE the file content." appears first in the console. The callback only runs after the file operation completes, which happens after the synchronous `console.log` has already executed.
+
+## Promise-based Methods
+
+Promise-based methods are imported from `fs/promises`. They allow us to use `async/await` to write non-blocking code that reads like synchronous code, making it much easier to reason about.
+
+```js
+import { readFile } from "fs/promises";
+
+try {
+  const data = await readFile("example.txt", "utf-8");
+  console.log("File content:", data);
+} catch (err) {
+  console.error("Error reading file:", err);
+}
+```
+
+This works exactly like the callback version under the hood. The `await` keyword doesn't block the Node.js process; it just pauses this particular async function until the promise resolves, allowing other code to run in the meantime.
+
+## Reading Files
+
+You can use the `readFile` method to read the contents of a file. It takes two arguments: the file path and an optional encoding:
+
+```js
+import { readFile } from "fs/promises";
+
+try {
+  const data = await readFile("example.txt", "utf-8");
+  console.log("File content:", data);
+} catch (err) {
+  console.error("Error reading file:", err);
+}
+```
+
+The second argument (`"utf-8"`) tells Node.js how to interpret the raw bytes stored in the file and convert them into a human-readable string.
+
+At the lowest level, files don't contain "text" — they contain raw binary data (a sequence of bytes, where each byte is a number from 0 to 255). When you open a text file in an editor and see readable characters, your editor is interpreting those bytes according to some encoding scheme. UTF-8 is the most common encoding for text files and can represent characters from virtually any language.
+
+If you don't provide an encoding, `readFile` returns a `Buffer` — Node.js's way of representing raw binary data:
+
+```js
+import { readFile } from "fs/promises";
+
+try {
+  const data = await readFile("example.txt");
+  console.log("File content:", data); // <Buffer 48 65 6c>
+} catch (err) {
+  console.error("Error reading file:", err);
+}
+```
+
+## Writing to Files
+
+The `fs` module provides two methods you can use to write to files: `writeFile` and `appendFile`.
+
+### writeFile
+
+When you use `writeFile`, it completely replaces the file's contents. If the file doesn't exist, it creates it. If it does exist, everything previously in that file is gone — no warning, no confirmation, just replaced.
+
+```js
+import { writeFile } from "fs/promises";
+
+try {
+  await writeFile("example.txt", "Hello world!", "utf-8");
+} catch (err) {
+  console.error("Error writing to file:", err);
+}
+```
+
+This behavior makes `writeFile` ideal for scenarios where you're saving a complete "snapshot" of something. You don't care what was there before because you're replacing it entirely with the current state.
+
+### appendFile
+
+`appendFile` opens the file, seeks to the end, and writes your new data there without touching what already exists. Like `writeFile`, it creates the file if it doesn't exist (starting with empty content, then appending your data).
+
+```js
+import { appendFile } from "fs/promises";
+
+try {
+  await appendFile(
+    "example.txt",
+    "Let's learn about Node.js's fs module.",
+    "utf-8",
+  );
+} catch (err) {
+  console.error("Error appending to file:", err);
+}
+```
+
+## Getting File Information
+
+You can use the `stat` method to get comprehensive metadata about a file: size, creation time, modification time, etc. The name comes from the Unix `stat` system call (short for "status").
+
+```js
+import { stat } from "fs/promises";
+
+try {
+  const stats = await stat("example.txt");
+} catch (error) {
+  console.error("File does not exist or can't be accessed.");
+}
+```
+
+The `stats` object returned contains a wealth of information:
+
+```js
+import { stat } from "fs/promises";
+
+try {
+  const stats = await stat("example.txt");
+
+  // Size information
+  console.log(`Size: ${stats.size} bytes`);
+
+  // Type checking methods
+  console.log(`Is a file: ${stats.isFile()}`);
+  console.log(`Is a directory: ${stats.isDirectory()}`);
+
+  // Timestamps
+  console.log(`Created: ${stats.birthtime}`); // When file was created
+  console.log(`Last modified: ${stats.mtime}`); // When content was last changed
+  console.log(`Last accessed: ${stats.atime}`); // When file was last read
+  console.log(`Last status change: ${stats.ctime}`); // When metadata (permissions, etc.) changed
+} catch (error) {
+  console.error("File does not exist or can't be accessed.");
+}
+```
+
+## Checking File Permissions and Visibility
+
+You can use the `access` method to check whether the current process (your Node.js application) has specific permissions to interact with a file. This is important because even if a file exists, your application might not have permission to read it, write to it, or execute it depending on the file's permission settings and what user your Node process is running as.
+
+```js
+import { constants } from "fs";
+import { access } from "fs/promises";
+```
+
+The `constants` object from the `fs` module provides flags that you pass to `access` to specify what permission you're checking:
+
+| Constant         | What it checks                                         |
+| ---------------- | ------------------------------------------------------ |
+| `constants.F_OK` | Does the file exist and is it visible to this process? |
+| `constants.R_OK` | Can this process read the file?                        |
+| `constants.W_OK` | Can this process write to the file?                    |
+| `constants.X_OK` | Can this process execute the file?                     |
+
+The naming convention comes from Unix/POSIX systems where "OK" means "okay to do this operation" — so `R_OK` means "read okay," `W_OK` means "write okay," etc.
+
+Here's how `access` works in practice:
+
+```js
+import { constants } from "fs";
+import { access } from "fs/promises";
+
+// Check if file exists
+try {
+  await access("example.txt", constants.F_OK);
+  console.log("✓ File exists.");
+} catch {
+  console.log("✗ File does not exist.");
+}
+
+// Check read permission
+try {
+  await access("example.txt", constants.R_OK);
+  console.log("✓ File is readable");
+} catch {
+  console.log("✗ File is NOT readable");
+}
+```
+
+Notice how `access` doesn't return a boolean. It either resolves (permission granted) or rejects (permission denied or file doesn't exist).
+
+You can also combine multiple checks in a single call using bitwise OR:
+
+```js
+import { constants } from "fs";
+import { access } from "fs/promises";
+
+try {
+  await access("example.txt", constants.R_OK | constants.W_OK);
+  console.log("✓ File is readable and writable.");
+} catch {
+  console.log("✗ File is not both readable and writable.");
+}
+```
+
+The `|` operator combines the flags, so this single call checks if the file is both readable AND writable.
+
+## Directory Operations
+
+The `fs` module provides a full suite of methods for working with directories. Let me walk you through the main operations.
+
+### Creating directories with mkdir
+
+The basic usage creates a single directory:
+
+```js
+import { mkdir } from "fs/promises";
+
+await mkdir("logs");
+```
+
+But here's where it gets interesting. What if you want to create nested directories like `logs/2025/december`? By default, `mkdir` fails if the parent directories don't exist. This is where the `recursive` option becomes essential:
+
+```js
+// This fails if 'logs' or 'logs/2025' don't exist
+await mkdir("logs/2025/december");
+
+// This creates all necessary parent directories automatically
+await mkdir("logs/2025/december", { recursive: true });
+```
+
+The `recursive: true` option creates the entire directory tree as needed and doesn't throw an error if the directory already exists (without `recursive`, trying to create an existing directory throws an `EEXIST` error).
+
+### Reading directory contents with readdir
+
+This returns an array of the names of files and subdirectories within a directory:
+
+```js
+import { readdir } from "fs/promises";
+
+const entries = await readdir("src");
+console.log(entries); // ["index.ts", "utils", "components", "types.ts"]
+```
+
+But notice the problem here — you can't tell which entries are files and which are directories just from the names. You'd have to call `stat` on each one to find out. This is inefficient, so `readdir` has a `withFileTypes` option that solves this:
+
+```js
+import { readdir } from "fs/promises";
+
+const entries = await readdir("src", { withFileTypes: true });
+
+for (const entry of entries) {
+  if (entry.isDirectory()) {
+    console.log(`📁 ${entry.name}`);
+  } else if (entry.isFile()) {
+    console.log(`📄 ${entry.name}`);
+  }
+}
+```
+
+When you use `withFileTypes: true`, instead of getting strings, you get `Dirent` objects that have methods like `isFile()`, `isDirectory()`, `isSymbolicLink()`, etc. This is much more efficient because the file type information is retrieved in the same system call as reading the directory.
+
+### Deleting directories with rm
+
+Historically, Node had `rmdir` for removing directories, but it could only remove empty directories. For non-empty directories, you'd have to recursively delete all contents first — tedious and error-prone.
+
+Modern Node.js provides `rm` with a `recursive` option that handles everything:
+
+```js
+import { rm } from "fs/promises";
+
+// Remove an empty directory (works like old rmdir)
+await rm("empty-folder", { recursive: false });
+
+// Remove a directory and ALL its contents — files, subdirectories, everything
+await rm("project-folder", { recursive: true });
+```
