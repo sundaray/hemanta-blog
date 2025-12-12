@@ -1,0 +1,246 @@
+---
+title: "A Complete Guide to Node.js Streams"
+description: "Learn how to work with streams in Node.js. Understand Readable, Writable, Duplex, and Transform streams with practical examples."
+author: "Hemanta Sundaray"
+publishedAt: "2025-12-12"
+tags: ["Node.js"]
+isPublished: true
+---
+
+Streams are a way to transfer and process large amounts of data in small chunks.
+
+Consider reading a 6GB video file. Without streams, you would need to load the entire 6GB into memory before doing anything with it. What if your machine only has 4GB of RAM? Your program would crash before it even started.
+
+With streams, on the other hand, you can start processing the first chunk of data almost immediately, while the rest of the file is still being read. Each chunk gets processed and can be released from memory, so you might only ever have a few kilobytes in memory at any given moment.
+
+This approach gives us two major benefits:
+
+- **Memory efficiency (spatial):** Because you process small chunks, you don't need huge amounts of RAM. You can process files larger than your available memory.
+- **Time efficiency (temporal):** You can start processing data as soon as you receive the first chunk. You don't have to wait for the entire payload to arrive. This significantly reduces latency.
+
+In Node.js, there are four types of streams:
+
+- **Readable:** A source you consume data from, such as reading a file or receiving an HTTP response.
+- **Writable:** A destination you send data to, such as writing to a file or sending an HTTP request.
+- **Duplex:** A stream that is both readable and writable, such as a TCP socket where you can send and receive data simultaneously.
+- **Transform:** A special type of duplex stream that can modify or transform data (compressing or encrypting, for example) as it passes through.
+
+Let's explore each of these in detail, starting with Readable streams.
+
+## Readable Streams
+
+A readable stream represents a source of data. We can read from a readable stream in two modes: paused mode and flowing mode.
+
+### Reading from a stream in paused mode
+
+Paused mode is the default mode. In this mode, we pull data from the source. This is why paused mode is also known as the pull mode. Here is an example where we read a file using streams:
+
+```js
+import { createReadStream } from "node:fs";
+
+// Get the readable stream
+const readable = createReadStream("example.txt");
+
+// Set the encoding to receive strings instead of Buffer objects
+readable.setEncoding("utf-8");
+
+// Attach a listener to the readable event
+readable.on("readable", function () {
+  let chunk: string | null;
+
+  // Read data in loop until the internal buffer is empty (returns null)
+  while ((chunk = readable.read()) !== null) {
+    console.log(`Received ${chunk.length} characters of data`);
+    console.log(chunk);
+  }
+});
+
+// Handle the end of the stream
+readable.on("end", function () {
+  console.log("Finished reading the file");
+});
+
+// Handle potential errors
+readable.on("error", function (err) {
+  console.error("Error reading file:", err.message);
+});
+```
+
+In this code snippet:
+
+- We first create a readable stream for the `example.txt` file using the `createReadStream` method. At this point, Node.js hasn't read anything yet; it has just set up the stream.
+- We call `setEncoding("utf-8")` to receive strings instead of raw `Buffer` objects. Without this, we would need to manually convert each chunk using `chunk.toString("utf-8")`.
+- We attach a listener to the `readable` event, which fires whenever new data is available in the stream's internal buffer.
+- Inside the listener, we use a `while` loop to repeatedly call `read()` until it returns `null`. This pulls data from the internal buffer chunk by chunk. When `read()` returns `null`, it means the buffer is temporarily empty, not that the file is finished. When more data arrives, the `readable` event fires again.
+- We listen for the `end` event, which fires once when the entire stream has been consumed and there is no more data coming.
+- We listen for the `error` event to handle any problems that might occur, such as the file not existing or permission issues.
+
+### Reading from a stream in flowing mode
+
+While paused mode requires you to "pull" data, flowing mode "pushes" data to you as soon as it is available. This is why flowing mode is often referred to as push mode.
+
+To switch a stream into flowing mode, you simply attach a listener to the `data` event. Here is how the previous example looks in flowing mode:
+
+```js
+import { createReadStream } from "node:fs";
+
+// Get the readable stream
+const readable = createReadStream("example.txt");
+
+// Set the encoding to receive strings instead of Buffer objects
+readable.setEncoding("utf-8");
+
+// Attach a listener to the data event (switches to flowing mode)
+readable.on("data", function (chunk: string) {
+  console.log(`Received ${chunk.length} characters of data`);
+  console.log(chunk);
+});
+
+// Handle the end of the stream
+readable.on("end", function () {
+  console.log("Finished reading the file");
+});
+
+// Handle potential errors
+readable.on("error", function (err) {
+  console.error("Error reading file:", err.message);
+});
+```
+
+In this code snippet:
+
+- Instead of the `readable` event, we listen for the `data` event. This single change switches the stream from paused mode to flowing mode.
+- We no longer need a `while` loop or the `read()` method. The stream automatically pushes each chunk directly to our `data` event handler.
+- The chunk is passed as an argument to our listener function, so we simply use it rather than pulling it ourselves.
+- The `end` and `error` events work exactly the same as in paused mode.
+
+Notice how the code is simpler. But this simplicity comes with a trade-off. In flowing mode, data keeps arriving whether you're ready for it or not. With paused mode, you have fine-grained control: you decide when to call `read()`, how many bytes to request, and when to pause processing. In flowing mode, you're just reacting to data as it arrives.
+
+That said, you can regain some control by calling `pause()` to temporarily stop the flow and `resume()` to start it again. But if you need precise control over when and how much data to read, paused mode is the better choice.
+
+### Reading streams using async iterators
+
+Readable streams in Node.js implement the async iterator protocol. This means you can use the `for await...of` syntax to consume data from a stream, which often results in cleaner and more readable code.
+
+Here is the same file reading example using async iterators:
+
+```js
+import { createReadStream } from "node:fs";
+
+async function readFile(): Promise<void> {
+  const readable = createReadStream("example.txt");
+  readable.setEncoding("utf-8");
+
+  try {
+    for await (const chunk of readable) {
+      console.log(`Received ${chunk.length} characters`);
+      console.log(chunk);
+    }
+    console.log("Finished reading the file");
+  } catch (err) {
+    console.error("Error reading file:", (err as Error).message);
+  }
+}
+
+readFile();
+```
+
+In this code snippet:
+
+- We wrap our logic in an async function since `for await...of` can only be used inside async functions.
+- The `for await...of` loop waits for each chunk to arrive and gives it to us as the loop variable. No need to listen for events or call `read()` manually.
+- When the stream ends, the loop exits naturally. There is no need for an `end` event listener.
+- If the stream emits an error, the loop throws an exception. We handle this with a standard `try...catch` block instead of an `error` event listener.
+
+This approach reads almost like synchronous code while remaining fully asynchronous under the hood. The `await` keyword pauses the loop until the next chunk arrives, but it doesn't block the event loop—other operations can still happen while waiting.
+
+One thing to keep in mind: when you use `for await...of`, the stream operates in flowing mode. If you need fine-grained control over when and how much data to read, stick with paused mode and the `readable` event.
+
+### Implementing readable streams
+
+So far, we have been consuming readable streams. You can also create your own custom readable streams that produce data from any source you want.
+
+The `stream` module provides a base `Readable` class that you can use to implement custom readable streams. There are two approaches to creating them: the inheritance approach (extending the class) and the constructor approach (passing options to the `Readable` constructor).
+
+Let's understand how both approaches work by creating a simple custom stream that generates a sequence of numbers from 1 to a specified maximum value. Each time the stream is read, it will produce the next number in the sequence until it reaches the maximum value and signals the end.
+
+#### The inheritance approach
+
+When you extend the `Readable` class, you must implement a method called `_read()`. This is the internal method that the stream calls whenever it needs more data to fill its internal buffer. Inside `_read()`, you push data into the stream using `this.push()`.
+
+```js
+import { Readable } from "node:stream";
+
+class CounterStream extends Readable {
+  private current: number;
+  private max: number;
+
+  constructor(max: number) {
+    super({ encoding: "utf-8" });
+    this.current = 1;
+    this.max = max;
+  }
+
+  _read(): void {
+    if (this.current <= this.max) {
+      this.push(`${this.current}\n`);
+      this.current++;
+    } else {
+      this.push(null); // signals end of stream
+    }
+  }
+}
+
+const counter = new CounterStream(5);
+
+counter.on("data", function (chunk: string) {
+  console.log(`Received: ${chunk.trim()}`);
+});
+
+counter.on("end", function () {
+  console.log("Stream finished");
+});
+```
+
+In this code snippet:
+
+- We create a `CounterStream` class that extends the `Readable` class.
+- In the constructor, we call `super({ encoding: "utf-8" })` to initialize the parent class and set the encoding so we receive strings instead of buffers.
+- We implement the `_read()` method. We don't call this method ourselves—the stream calls it internally whenever its buffer needs filling.
+- Inside `_read()`, we push data using `this.push()`. When we've produced all our numbers, we push `null` to signal that there is no more data.
+- We consume the stream using the `data` event, just like any other readable stream.
+
+#### The constructor approach
+
+Instead of creating a class, you can pass a `read` function directly to the `Readable` constructor. This achieves the same result with less boilerplate:
+
+```typescript
+import { Readable } from "node:stream";
+
+let current = 1;
+const max = 5;
+
+const counter = new Readable({
+  encoding: "utf-8",
+  read(): void {
+    if (current <= max) {
+      this.push(`${current}\n`);
+      current++;
+    } else {
+      this.push(null);
+    }
+  },
+});
+
+counter.on("data", function (chunk: string) {
+  console.log(`Received: ${chunk.trim()}`);
+});
+
+counter.on("end", function () {
+  console.log("Stream finished");
+});
+```
+
+This does exactly the same thing, but without defining a class. The `read` function in the options object works just like the `_read()` method in the inheritance approach.
+
+The constructor approach is useful when you need a quick, one-off stream and don't want the ceremony of defining a class. The inheritance approach makes more sense when you need reusable stream types with additional methods or complex internal state.
