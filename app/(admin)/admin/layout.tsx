@@ -24,7 +24,7 @@ export default function AdminLayout(props: LayoutProps<"/admin">) {
         </MainNavWrapper>
         <BreadcrumbBar />
       </header>
-      <main className="py-(--main-content-padding) container mx-auto max-w-4xl flex-1 px-4">
+      <main className="py-(--main-content-padding) flex-1">
         {props.children}
       </main>
     </>

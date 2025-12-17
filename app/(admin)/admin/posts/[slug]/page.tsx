@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { getAdminPostBySlug } from "@/lib/get-admin-post-by-slug";
 import { getAdminPostsSlugs } from "@/lib/get-admin-posts-slugs";
 
-import { BlogPostLayout } from "@/components/blog/blog-post-layout";
+import { AdminPostLayout } from "@/components/admin/admin-post-layout";
 
 export async function generateMetadata(
   props: PageProps<"/admin/posts/[slug]">,
@@ -58,8 +58,12 @@ export default async function AdminPostPage(
     await getAdminPostBySlug(slug);
 
   return (
-    <BlogPostLayout frontmatter={frontmatter} toc={toc} rawContent={rawContent}>
+    <AdminPostLayout
+      frontmatter={frontmatter}
+      toc={toc}
+      rawContent={rawContent}
+    >
       <ContentComponent />
-    </BlogPostLayout>
+    </AdminPostLayout>
   );
 }

@@ -5,6 +5,8 @@ import Link from "next/link";
 
 import { signOutAction } from "@/app/actions";
 
+import { navbarLinks } from "@/config/navbar";
+
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -63,15 +65,17 @@ export function UserAccountNavClient({ email }: UserAccountNavClientProps) {
         {isAdmin && (
           <>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link
-                href="/admin"
-                className="flex cursor-pointer items-center gap-2 text-neutral-700 focus:bg-neutral-100 focus:text-neutral-900"
-              >
-                <Icons.admin className="size-4" />
-                <span className="font-medium">Admin</span>
-              </Link>
-            </DropdownMenuItem>
+            {navbarLinks.admin.map((link) => (
+              <DropdownMenuItem key={link.href} asChild>
+                <Link
+                  href={link.href}
+                  className="flex cursor-pointer items-center gap-2 text-neutral-700 focus:bg-neutral-100 focus:text-neutral-900"
+                >
+                  <Icons.admin className="size-4" />
+                  <span className="font-medium">{link.title}</span>
+                </Link>
+              </DropdownMenuItem>
+            ))}
             <DropdownMenuSeparator />
           </>
         )}

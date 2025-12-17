@@ -44,7 +44,7 @@ type CustomTagProps = AriaTagProps & {
 function Tag({ className, ref, ...props }: CustomTagProps) {
   return (
     <AriaTag
-      ref={ref}
+      ref={ref as React.Ref<HTMLDivElement>}
       className={cn(
         "focus-ring",
         "cursor-pointer rounded-full bg-neutral-200/40 px-3 py-2 text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-200",
