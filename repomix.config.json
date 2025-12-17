@@ -1,0 +1,13 @@
+{
+  "output": {
+    "style": "markdown"
+  },
+  "ignore": {
+    "customPatterns": [
+      "app/\\(posts\\)/**",
+      "lambda/dist/**",
+      "public/**",
+      "**/*.svg"
+    ]
+  }
+}

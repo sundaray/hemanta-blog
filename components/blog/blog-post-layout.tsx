@@ -6,6 +6,7 @@ import { format } from "date-fns";
 
 import { type TableOfContents as TOCType } from "@/lib/toc";
 
+import { CopyBlogPostButton } from "@/components/blog/copy-blog-post-button";
 import { TagDisplayList } from "@/components/blog/tag-display-list";
 import { TableOfContents } from "@/components/blog/toc";
 
@@ -13,14 +14,16 @@ type BlogPostLayoutProps = {
   frontmatter: Frontmatter;
   children: React.ReactNode;
   toc: TOCType;
+  rawContent: string;
 };
 
 export function BlogPostLayout({
   children,
   frontmatter,
   toc,
+  rawContent,
 }: BlogPostLayoutProps) {
-  const { title, publishedAt, author, tags } = frontmatter;
+  const { title, publishedAt, updatedAt, author, tags } = frontmatter;
 
   return (
     <div className="lg:grid-cols-16 mx-auto max-w-6xl px-4 sm:px-6 lg:grid lg:gap-x-8">
@@ -43,6 +46,14 @@ export function BlogPostLayout({
                   {format(new Date(publishedAt), "LLL d, yyyy")}
                 </time>
               </p>
+              {updatedAt && (
+                <p className="text-sm text-neutral-600">
+                  Updated{" "}
+                  <time dateTime={updatedAt}>
+                    {format(new Date(updatedAt), "LLL d, yyyy")}
+                  </time>
+                </p>
+              )}
             </div>
           </div>
         </header>
@@ -59,7 +70,8 @@ export function BlogPostLayout({
       </article>
 
       <aside className="lg:col-start-14 lg:col-end-17 mt-12 hidden lg:block">
-        <div className="sticky top-32">
+        <div className="sticky top-32 space-y-6">
+          <CopyBlogPostButton content={rawContent} />
           <TableOfContents toc={toc} />
         </div>
       </aside>

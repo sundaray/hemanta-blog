@@ -1,0 +1,179 @@
+---
+title: "How Node.js Event Loop Works"
+description: "Learn how the event loop enables Node.js to perform asynchronous, non-blocking operations. Understand the call stack, microtask queue, macrotask queue, and how they work together."
+author: "Hemanta Sundaray"
+publishedAt: "2025-12-14"
+tags: ["Node.js"]
+isPublished: true
+---
+
+import { Note } from "@/components/blog/note";
+
+The event loop is the mechanism that enables Node.js to perform asynchronous, non-blocking operations despite JavaScript being single-threaded.
+
+It operates continuously while your Node.js application is running, responsible for handling asynchronous callbacks. The event loop utilizes queues (macrotask and microtask) to ensure these callbacks are processed in the right order.
+
+Before we understand how the event loop prioritizes the processing of different callbacks, we must understand three core concepts: **call stack**, **macrotask queue**, and **microtask queue**.
+
+<Note>
+  Node.js itself is not purely single-threaded. The JavaScript execution is
+  single-threaded (one call stack), but Node.js uses `libuv` under the hood,
+  which maintains a thread pool (default 4 threads) for certain operations like
+  file system I/O, DNS lookups, and cryptographic operations.
+</Note>
+
+## 1. The Call Stack
+
+This is where your synchronous code executes. It's a LIFO (Last In, First Out) data structure. When you call a function, it gets pushed onto the stack. When the function returns, it gets popped off.
+
+```js
+function first() {
+  console.log("first");
+  second();
+  console.log("first done");
+}
+
+function second() {
+  console.log("second");
+}
+
+first();
+```
+
+The call stack progression looks like:
+
+1. `first()` pushed
+2. `console.log("first")` pushed, executes, popped
+3. `second()` pushed
+4. `console.log("second")` pushed, executes, popped
+5. `second()` popped (returns)
+6. `console.log("first done")` pushed, executes, popped
+7. `first()` popped (returns)
+
+## 2. The Microtask Queue
+
+This queue is further divided into two sub-queues:
+
+- **nextTick queue**: Holds callbacks scheduled with `process.nextTick()`.
+- **Promise queue**: Holds callbacks associated with resolving or rejecting promises (`promise.then()`, `promise.catch()`, `promise.finally()`).
+
+<Note>
+  `process.nextTick()` callbacks have higher priority than promise callbacks.
+</Note>
+
+## 3. The Macrotask Queue
+
+This queue (also called the task queue) is further divided into four sub-queues:
+
+- **Timer queue**: Holds callbacks scheduled with `setTimeout` and `setInterval`.
+- **I/O queue**: Holds callbacks associated with asynchronous I/O operations, such as file system or network requests.
+- **Check queue**: Holds callbacks scheduled with `setImmediate`.
+- **Close queue**: Holds callbacks associated with closing asynchronous resources, ensuring proper cleanup.
+
+<Note>
+  **The microtask queue has higher priority than the macrotask queue**. After
+  each task from the macrotask queue completes (and the call stack is empty),
+  the event loop will drain the entire microtask queue before moving to the next
+  macrotask. In other words, before the event loop moves from one sub-queue to
+  another inside the macrotask queue, it will drain the entire microtask queue.
+</Note>
+
+## The Event Loop in Action
+
+What we discussed so far might sound theoretical, so to get a better grasp of how the event loop works, let's walk through an example.
+
+Consider the following script:
+
+```js
+console.log("start");
+
+setTimeout(function timeout() {
+  console.log("setTimeout");
+}, 0);
+
+Promise.resolve().then(function promise() {
+  console.log("Promise");
+});
+
+setImmediate(function immediate() {
+  console.log("setImmediate");
+});
+
+process.nextTick(function nextTick() {
+  console.log("nextTick");
+});
+
+console.log("end");
+```
+
+This script gets executed in three phases.
+
+### Phase 1: Main script execution
+
+When Node.js starts running this script, the entire script (from top to bottom) is treated as one synchronous operation that runs to completion before anything else happens. Here's what happens precisely:
+
+- `console.log("start")` executes immediately. **Output: "start"**
+- `setTimeout()` is called — the callback is registered to the **timer queue**. Nothing executes yet.
+- `Promise.resolve().then()` is called — the promise is already resolved, so the callback is registered to the **promise queue**. Nothing executes yet.
+- `setImmediate()` is called — the callback is registered to the **check queue**. Nothing executes yet.
+- `process.nextTick()` is called — the callback is registered to the **nextTick queue**. Nothing executes yet.
+- `console.log("end")` executes immediately. **Output: "end"**
+
+At this point, the call stack is empty and the queues look like this:
+
+- nextTick queue: `[nextTick callback]`
+- Promise queue: `[promise callback]`
+- Timer queue: `[timeout callback]`
+- Check queue: `[immediate callback]`
+
+**It's important to understand that the event loop has no role in Phase 1. This is purely synchronous execution**.
+
+### Phase 2: Drain the microtask queue
+
+This is where the event loop begins its work.
+
+Remember that the microtask queue has higher priority than the macrotask queue, and inside the microtask queue, the nextTick sub-queue has higher priority than the promise sub-queue.
+
+So the event loop first drains the nextTick queue. **Output: "nextTick"**
+
+Then it drains the promise queue. **Output: "Promise"**
+
+### Phase 3: Drain the macrotask queue
+
+With the microtask queue empty, the event loop moves to the macrotask queue. It processes the timer queue first. **Output: "setTimeout"**
+
+After the timer queue, the event loop checks the microtask queue again (it's empty), then moves to the check queue. **Output: "setImmediate"**
+
+So, the final output looks like this:
+
+```terminal
+start
+end
+nextTick
+Promise
+setTimeout
+setImmediate
+```
+
+## process.nextTick() vs setImmediate()
+
+Given what we just learned, you'd expect `process.nextTick()` to mean "run this callback on the next iteration of the event loop," right?
+
+But that's not what it does.
+
+`process.nextTick()` runs the callback immediately after the current operation completes, before the event loop moves to the next queue. By "current operation," I mean whatever synchronous code is currently running on the call stack.
+
+Conversely, `setImmediate()` (which sounds like it should run immediately) actually waits until the check queue of the event loop.
+
+The naming is admittedly confusing. `nextTick` happens sooner than `setImmediate`, despite what the names suggest.
+
+## What Is an Event Loop Tick?
+
+A single iteration of the event loop (one complete cycle through all the queues) is called a tick. Here is a visualization to help you picture it:
+
+<div className="my-6 flex justify-center">
+  ![Node.js Event Loop Tick](/images/blog/nodejs-event-loop-tick.svg)
+</div>
+
+Remember that within a single tick, microtasks are drained multiple times, once
+after each queue.

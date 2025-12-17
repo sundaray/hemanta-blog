@@ -1,22 +1,27 @@
 import type { Metadata } from "next";
 
-import { getBlogPostBySlug } from "@/lib/get-blog-post-by-slug";
-import { getBlogPostsSlugs } from "@/lib/get-blog-posts-slugs";
+import { getAdminPostBySlug } from "@/lib/get-admin-post-by-slug";
+import { getAdminPostsSlugs } from "@/lib/get-admin-posts-slugs";
 
 import { BlogPostLayout } from "@/components/blog/blog-post-layout";
 
 export async function generateMetadata(
-  props: PageProps<"/blog/[slug]">,
+  props: PageProps<"/admin/posts/[slug]">,
 ): Promise<Metadata> {
   try {
     const { slug } = await props.params;
-    const { frontmatter } = await getBlogPostBySlug(slug);
+    const { frontmatter } = await getAdminPostBySlug(slug);
 
     return {
       title: frontmatter.title,
       description: frontmatter.description,
       authors: [{ name: frontmatter.author }],
       keywords: frontmatter.tags,
+      // 🔒 Security: Ensure admin posts are never indexed
+      robots: {
+        index: false,
+        follow: false,
+      },
       openGraph: {
         title: frontmatter.title,
         description: frontmatter.description,
@@ -33,22 +38,24 @@ export async function generateMetadata(
       },
     };
   } catch (error) {
-    console.error("Failed to generate metadata for blog post:", error);
+    console.error("Failed to generate metadata for admin post:", error);
     return {
       title: "Post Not Found",
-      description: "The requested blog post could not be found.",
+      description: "The requested admin post could not be found.",
     };
   }
 }
 
 export async function generateStaticParams() {
-  return getBlogPostsSlugs();
+  return getAdminPostsSlugs();
 }
 
-export default async function BlogPostPage(props: PageProps<"/blog/[slug]">) {
+export default async function AdminPostPage(
+  props: PageProps<"/admin/posts/[slug]">,
+) {
   const { slug } = await props.params;
   const { frontmatter, toc, ContentComponent, rawContent } =
-    await getBlogPostBySlug(slug);
+    await getAdminPostBySlug(slug);
 
   return (
     <BlogPostLayout frontmatter={frontmatter} toc={toc} rawContent={rawContent}>

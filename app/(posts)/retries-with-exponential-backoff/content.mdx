@@ -1,0 +1,163 @@
+---
+title: "Implementing Retries with Exponential Backoff"
+description: "Learn how to handle temporary API failures using exponential backoff."
+author: "Hemanta Sundaray"
+publishedAt: "2025-12-17"
+tags: ["Node.js"]
+isPublished: true
+---
+
+When developing applications, we often integrate with external APIs. Stripe for payments, OpenAI for AI capabilities, Twilio for messaging, and countless others. And when integrating with these services, things can go wrong.
+
+The API might be temporarily down; there might be rate limiting; or temporary network failures might cause requests to fail.
+
+In such temporary downtimes, making one call to the API and immediately showing an error to the user is not the right experience. Instead, what we should do is retry the API call using jittered exponential backoff.
+
+What does this mean?
+
+## Exponential Backoff
+
+Exponential backoff is a retry strategy where you progressively increase the wait time between attempts. Instead of retrying every second, you wait 1 second, then 2 seconds, then 4 seconds, and so on. Each delay doubles from the previous one. This gives the struggling server progressively more breathing room to recover.
+
+But exponential backoff has a hidden flaw.
+
+Imagine 1000 clients all make a request to an API at roughly the same time, and they all fail because the server is overloaded. With standard exponential backoff:
+
+```
+Time 0ms:     1000 clients fail
+Time 1000ms:  1000 clients retry simultaneously → fail again
+Time 2000ms:  1000 clients retry simultaneously → fail again
+Time 4000ms:  1000 clients retry simultaneously → fail again
+```
+
+The retries are synchronized. Everyone waits exactly 1000ms, then exactly 2000ms. The server keeps getting hit with massive spikes, never getting a chance to recover. This is known as the **thundering herd problem**.
+
+How do we solve this? By adding **jitter**.
+
+## Jitter
+
+Jitter adds randomness to the delay. Instead of everyone retrying at exactly 1000ms, clients retry at random times within a range:
+
+```
+Time 0ms:      1000 clients fail
+Time 500ms:   ~150 clients retry
+Time 800ms:   ~200 clients retry
+Time 1000ms:  ~180 clients retry
+Time 1200ms:  ~170 clients retry
+...and so on, spread out
+```
+
+The load is distributed over time, giving the server a much better chance to recover.
+
+In this blog post, we'll create a `withRetry` higher-order function that wraps any async function with retry logic, exponential backoff, and jitter.
+
+Here's the implementation:
+
+```ts
+interface RetryOptions {
+  maxRetryCount?: number;
+  delayMs?: number;
+  maxDelayMs?: number;
+}
+
+export function withRetry<TArgs extends unknown[], TReturn>(
+  fn: (...args: TArgs) => Promise<TReturn>,
+  options: RetryOptions = {},
+): (...args: TArgs) => Promise<TReturn> {
+  const { maxRetryCount = 3, delayMs = 1000, maxDelayMs = 10000 } = options;
+
+  return async function (...args: TArgs): Promise<TReturn> {
+    async function attempt(attemptCount: number): Promise<TReturn> {
+      try {
+        return await fn(...args);
+      } catch (error: unknown) {
+        const canAttempt = attemptCount < maxRetryCount;
+
+        if (!canAttempt) {
+          throw new Error(
+            `Operation failed after ${maxRetryCount} attempts: ${
+              (error as Error)?.message
+            }`,
+          );
+        }
+
+        // Calculate delay using exponential backoff: 1000ms, 2000ms, 4000ms, etc.
+        const baseDelay = delayMs * Math.pow(2, attemptCount - 1);
+        // Add randomness to spread out retries and avoid thundering herd
+        const jitter = Math.random() * baseDelay;
+        // Cap the delay to maxDelayMs to prevent excessively long waits
+        const delay = Math.min(baseDelay + jitter, maxDelayMs);
+        // Pause execution before retrying
+        await new Promise((resolve) => setTimeout(resolve, delay));
+
+        return attempt(attemptCount + 1);
+      }
+    }
+
+    return attempt(1);
+  };
+}
+```
+
+Let's explore in detail what is happening in the function:
+
+- **`RetryOptions` interface:**
+  - Defines the configuration options for the retry behavior.
+  - `maxRetryCount`: The maximum number of attempts before giving up. Defaults to 3.
+  - `delayMs`: The base delay in milliseconds for the exponential backoff calculation. Defaults to 1000ms.
+  - `maxDelayMs`: The maximum delay allowed, regardless of exponential growth. Defaults to 10000ms (10 seconds). This prevents delays from becoming unreasonably long on later retries.
+
+- **Function signature:**
+  - `withRetry` is a higher-order function. It takes a function and returns a new function with retry capabilities built in.
+  - The generic types `TArgs` and `TReturn` preserve the original function's argument types and return type, so TypeScript knows exactly what goes in and what comes out.
+
+- **The returned function:**
+  - When you call `withRetry(fetchUser)`, you get back a new function that behaves like `fetchUser` but with automatic retries.
+  - It accepts the same arguments as the original function (`...args: TArgs`) and passes them through when calling `fn`.
+
+- **Inner `attempt` function:**
+  - A recursive async function that performs the actual retry logic.
+  - Takes `attemptCount` as a parameter to track which attempt we're on and to calculate the exponential delay.
+
+- **The try block (happy path):**
+  - We execute `fn(...args)` and await its result.
+  - If it succeeds, we return immediately. No retries needed.
+
+- **The catch block (handling failures):**
+  - If `fn` throws an error or returns a rejected promise, we check if we have attempts remaining.
+  - With `maxRetryCount = 3`: attempts 1 and 2 can retry, but attempt 3 gives up.
+
+- **Giving up after exhausting retries:**
+  - If `canAttempt` is `false`, we throw a descriptive error that includes the original error message.
+
+- **Exponential backoff with jitter:**
+  - `baseDelay = delayMs * Math.pow(2, attemptCount - 1)` calculates the exponential delay: 1000ms, 2000ms, 4000ms, etc.
+  - `jitter = Math.random() * baseDelay` adds a random value between 0 and the base delay.
+  - `Math.min(baseDelay + jitter, maxDelayMs)` ensures the final delay never exceeds our maximum cap.
+
+- **Waiting before retry:**
+  - `await new Promise((resolve) => setTimeout(resolve, delay))` pauses execution for the calculated delay.
+
+- **Recursive retry:**
+  - After waiting, we call `attempt(attemptCount + 1)` to try again.
+  - The `return` propagates the eventual success or failure back to the caller.
+
+---
+
+## Usage
+
+```ts
+async function fetchUser(id: string): Promise<User> {
+  const response = await fetch(`/api/users/${id}`);
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
+  return response.json();
+}
+
+// Create a retry-enabled version of fetchUser
+const fetchUserWithRetry = withRetry(fetchUser, { maxRetryCount: 5 });
+
+// Call it just like the original function
+const user = await fetchUserWithRetry("user-123");
+```

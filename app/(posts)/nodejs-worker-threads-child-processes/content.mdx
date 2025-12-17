@@ -1,0 +1,371 @@
+---
+title: "How to Run CPU-Intensive Tasks in Node.js Using Worker Threads and Child Processes"
+description: "Learn how to offload CPU-intensive tasks from the main thread using worker threads and child processes to keep your Node.js server responsive."
+author: "Hemanta Sundaray"
+publishedAt: "2025-12-16"
+tags: ["Node.js"]
+isPublished: true
+---
+
+import { Note } from "@/components/blog/note";
+
+Let's say you want to resize a high-resolution image or compress a video file. These are CPU-intensive tasks, meaning the CPU remains occupied the whole time until the job is done. In I/O-intensive tasks (like reading a file or querying a database), on the other hand, the CPU initiates the request and is free to handle other work while waiting for the response.
+
+Node.js runs on a [single-threaded event loop](/blog/nodejs-event-loop). This means there is only one main thread of execution.
+
+**So, what happens if we run a CPU-intensive task on this single thread?**
+
+If a CPU-intensive task takes 10 seconds to finish, for example, you **block the event loop** for 10 seconds. During this 10-second window, your server becomes completely unresponsive. It cannot handle incoming API requests. To the outside world, your application appears to have crashed until the task finishes.
+
+In situations like these, Node.js provides two distinct mechanisms we can use to offload these heavy tasks from the main thread, keeping the server responsive:
+
+- **Child processes** (`node:child_process`)
+- **Worker threads** (`node:worker_threads`)
+
+Both mechanisms achieve the same goal—freeing up the event loop—but they do it in different ways. Before we understand how they work and the key differences between them, we must first clarify two fundamental concepts: process and thread.
+
+## Process vs Thread
+
+When you run Node.js, a process is started. A process is simply a running instance of a program in the operating system. It has its own memory, which is not shared with other processes.
+
+A thread is a single sequence of execution within a process. A single process can contain multiple threads. However, every process has at least one thread—the main thread—which begins execution when the process starts. Note that threads share the general resources of the process (like global memory).
+
+## Worker Threads
+
+Worker threads are available through the built-in `node:worker_threads` module.
+
+We can create a new worker thread using the `Worker` constructor. The syntax is:
+
+```js
+new Worker(filename, [options]);
+```
+
+The first argument is the path to the file you want to execute inside the worker thread.
+
+The second argument is an `options` object. One useful property of this object is `workerData`, which allows you to pass data to the worker thread immediately upon startup. Inside the thread, you can access this data by importing `workerData` from the `node:worker_threads` module.
+
+<Note>
+  Objects passed via `workerData` are cloned, not shared. This means the data is
+  copied to the new thread's memory. Any changes you make to the object inside
+  the worker will not affect the original object in the main thread.
+</Note>
+
+### Main Thread and Worker Thread Communication
+
+The main thread and worker threads communicate using a message port.
+
+**Main Thread → Worker Thread**
+
+To send data to the worker, you use the `worker.postMessage()` method.
+
+Inside the worker thread, you receive this data by listening to the `'message'` event on the `parentPort` object.
+
+**Worker Thread → Main Thread**
+
+To send data back to the main thread, the worker uses `parentPort.postMessage()`.
+
+Inside the main thread, you receive this data by listening to the `'message'` event on the worker instance.
+
+Here is a complete example showing how to spawn a worker and exchange messages. We use `isMainThread` to keep everything in a single file for simplicity. It returns `true` when the code is running on the main thread and `false` when running inside a worker.
+
+```js
+import { Worker, isMainThread, parentPort } from "node:worker_threads";
+
+if (isMainThread) {
+  // ============================
+  // 🟢 MAIN THREAD
+  // ============================
+  const worker = new Worker(import.meta.filename);
+
+  worker.on("message", (workerThreadMessage) => {
+    console.log("Message from worker thread: ", workerThreadMessage);
+    worker.terminate();
+  });
+
+  worker.postMessage("Start working!");
+} else {
+  // ============================
+  // 🟠 WORKER THREAD
+  // ============================
+  parentPort.on("message", (mainThreadMessage) => {
+    console.log("Message from main thread:", mainThreadMessage);
+    parentPort.postMessage("Job is done!");
+  });
+}
+```
+
+## Child Processes
+
+Child processes are accessible through the built-in `node:child_process` module, which provides four different ways to create a child process:
+
+- **spawn()**
+- **fork()**
+- **exec()**
+- **execFile()**
+
+Before we explore how these methods work, let's first understand that every child process gets three standard stdio streams.
+
+What does this mean?
+
+In the world of operating systems (Linux, Windows, Mac), every single program that runs is treated like a machine. To be useful, this machine needs three holes drilled into it:
+
+- **stdin** (standard input)
+- **stdout** (standard output)
+- **stderr** (standard error)
+
+Now, in Node.js specifically, these are exposed as streams. `stdin` becomes a [writable stream](/blog/nodejs-streams#writable-streams), `stdout` and `stderr` become [readable streams](/blog/nodejs-streams#readable-streams) (from the main process's perspective). Node.js automatically connects pipes to these three holes so your main process can talk to the child process.
+
+| Stream Name                | Type                    | Purpose                             |
+| -------------------------- | ----------------------- | ----------------------------------- |
+| `stdin` (standard input)   | Writable (write to it)  | Sending data into the child process |
+| `stdout` (standard output) | Readable (read from it) | The data coming out of the child    |
+| `stderr` (standard error)  | Readable (read from it) | Errors coming out of the child      |
+
+Let's now look at each method.
+
+### spawn()
+
+The `spawn()` function can run any executable on your system. It doesn't matter if the program is written in Python, Go, C++, or Node.js. It simply asks the OS: "Please run this command."
+
+Syntax:
+  
+```js
+spawn(command, [arguments], options);
+```
+
+Below, we use `spawn()` to run a Python script from Node.js. The Python script performs a CPU-intensive calculation:
+
+```py title="cpu_task.py"
+import sys
+
+def calculate_sum(n):
+   total = 0
+   for i in range(n):
+       total += i
+   return total
+
+if __name__ == "__main__":
+   n = int(sys.argv[1])
+   result = calculate_sum(n)
+   print(f"Sum of numbers from 0 to {n - 1} is: {result}")
+```
+
+```js title="main.js"
+import { spawn } from "node:child_process";
+
+const pythonProcess = spawn("python3", ["cpu_task.py", "1000000"]);
+
+pythonProcess.stdout.on("data", (data) => {
+  console.log(`[Python]: ${data.toString()}`);
+});
+
+pythonProcess.stderr.on("data", (data) => {
+  console.error(`[Python Error]: ${data.toString()}`);
+});
+
+pythonProcess.on("close", (code) => {
+  console.log(`Python process exited with code: ${code}`);
+});
+```
+
+<Note>
+By default, `spawn()` does not use a shell to run the command. If you need to access shell-specific syntax, you can pass `{ shell: true }` as the third argument.
+</Note>
+
+### fork()
+
+While `spawn()` can run any executable, `fork()` is specifically designed for spawning Node.js processes. The key difference is that `fork()` automatically sets up an IPC (Inter-Process Communication) channel between the parent and child, allowing them to exchange messages using `process.send()` and `process.on('message')`.
+
+Syntax:
+
+```js
+fork(modulePath, [args], [options]);
+```
+
+The first argument is the path to the Node.js module you want to run as a child process.
+
+**Parent → Child**
+
+To send data to the child, the parent uses `childProcess.send()`.
+
+Inside the child, you receive this data by listening to the `'message'` event on the `process` object.
+
+**Child → Parent**
+
+To send data back to the parent, the child uses `process.send()`.
+
+Inside the parent, you receive this data by listening to the `'message'` event on the child process instance.
+
+Here's an example where we offload a CPU-intensive calculation to a child process:
+
+```js title="cpu_task.js"
+function calculateSum(n) {
+  let total = 0;
+  for (let i = 0; i < n; i++) {
+    total += i;
+  }
+  return total;
+}
+
+process.on("message", (n) => {
+  const result = calculateSum(n);
+  process.send({ n, result });
+});
+```
+
+```js title="main.js"
+import { fork } from "node:child_process";
+
+const childProcess = fork("cpu_task.js");
+
+childProcess.send(1_000_000);
+
+childProcess.on("message", (message) => {
+  console.log(
+    `Sum of numbers from 0 to ${message.n - 1} is: ${message.result}`,
+  );
+  childProcess.kill();
+});
+```
+
+Notice how we don't need to specify `"node"` as the command. `fork()` handles that automatically. Also, unlike `spawn()` where we communicated through `stdout` streams, here we're passing JavaScript objects directly through the IPC channel.
+
+### exec()
+
+The `exec()` function spawns a shell (like `/bin/sh` on Unix or `cmd.exe` on Windows) and runs the command inside it. Unlike `spawn()`, which streams output as it happens, `exec()` buffers the entire output and gives it to you all at once when the command finishes.
+
+Syntax:
+
+```js
+exec(command, [options], callback);
+```
+
+Because `exec()` runs inside a shell, you can use shell syntax like pipes (`|`), redirections (`>`), and chaining (`&&`):
+
+```js
+import { exec } from "node:child_process";
+import util from "node:util";
+
+const execPromise = util.promisify(exec);
+
+async function main() {
+  try {
+    const { stdout, stderr } = await execPromise("ls -la | grep node");
+    if (stderr) {
+      console.error(`stderr: ${stderr}`);
+      return;
+    }
+    console.log(stdout);
+  } catch (error) {
+    console.error(`Error: ${error.message}`);
+  }
+}
+
+main();
+```
+
+### execFile()
+
+The `execFile()` function is similar to `exec()`, but instead of spawning a shell, it runs the executable directly. This makes it slightly more efficient and more secure since there's no risk of shell injection attacks.
+
+Syntax:
+
+```js
+execFile(file, [arguments], [options], callback);
+```
+
+Like `exec()`, it buffers the output and gives it to you all at once. However, since there's no shell, you cannot use shell syntax like pipes (`|`) or redirections (`>`).
+
+Here's an example that runs the `node` executable to check its version:
+
+```js
+import { execFile } from "node:child_process";
+import util from "node:util";
+
+const execFilePromise = util.promisify(execFile);
+
+async function main() {
+  try {
+    const { stdout } = await execFilePromise("node", ["--version"]);
+    console.log(`Node.js version: ${stdout.trim()}`);
+  } catch (error) {
+    console.error(`Error: ${error.message}`);
+  }
+}
+
+main();
+```
+
+### execFile() vs exec()
+
+Use `execFile()` when you're running a specific executable and don't need shell features. It's the safer choice when dealing with user input since there's no shell to interpret special characters. Use `exec()` when you need shell syntax like pipes, redirections, or command chaining.
+
+### exec() vs spawn()
+
+Use `exec()` for short-lived commands where you want the complete output at once — like running `git status`, checking a version, or executing simple shell scripts. However, since `exec()` buffers all output in memory, it has a default limit of 1MB. If your command produces more output than that, the process will be killed. For long-running processes or commands that produce large output, use `spawn()` instead.
+
+### Running a Detached Child Process
+
+By default, a child process is tied to its parent. If the parent process exits, the child process is also terminated. But sometimes you want to start a long-running process that continues even after your Node.js script finishes — like a background server or a scheduled task.
+
+To achieve this, you can use the `detached` option in `spawn()`:
+
+```js
+import { spawn } from "node:child_process";
+
+const child = spawn("node", ["long_running_task.js"], {
+  detached: true,
+  stdio: "ignore",
+});
+
+child.unref();
+
+console.log(`Started background process with PID: ${child.pid}`);
+```
+
+There are two key pieces here:
+
+- `detached: true` — This tells the OS to run the child process independently of the parent. On Unix systems, the child becomes the leader of a new process group. On Windows, it allows the child to continue after the parent exits.
+- `child.unref()` — By default, the parent process will wait for all attached children before exiting. Calling `unref()` tells Node.js: "Don't keep the parent alive just because this child is still running."
+- `stdio: "ignore"` — Since the parent won't be around to receive output, we disconnect the standard streams. Without this, the parent might hang waiting for the child's streams to close.
+
+Here's an example of a long-running task that writes to a file every second:
+
+```js title="long_running_task.js"
+import fs from "node:fs";
+
+setInterval(() => {
+  const timestamp = new Date().toISOString();
+  fs.appendFileSync("log.txt", `Heartbeat at ${timestamp}\n`);
+}, 1000);
+```
+
+```js title="main.js"
+import { spawn } from "node:child_process";
+
+const child = spawn("node", ["long_running_task.js"], {
+  detached: true,
+  stdio: "ignore",
+});
+
+child.unref();
+
+console.log(`Started background process with PID: ${child.pid}`);
+console.log("Parent process exiting...");
+```
+
+After running this, your terminal returns immediately, but the child process keeps running in the background. You'll see `log.txt` growing with new entries every second. To stop it, you'll need to manually kill the process using the `PID`:
+
+```bash
+kill 12345
+```
+
+## Worker Thread vs Child Process
+
+Now that you understand how worker threads and child processes work, which one should you choose?
+
+Worker threads have a small memory footprint and a faster startup time since they run within the main Node.js process. Child processes, on the other hand, are completely separate Node.js processes with their own memory space and V8 engine instances (with independent Node.js runtime and event loop).
+
+**Choose worker threads** if you want to run CPU-intensive JavaScript operations, although the main Node.js event loop should still be used for asynchronous I/O activities.
+
+**Choose child processes** if you want to run external programs (like Python or shell scripts), tasks requiring complete process isolation, or operations that might crash or need independent lifecycle management.

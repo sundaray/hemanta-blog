@@ -1,0 +1,73 @@
+---
+title: "2 Key Features of ES Modules in Node.js"
+description: "Explore two key features of ES modules in Node.js: static imports and top-level await."
+author: "Hemanta Sundaray"
+publishedAt: "2025-12-15"
+tags: ["Node.js"]
+isPublished: true
+---
+
+import { Note } from "@/components/blog/note";
+
+Node.js supports two module systems: CommonJS and ECMAScript (ES) modules.
+
+CommonJS was the original module system built into Node.js. It remains widely used, especially in older codebases and many npm packages. However, ES modules are now the recommended approach for new projects.
+
+In this blog post, let’s explore two key features of ES modules you must understand.
+
+## ES Modules are Static
+
+The term “static” means that the structure of imports and exports is determined at parse time, not at runtime. The JavaScript engine reads your import/export statements and builds the complete module dependency graph without executing a single line of your code.
+
+In practice, this means that:
+
+### Import paths must be literal strings
+
+In ES modules, the import path must be a string literal that the parser can see:
+
+```js
+import { readFile } from "node:fs";
+
+const fsModule = "node:fs";
+
+// SyntaxError: Unexpected identifier 'fsModule'
+import {readFile} from fsModule
+```
+
+### Imports must be at the top-level
+
+ES module imports cannot appear inside functions, conditionals, or any other block:
+
+```js
+if (process.env.NODE_ENV === "production") {
+  // An import declaration can only be used at the top level of a module.
+  import { logger } from "./logger.js";
+}
+```
+
+A benefit of ES modules being static is that bundlers can perform static analysis to determine which exports are actually consumed. They can then safely eliminate exports that no module ever imports from the final bundle. This is called **tree shaking**.
+
+<Note>
+
+**What is parsing ?**
+
+Before the Node.js interpreter can execute any code in a JavaScript file, it must first find all imports. This is exactly what happens in the parsing phase (the first of three phases that ES modules go through when being loaded).
+
+In this phase, the Node.js interpreter identifies all import declarations and recursively loads the content of each imported module from their respective files.
+
+</Note >
+
+## ES Modules Allow Top-Level Await
+
+Some modules need to do async work before they're actually ready to be used. Think database connections, fetching remote configuration, loading cached data, etc.
+
+Before top-level await existed, you couldn't just `await` at the module level. You had to use `await` inside an async function. Top-level await removes this restriction in ES modules. You can use `await` directly at the module level, outside of any function.
+
+```js
+import {readFile} from “node:fs/promises”
+
+// Top-level await - no async function wrapper needed!
+const configJson = await readFile("./config.json", "utf-8");
+
+export const config = JSON.parse(raw)
+```

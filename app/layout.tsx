@@ -10,8 +10,6 @@ import "@/app/styles/globals.css";
 
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
-// export const dynamic = "force-dynamic";
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],

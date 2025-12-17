@@ -25,5 +25,6 @@
 
     "^[./]"
   ],
-  "importOrderTypeScriptVersion": "5.0.0"
+  "importOrderTypeScriptVersion": "5.0.0",
+  "overrides": [{ "files": "*.mdx", "options": { "importOrder": [] } }]
 }

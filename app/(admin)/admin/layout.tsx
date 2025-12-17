@@ -2,10 +2,9 @@ import type { Metadata } from "next";
 
 import { navbarLinks } from "@/config/navbar";
 
-import { AdminSidebar } from "@/components/admin-sidebar";
+import { BreadcrumbBar } from "@/components/breadcrumb-bar";
 import { MainNav } from "@/components/navigation/main-nav";
 import { MainNavWrapper } from "@/components/navigation/main-nav-wrapper";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard",
@@ -15,6 +14,7 @@ export const metadata: Metadata = {
     follow: false,
   },
 };
+
 export default function AdminLayout(props: LayoutProps<"/admin">) {
   return (
     <>
@@ -22,18 +22,11 @@ export default function AdminLayout(props: LayoutProps<"/admin">) {
         <MainNavWrapper>
           <MainNav links={navbarLinks.main} />
         </MainNavWrapper>
+        <BreadcrumbBar />
       </header>
-      <div className="py-(--main-content-padding) container mx-auto max-w-6xl px-4">
-        <SidebarProvider>
-          <aside className="top-(--main-nav-height) sticky self-start">
-            <AdminSidebar />
-          </aside>
-          <main className="relative flex-1">
-            <SidebarTrigger className="absolute left-2 top-2" />
-            <div className="mx-auto w-full max-w-xl">{props.children}</div>
-          </main>
-        </SidebarProvider>
-      </div>
+      <main className="py-(--main-content-padding) container mx-auto max-w-4xl flex-1 px-4">
+        {props.children}
+      </main>
     </>
   );
 }
