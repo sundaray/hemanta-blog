@@ -3,6 +3,7 @@ title: "Implementing Retries with Exponential Backoff"
 description: "Learn how to handle temporary API failures using exponential backoff."
 author: "Hemanta Sundaray"
 publishedAt: "2025-12-17"
+updatedAt: "2025-12-18"
 tags: ["Node.js"]
 isPublished: true
 ---
@@ -152,7 +153,7 @@ async function fetchUser(id: string): Promise<User> {
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}`);
   }
-  return response.json();
+  return await response.json();
 }
 
 // Create a retry-enabled version of fetchUser

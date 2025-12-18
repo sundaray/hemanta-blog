@@ -1,0 +1,143 @@
+---
+title: "Understanding Iterators in Javascript"
+description: "Learn what iterators are and how they work under the hood."
+author: "Hemanta Sundaray"
+publishedAt: "2025-12-18"
+tags: ["JavaScript"]
+isPublished: true
+---
+
+import { Note } from "@/components/blog/note";
+
+In JavaScript, arrays, strings, Maps, Sets, and TypedArrays are all iterable. This means they have a standard way to provide an iterator for their contents. But what exactly is an iterator? How does it work? And what does it mean for an object to provide an iterator?
+
+Let's find out.
+
+## What is an Iterator?
+
+An iterator is an object that knows how to access items from a collection one at a time, while tracking its current position. It follows a simple protocol: it must have a `next()` method that returns an object with two properties:
+
+- **value**: the current item
+- **done**: a boolean indicating whether the iteration is complete
+
+That's it. Any object with a `next()` method that returns `{ value, done }` is an iterator.
+
+## What is an Iterable?
+
+An iterable is any object that can provide an iterator for its contents. Technically, this means the object has a method at the key `Symbol.iterator` that, when called, returns an iterator.
+
+For example, an array is an iterable:
+
+```js
+const array = [1, 2, 3];
+
+// Arrays have a Symbol.iterator method
+console.log(typeof array[Symbol.iterator]); // "function"
+
+// Calling it returns an iterator
+const iterator = array[Symbol.iterator]();
+
+console.log(typeof iterator.next); // "function"
+```
+
+When we say "arrays are iterable," we mean arrays have this built-in `Symbol.iterator` method.
+
+<Note>
+  Until ES6, object property keys in JavaScript could only be strings. ES6
+  introduced **Symbols**: unique primitive values that can also be used as
+  property keys. `Symbol.iterator` is a built-in Symbol that JavaScript uses to
+  look up the `iterator` method on an object.
+</Note>
+
+## You're Already Using Iterators
+
+If you've ever used a `for...of` loop, you've used iterators:
+
+```js
+const numbers = [10, 20, 30];
+
+for (const num of numbers) {
+  console.log(num);
+}
+```
+
+This familiar syntax uses iterators under the hood. JavaScript automatically gets the array's iterator and calls `next()` repeatedly until the iteration is complete.
+
+So how does this actually work? Let's construct an iterator manually.
+
+## Getting an Iterator Manually
+
+Here's how you'd manually get and use an array's iterator:
+
+```js
+const numbers = [10, 20, 30];
+
+// Get the iterator
+const iterator = numbers[Symbol.iterator]();
+
+// Manually call next() to get each value
+console.log(iterator.next()); // { value: 10, done: false }
+console.log(iterator.next()); // { value: 20, done: false }
+console.log(iterator.next()); // { value: 30, done: false }
+console.log(iterator.next()); // { value: undefined, done: true }
+```
+
+Each call to `next()` advances the iterator's internal position. Once exhausted, `done` becomes `true`, signaling the iteration is complete and there are no more values to return.
+
+## How `for...of` Works Under the Hood
+
+Now that we know how to use an iterator manually, we can see what `for...of` is really doing. When you write:
+
+```js
+for (const num of numbers) {
+  console.log(num);
+}
+```
+
+JavaScript essentially does this:
+
+```js
+const iterator = numbers[Symbol.iterator]();
+let result = iterator.next();
+
+while (!result.done) {
+  const num = result.value;
+  console.log(num);
+  result = iterator.next();
+}
+```
+
+The `for...of` loop is syntactic sugar that automates getting the iterator and calling `next()` until `done` is `true`.
+
+## Early Termination with `return()`
+
+Sometimes while iterating, you want to stop midway. Maybe you're searching for a specific item in a collection, and once you find it, there's no need to continue.
+
+Your first thought might be: "Just stop calling `next()`." But here's the problem: the iterator has no way to know you're done with it. It just sits there, waiting for the next `next()` call that will never come.
+
+For simple array iterators, this isn't a big deal. But consider iterators that hold onto resources:
+
+```js
+// Hypothetical file line iterator
+const lineIterator = readFileLines("huge-file.txt");
+
+lineIterator.next(); // opens file handle internally
+lineIterator.next();
+lineIterator.next();
+
+// We stop here. The file handle is never closed.
+```
+
+The iterator opened a file, and now it's stuck open because the iterator doesn't know we're finished.
+
+This is why iterators can have a `return()` method. It signals: "I'm done early, please clean up." When called, it returns `{ done: true }` and gives the iterator a chance to release any resources it's holding onto.
+
+## The `throw()` Method
+
+Iterators can also have a `throw()` method. It's used to inject an exception into an iterator at its current position. In practice, `throw()` is rarely used and you likely won't need it in everyday code.
+
+## Summary
+
+Iterators have three methods: `next()` to get the next value, `return()` to signal early termination and allow cleanup, and `throw()` to inject an exception.
+
+The iterator protocol is simple but powerful. It provides a standard interface for sequential access to data, enabling `for...of` to work uniformly across arrays, strings, Maps, Sets, and any custom iterable you create.
