@@ -1,0 +1,106 @@
+---
+title: "Promisification in Node.js Explained"
+description: "Learn how promisification bridges Node.js's callback-based origins with modern async/await syntax, and when you'd actually use it today."
+author: "Hemanta Sundaray"
+publishedAt: "2025-12-19"
+tags: ["Node.js"]
+isPublished: true
+---
+
+import { Note } from "@/components/blog/note";
+
+Promisification makes a lot more sense when you understand the historical context and see practical scenarios where you'd actually use it.
+
+## The Historical Context
+
+Node.js was created in 2009, long before Promises were standardized in JavaScript (ES2015). So the entire Node.js core API was built using callbacks. Functions like `fs.readFile`, `fs.writeFile`, `crypto.randomBytes`, `dns.lookup`, and many others all used the callback pattern.
+
+When Promises became standard, developers wanted to use `async/await` with these callback-based functions. That's where promisification comes in. It's a bridge between the old callback world and the modern Promise world.
+
+## A Concrete Example: Reading a File
+
+Let's start with something you've probably done before. The callback-based way to [read a file](/blog/file-system-operations-using-nodejs-fs-module#reading-files):
+
+```typescript
+import { readFile } from "node:fs";
+
+// The callback way - this is how Node.js APIs were originally designed
+readFile("./config.json", "utf-8", (err, data) => {
+  if (err) {
+    console.error("Failed to read file:", err.message);
+    return;
+  }
+  console.log("File contents:", data);
+});
+```
+
+This works, but what if you want to read multiple files in sequence? You end up with nested callbacks (the infamous **callback hell**):
+
+```typescript
+readFile("./config.json", "utf-8", (err, config) => {
+  if (err) return console.error(err);
+
+  readFile("./users.json", "utf-8", (err, users) => {
+    if (err) return console.error(err);
+
+    readFile("./products.json", "utf-8", (err, products) => {
+      if (err) return console.error(err);
+
+      // Finally do something with all three files
+      console.log(config, users, products);
+    });
+  });
+});
+```
+
+Now let's promisify `readFile` and see how much cleaner it becomes:
+
+```typescript
+import { readFile } from "node:fs";
+import { promisify } from "node:util";
+
+const readFileAsync = promisify(readFile);
+
+async function loadAllData() {
+  try {
+    const config = await readFileAsync("./config.json", "utf-8");
+    const users = await readFileAsync("./users.json", "utf-8");
+    const products = await readFileAsync("./products.json", "utf-8");
+
+    console.log(config, users, products);
+  } catch (err) {
+    console.error("Failed to read files:", err);
+  }
+}
+```
+
+Much cleaner! And you can even run them in parallel:
+
+```typescript
+const [config, users, products] = await Promise.all([
+  readFileAsync("./config.json", "utf-8"),
+  readFileAsync("./users.json", "utf-8"),
+  readFileAsync("./products.json", "utf-8"),
+]);
+```
+
+<Note>
+Modern Node.js provides promise-based versions of most core modules out of the box. For the `fs` module, you can simply import from `node:fs/promises`:
+>
+ ```typescript
+ import { readFile } from "node:fs/promises";
+
+// No promisification needed!
+const config = await readFile("./config.json", "utf-8");
+
+```
+>
+The examples above use `promisify` purely to demonstrate how the function works.
+</Note>
+
+## Summary
+
+Today, you'll rarely need to manually promisify things because Node.js now provides Promise-based APIs directly. And most modern libraries use Promises by default.
+
+You'd reach for `promisify` when you encounter a callback-based API that doesn't have a Promise alternative. This happens most often with older third-party libraries or when maintaining legacy code.
+```

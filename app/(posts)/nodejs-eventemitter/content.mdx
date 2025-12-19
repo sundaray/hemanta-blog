@@ -1,0 +1,596 @@
+---
+title: "How EventEmitter Works in Node.js"
+description: "Understand how EventEmitter enables Node.js's event-driven architecture and learn to build your own observable classes."
+author: "Hemanta Sundaray"
+publishedAt: "2025-12-19"
+tags: ["Node.js"]
+isPublished: true
+---
+
+The `EventEmitter` is the foundation of Node.js's event-driven architecture. At its core, it allows objects to emit named events and register listeners that respond to those events. But what does this actually mean, and why should you care?
+
+Think of an `EventEmitter` as a notification system. Instead of code calling other code directly (like a function call), one part of your program announces "something happened" and other parts that care about that thing respond.
+
+## The Core Idea
+
+The two key operations are:
+
+1. **Emitting**: Broadcasting that something occurred, along with any relevant data
+2. **Listening**: Registering a listener to run when a specific event is broadcast
+
+Here's a simple example to illustrate:
+
+```typescript
+import { EventEmitter } from "node:events";
+
+const emitter = new EventEmitter();
+
+// Register a listener for the "userSignedUp" event
+emitter.on("userSignedUp", function (user: { email: string }) {
+  console.log(`Welcome email sent to ${user.email}`);
+});
+
+// Register another listener for the same event
+emitter.on("userSignedUp", function (user: { email: string }) {
+  console.log(`Analytics tracked for ${user.email}`);
+});
+
+// Later, when a user signs up, emit the event
+emitter.emit("userSignedUp", { email: "hemanta@example.com" });
+```
+
+Running this would output:
+
+```
+Welcome email sent to hemanta@example.com
+Analytics tracked for hemanta@example.com
+```
+
+## Why This Matters
+
+The power here is **decoupling**. The code that emits the event doesn't need to know (or care) what happens in response. It just announces "a user signed up" and moves on. This creates a few benefits:
+
+- **Loose coupling**: The signup logic doesn't import or call the email service or analytics service directly. You can add, remove, or modify listeners without touching the emitting code.
+
+- **Multiple responders**: A single event can trigger many different actions. Each listener handles its own concern independently.
+
+- **Asynchronous thinking**: This pattern naturally fits scenarios where you don't want to block execution waiting for side effects to complete.
+
+## How Node.js Uses EventEmitter Internally
+
+Almost every I/O-related class in Node.js extends `EventEmitter`. Let me show you a few:
+
+### Streams
+
+All streams ([Readable](/blog/nodejs-streams#readable-streams), [Writable](/blog/nodejs-streams#writable-streams), [Duplex](/blog/nodejs-streams#duplex-streams), [Transform](/blog/nodejs-streams#transform-streams)) extend `EventEmitter`:
+
+```typescript
+import { createReadStream } from "node:fs";
+
+const stream = createReadStream("./large-file.txt");
+
+// These methods come from EventEmitter
+stream.on("data", function (chunk) {
+  console.log(`Received ${chunk.length} bytes`);
+});
+
+stream.on("end", function () {
+  console.log("Finished reading");
+});
+
+stream.on("error", function (err) {
+  console.error("Read failed:", err);
+});
+```
+
+### HTTP Server
+
+The `http.Server` class extends `net.Server`, which extends EventEmitter:
+
+```typescript
+import { createServer } from "node:http";
+
+const server = createServer();
+
+server.on("request", function (req, res) {
+  res.end("Hello");
+});
+
+server.on("listening", function () {
+  console.log("Server is ready");
+});
+
+server.on("close", function () {
+  console.log("Server shut down");
+});
+
+server.listen(3000);
+```
+
+### Child Processes
+
+[Spawned processes](/blog/nodejs-worker-threads-child-processes#spawn) are observable:
+
+```typescript
+import { spawn } from "node:child_process";
+
+const child = spawn("ls", ["-la"]);
+
+child.stdout.on("data", function (data) {
+  console.log(`Output: ${data}`);
+});
+
+child.on("exit", function (code) {
+  console.log(`Process exited with code ${code}`);
+});
+```
+
+## Creating Custom EventEmitters
+
+In the Node.js world, the `EventEmitter` is rarely used on its own. Instead, it's more common to see it extended by other classes. This enables any class to inherit the capabilities of the `EventEmitter`, becoming an "observable" object — meaning external code can subscribe to be notified when interesting things happen inside it.
+
+When a class extends `EventEmitter`, it gains all the event capabilities (`.on()`, `.emit()`, `.once()`, etc.) while also having its own domain-specific methods and state. The key insight is that the `EventEmitter` becomes part of the object's identity, not a separate thing you interact with.
+
+Here's a practical example: a session manager that other parts of an application can observe:
+
+```typescript
+import { EventEmitter } from "node:events";
+import crypto from "node:crypto";
+
+interface Session {
+  userId: string;
+  token: string;
+  expiresAt: Date;
+}
+
+interface SessionManagerEvents {
+  sessionCreated: [session: Session];
+  sessionExpired: [userId: string];
+  sessionRevoked: [userId: string, reason: string];
+  error: [error: Error];
+}
+
+class SessionManager extends EventEmitter<SessionManagerEvents> {
+  private sessions: Map<string, Session> = new Map();
+
+  createSession(userId: string): Session {
+    const session: Session = {
+      userId,
+      token: crypto.randomUUID(),
+      expiresAt: new Date(Date.now() + 3600_000),
+    };
+
+    this.sessions.set(userId, session);
+    this.emit("sessionCreated", session);
+
+    return session;
+  }
+
+  revokeSession(userId: string, reason: string): void {
+    const session = this.sessions.get(userId);
+
+    if (!session) {
+      this.emit("error", new Error(`No session found for user ${userId}`));
+      return;
+    }
+
+    this.sessions.delete(userId);
+    this.emit("sessionRevoked", userId, reason);
+  }
+
+  validateSession(token: string): Session | null {
+    for (const session of this.sessions.values()) {
+      if (session.token === token) {
+        if (session.expiresAt < new Date()) {
+          this.sessions.delete(session.userId);
+          this.emit("sessionExpired", session.userId);
+          return null;
+        }
+        return session;
+      }
+    }
+    return null;
+  }
+}
+```
+
+Now different parts of your application can react to session events independently:
+
+```typescript
+const sessionManager = new SessionManager();
+
+// Logging concern
+sessionManager.on("sessionCreated", function (session) {
+  logger.info(`New session for user ${session.userId}`);
+});
+
+// Analytics concern
+sessionManager.on("sessionCreated", function (session) {
+  analytics.track("session_started", { userId: session.userId });
+});
+
+// Security concern
+sessionManager.on("sessionRevoked", function (userId, reason) {
+  securityAudit.log(`Session revoked: ${userId}, reason: ${reason}`);
+});
+
+// Error handling
+sessionManager.on("error", function (err) {
+  logger.error("Session error:", err.message);
+});
+```
+
+The session manager's internal logic stays focused on its primary responsibility, while side effects (logging, analytics, notifications) are handled by listeners that are completely decoupled.
+
+### Error Handling
+
+EventEmitters treat the `"error"` event specially. When you emit an `"error"` event and there are no listeners registered for it, Node.js doesn't silently ignore it. Instead, it throws the error, which will crash your process.
+
+```typescript
+import { EventEmitter } from "node:events";
+
+const emitter = new EventEmitter();
+
+// No error listener registered
+emitter.emit("error", new Error("Something went wrong"));
+
+// This line never runs — the process crashes
+console.log("After emit");
+```
+
+Compare this to a regular event with no listeners:
+
+```typescript
+const emitter = new EventEmitter();
+
+// No listener for "data"
+emitter.emit("data", { some: "payload" });
+
+// This runs fine — the event is simply ignored
+console.log("After emit");
+```
+
+The reasoning behind this design is that errors represent exceptional conditions that should not be silently ignored. If something goes wrong and no code is prepared to handle it, Node.js forces you to notice by crashing rather than letting the error disappear.
+
+This is why our `SessionManager` example includes an `"error"` event in its type definition and why consumers should always attach an error listener:
+
+```typescript
+sessionManager.on("error", function (err) {
+  logger.error("Session error:", err.message);
+});
+```
+
+Node.js also has a built-in safeguard: if more than 10 listeners are added to a single event, you'll see a warning:
+
+```
+MaxListenersExceededWarning: Possible EventEmitter memory leak detected.
+11 sessionCreated listeners added to [SessionManager].
+```
+
+This warning exists because of a closely related concern: memory management.
+
+### Memory Management
+
+`EventEmitters` can be a source of memory leaks if listeners aren't properly removed when no longer needed. When you call `.on()` or `.addListener()`, the `EventEmitter` stores a reference to your callback function internally. That reference persists until you explicitly remove it.
+
+The problem arises when you keep adding listeners without removing them. Each one stays in memory, and the objects those listeners reference can't be garbage collected.
+
+Consider this problematic pattern with our session manager:
+
+```typescript
+function handleWebSocketConnection(
+  socket: WebSocket,
+  sessionManager: SessionManager,
+): void {
+  // BAD: Every new connection adds a listener that's never removed
+  sessionManager.on("sessionRevoked", function (userId) {
+    socket.send(JSON.stringify({ type: "logout", userId }));
+  });
+}
+```
+
+If you get 10,000 WebSocket connections, you now have 10,000 listeners attached, each holding a reference to its respective socket. Even if those sockets disconnect and would otherwise be garbage collected, the listener references keep them alive.
+
+There are several strategies to prevent this:
+
+**Use `.removeListener()` or `.off()`** — Keep a reference to your callback and remove it during cleanup:
+
+```typescript
+function handleWebSocketConnection(
+  socket: WebSocket,
+  sessionManager: SessionManager,
+): void {
+  const handler = function (userId: string) {
+    socket.send(JSON.stringify({ type: "logout", userId }));
+  };
+
+  sessionManager.on("sessionRevoked", handler);
+
+  socket.on("close", function () {
+    sessionManager.off("sessionRevoked", handler);
+  });
+}
+```
+
+**Use `.once()` for one-time listeners** — The listener is automatically removed after it fires:
+
+```typescript
+sessionManager.once("sessionCreated", function (session) {
+  console.log("First session created:", session.userId);
+});
+```
+
+**Use AbortController for cleanup** — This is especially useful when you have multiple listeners to clean up at once:
+
+```typescript
+function handleWebSocketConnection(
+  socket: WebSocket,
+  sessionManager: SessionManager,
+): void {
+  const controller = new AbortController();
+  const { signal } = controller;
+
+  sessionManager.on(
+    "sessionRevoked",
+    function (userId) {
+      socket.send(JSON.stringify({ type: "logout", userId }));
+    },
+    { signal },
+  );
+
+  sessionManager.on(
+    "sessionExpired",
+    function (userId) {
+      socket.send(JSON.stringify({ type: "expired", userId }));
+    },
+    { signal },
+  );
+
+  socket.on("close", function () {
+    controller.abort(); // Removes all listeners at once
+  });
+}
+```
+
+The key insight is this: every `.on()` should have a corresponding `.off()` somewhere in your code's lifecycle, unless you're using `.once()` or the listener truly should live forever. When you're adding listeners dynamically (in handlers, loops, or constructors of short-lived objects), that's when you need to be especially careful about cleanup.
+
+## The Modern Alternative: Promises and Async Iterators
+
+In some cases, you'll see an `EventEmitter` used alongside a callback. This pattern is useful when you need to handle the final result of an asynchronous operation with a callback, but also want to emit progress events as the operation runs.
+
+Here's an example: a file download function that reports progress and completion:
+
+```typescript
+import { EventEmitter } from "node:events";
+import { createWriteStream } from "node:fs";
+import https from "node:https";
+
+interface DownloadProgress {
+  bytesDownloaded: number;
+  totalBytes: number | null;
+  percentage: number | null;
+}
+
+interface DownloadResult {
+  filePath: string;
+  totalBytes: number;
+  durationMs: number;
+}
+
+function downloadFile(
+  url: string,
+  destPath: string,
+  callback: (error: Error | null, result?: DownloadResult) => void,
+): EventEmitter {
+  const emitter = new EventEmitter();
+  const startTime = Date.now();
+
+  https
+    .get(url, function (response) {
+      const totalBytes = parseInt(
+        response.headers["content-length"] || "0",
+        10,
+      );
+      let bytesDownloaded = 0;
+
+      const fileStream = createWriteStream(destPath);
+
+      response.on("data", function (chunk: Buffer) {
+        bytesDownloaded += chunk.length;
+
+        emitter.emit("progress", {
+          bytesDownloaded,
+          totalBytes: totalBytes || null,
+          percentage: totalBytes ? (bytesDownloaded / totalBytes) * 100 : null,
+        } satisfies DownloadProgress);
+      });
+
+      response.pipe(fileStream);
+
+      fileStream.on("finish", function () {
+        callback(null, {
+          filePath: destPath,
+          totalBytes: bytesDownloaded,
+          durationMs: Date.now() - startTime,
+        });
+      });
+
+      fileStream.on("error", function (err) {
+        callback(err);
+      });
+    })
+    .on("error", function (err) {
+      callback(err);
+    });
+
+  return emitter;
+}
+```
+
+And here's how you'd use it:
+
+```typescript
+const download = downloadFile(
+  "https://example.com/large-file.zip",
+  "./download.zip",
+  function (error, result) {
+    if (error) {
+      console.error("Download failed:", error);
+      return;
+    }
+    console.log(
+      `Downloaded ${result.totalBytes} bytes in ${result.durationMs}ms`,
+    );
+  },
+);
+
+download.on("progress", function (progress: DownloadProgress) {
+  if (progress.percentage !== null) {
+    console.log(`Progress: ${progress.percentage.toFixed(1)}%`);
+  }
+});
+```
+
+This pattern is useful for managing long-running tasks where you need to track both completion and real-time progress. It's applicable to file uploads, data processing pipelines, database migrations, and more. Interestingly, the `get()` function from the `node:https` module uses this exact pattern. It provides a callback for accessing the response while also returning an EventEmitter to monitor the ongoing request.
+
+However, this callback + EventEmitter pattern is gradually being replaced by combining promises and async [iterators](/blog/javascript-iterators). The modern approach uses a Promise for completion and an async iterator for progress, integrating better with async/await and eliminating callback nesting.
+
+Here's the same functionality rewritten:
+
+```typescript
+import { createWriteStream } from "node:fs";
+import https from "node:https";
+
+interface DownloadProgress {
+  bytesDownloaded: number;
+  totalBytes: number | null;
+  percentage: number | null;
+}
+
+interface DownloadResult {
+  filePath: string;
+  totalBytes: number;
+  durationMs: number;
+}
+
+interface DownloadHandle {
+  progress: AsyncIterable<DownloadProgress>;
+  result: Promise<DownloadResult>;
+}
+
+function downloadFile(url: string, destPath: string): DownloadHandle {
+  const progressQueue: DownloadProgress[] = [];
+  let resolveNext: ((value: DownloadProgress | null) => void) | null = null;
+  let done = false;
+
+  function pushProgress(progress: DownloadProgress | null): void {
+    if (progress === null) {
+      done = true;
+    }
+
+    if (resolveNext) {
+      resolveNext(progress);
+      resolveNext = null;
+    } else if (progress !== null) {
+      progressQueue.push(progress);
+    }
+  }
+
+  async function* progressIterator(): AsyncGenerator<DownloadProgress> {
+    while (true) {
+      if (progressQueue.length > 0) {
+        yield progressQueue.shift()!;
+      } else if (done) {
+        return;
+      } else {
+        const next = await new Promise<DownloadProgress | null>(function (
+          resolve,
+        ) {
+          resolveNext = resolve;
+        });
+
+        if (next === null) return;
+        yield next;
+      }
+    }
+  }
+
+  const startTime = Date.now();
+
+  const result = new Promise<DownloadResult>(function (resolve, reject) {
+    https
+      .get(url, function (response) {
+        const totalBytes = parseInt(
+          response.headers["content-length"] || "0",
+          10,
+        );
+        let bytesDownloaded = 0;
+
+        const fileStream = createWriteStream(destPath);
+
+        response.on("data", function (chunk: Buffer) {
+          bytesDownloaded += chunk.length;
+
+          pushProgress({
+            bytesDownloaded,
+            totalBytes: totalBytes || null,
+            percentage: totalBytes
+              ? (bytesDownloaded / totalBytes) * 100
+              : null,
+          });
+        });
+
+        response.pipe(fileStream);
+
+        fileStream.on("finish", function () {
+          pushProgress(null);
+          resolve({
+            filePath: destPath,
+            totalBytes: bytesDownloaded,
+            durationMs: Date.now() - startTime,
+          });
+        });
+
+        fileStream.on("error", reject);
+      })
+      .on("error", reject);
+  });
+
+  return {
+    progress: progressIterator(),
+    result,
+  };
+}
+```
+
+Now the consumer code is much cleaner with async/await:
+
+```typescript
+async function main(): Promise<void> {
+  const download = downloadFile(
+    "https://example.com/large-file.zip",
+    "./download.zip",
+  );
+
+  for await (const progress of download.progress) {
+    if (progress.percentage !== null) {
+      console.log(`Progress: ${progress.percentage.toFixed(1)}%`);
+    }
+  }
+
+  const result = await download.result;
+  console.log(
+    `Downloaded ${result.totalBytes} bytes in ${result.durationMs}ms`,
+  );
+}
+```
+
+The modern approach offers several advantages. Error handling is unified. With callbacks + EventEmitters, errors can come from multiple places and need multiple handlers, but with promises, a single try/catch handles everything. Async iterators are also composable, working with iteration utilities. They naturally handle backpressure (if your consumer is slow, the producer waits), and there's no manual cleanup needed. The iteration just ends when the generator returns.
+
+That said, the `EventEmitter` pattern isn't obsolete. It's still ideal when multiple independent listeners need to respond to the same events (pub/sub pattern), when the emitter is long-lived (like a server or connection pool) rather than a single operation, or when you're building infrastructure that others will extend. The shift toward promises and async iterators is specifically for single operations with progress: things like file transfers, batch processing, or migrations where there's a clear start and end.
+
+## Conclusion
+
+The `EventEmitter` is one of those foundational patterns that, once you understand it, you'll start seeing everywhere in Node.js. Whether you're reading from streams, handling HTTP requests, or building your own observable classes, the same principles apply: emit events to announce what happened, listen for events to respond, handle errors explicitly, and clean up listeners when they're no longer needed.
+
+As Node.js evolves, the combination of promises and async iterators is becoming the preferred approach for single operations that need progress tracking. But for pub/sub scenarios, long-lived objects, and extensible infrastructure, extending `EventEmitter` remains the idiomatic Node.js pattern.

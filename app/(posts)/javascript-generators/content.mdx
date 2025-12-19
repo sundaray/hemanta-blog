@@ -1,0 +1,347 @@
+---
+title: "Understanding Generators in Javascript"
+description: "Learn what generators are and how they work under the hood."
+author: "Hemanta Sundaray"
+publishedAt: "2025-12-19"
+tags: ["JavaScript"]
+isPublished: true
+---
+
+A generator function is a special type of function that can **pause its execution** at specific points and **resume later** from where it left off.
+
+Unlike regular functions that run from start to finish in one go, generator functions can yield control back to the caller multiple times, maintaining their internal state between each pause.
+
+## Definition
+
+You define a generator function by placing an asterisk (`*`) between the `function` keyword and the function name. The spacing around the asterisk is flexible. All of these are valid and equivalent:
+
+```ts
+// Asterisk attached to 'function'
+function* generatorOne(): Generator {
+  yield 1;
+}
+
+// Asterisk attached to function name
+function *generatorTwo(): Generator {
+  yield 2;
+}
+
+// Asterisk with spaces on both sides
+function * generatorThree(): Generator {
+  yield 3;
+}
+
+// No spaces at all
+function*generatorFour(): Generator {
+  yield 4;
+}
+```
+
+The asterisk is simply a syntactic marker that tells the engine "this is a generator function, not a regular function."
+
+### Generator methods in objects and classes
+
+You can also define generator methods:
+
+```ts
+const obj = {
+  *values(): Generator<number> {
+    yield 1;
+    yield 2;
+  },
+};
+
+class MyClass {
+  *items(): Generator<string> {
+    yield "a";
+    yield "b";
+  }
+}
+```
+
+### Arrow functions cannot be generators
+
+Arrow functions cannot be generator functions. There's no valid syntax for it:
+
+```ts
+// None of these work:
+const gen = *() => { yield 1; };      // Syntax error
+const gen = ()* => { yield 1; };      // Syntax error
+const gen = () *=> { yield 1; };      // Syntax error
+```
+
+If you need a generator as a value, use a function expression instead:
+
+```ts
+const myGenerator = function* (): Generator<number> {
+  yield 1;
+  yield 2;
+};
+```
+
+## Execution
+
+When you call a generator function, it doesn't execute the function body immediately. Instead, it returns a **generator object**. This generator object is an [iterator](/blog/javascript-iterators). Calling its `next()` method causes the body of the generator function to run from the start (or its current position) until it reaches a `yield` statement.
+
+The `next()` method returns an object with two properties:
+
+- **done**: a boolean indicating whether the generator has finished
+- **value**: the value returned by the current `yield`
+
+From then on, each time `next()` is invoked, execution resumes from the last `yield` and continues until another `yield` is reached. When the generator function returns, `next()` returns `{ value: returnedValue, done: true }` to indicate that iteration is complete.
+
+**Example:**
+
+```ts
+function* exampleGenerator(): Generator<number, string, unknown> {
+  console.log("Started execution");
+  yield 1;
+  console.log("Resumed after first yield");
+  yield 2;
+  console.log("Resumed after second yield");
+  return "finished";
+}
+```
+
+**Point 1: Calling the generator function returns a generator object**
+
+```ts
+const gen = exampleGenerator();
+// Nothing is logged yet! The function body hasn't run.
+```
+
+**Point 2: First `next()` runs from the start until the first `yield`**
+
+```ts
+console.log(gen.next());
+// Logs: "Started execution"
+// Returns: { value: 1, done: false }
+```
+
+**Point 3: Subsequent `next()` calls resume from where it paused**
+
+```ts
+console.log(gen.next());
+// Logs: "Resumed after first yield"
+// Returns: { value: 2, done: false }
+
+console.log(gen.next());
+// Logs: "Resumed after second yield"
+// Returns: { value: "finished", done: true }
+```
+
+**Point 4: After completion, further `next()` calls return `{ value: undefined, done: true }`**
+
+```ts
+console.log(gen.next());
+// Returns: { value: undefined, done: true }
+```
+
+**Point 5: Empty generator body**
+
+```ts
+function* emptyGenerator(): Generator<never, void, unknown> {
+  // no yields, no return
+}
+
+const empty = emptyGenerator();
+console.log(empty.next()); // { value: undefined, done: true }
+```
+
+Since there are no `yield` statements and no explicit return, calling `next()` immediately completes the generator.
+
+## The `yield` Keyword
+
+At its simplest, `yield` pauses the generator and emits a value:
+
+```ts
+function* fruitGenerator(): Generator<string> {
+  yield "apple";
+  yield "banana";
+  yield "cherry";
+}
+
+const fruits = fruitGenerator();
+console.log(fruits.next()); // { value: "apple", done: false }
+console.log(fruits.next()); // { value: "banana", done: false }
+console.log(fruits.next()); // { value: "cherry", done: false }
+console.log(fruits.next()); // { value: undefined, done: true }
+```
+
+You can think of each `yield` as a checkpoint where the function stops, hands a value to whoever called `next()`, and waits to be resumed.
+
+### `yield` as an expression
+
+`yield` is not just a statement—it's an expression that evaluates to a value. That value comes from what you pass to `next()`:
+
+```ts
+function* conversation(): Generator<string, void, string> {
+  const name = yield "What is your name?";
+  const mood = yield `Hello, ${name}! How are you?`;
+  yield `Glad to hear you're ${mood}!`;
+}
+
+const chat = conversation();
+
+console.log(chat.next()); // { value: "What is your name?", done: false }
+console.log(chat.next("Hemanta")); // { value: "Hello, Hemanta! How are you?", done: false }
+console.log(chat.next("great")); // { value: "Glad to hear you're great!", done: false }
+```
+
+The first `next()` call cannot send a value into the generator because there's no `yield` expression waiting to receive it yet.
+
+### `yield*` — delegating to another iterable
+
+The `yield*` expression delegates iteration to another iterable, yielding each of its values one by one:
+
+```ts
+function* inner(): Generator<number> {
+  yield 1;
+  yield 2;
+}
+
+function* outer(): Generator<number | string> {
+  yield "start";
+  yield* inner();
+  yield* [3, 4];
+  yield "end";
+}
+
+const gen = outer();
+console.log(gen.next()); // { value: "start", done: false }
+console.log(gen.next()); // { value: 1, done: false }
+console.log(gen.next()); // { value: 2, done: false }
+console.log(gen.next()); // { value: 3, done: false }
+console.log(gen.next()); // { value: 4, done: false }
+console.log(gen.next()); // { value: "end", done: false }
+```
+
+## Early Termination: `return()` and `throw()`
+
+Generator objects have two additional methods beyond `next()` that allow you to intervene in the generator's execution.
+
+### The `return()` method
+
+Calling `return(value)` forces the generator to complete immediately, as if a `return` statement was executed at the current pause point:
+
+```ts
+function* countUp(): Generator<number> {
+  yield 1;
+  yield 2;
+  yield 3;
+}
+
+const counter = countUp();
+console.log(counter.next()); // { value: 1, done: false }
+console.log(counter.return("stop")); // { value: "stop", done: true }
+console.log(counter.next()); // { value: undefined, done: true }
+```
+
+The generator is now exhausted. The values `2` and `3` were never yielded.
+
+If the generator has a `try...finally` block, the `finally` block still runs:
+
+```ts
+function* withCleanup(): Generator<number> {
+  try {
+    yield 1;
+    yield 2;
+  } finally {
+    console.log("Cleanup!");
+  }
+}
+
+const gen = withCleanup();
+console.log(gen.next()); // { value: 1, done: false }
+console.log(gen.return("done"));
+// Logs: "Cleanup!"
+// Returns: { value: "done", done: true }
+```
+
+### The `throw()` method
+
+Calling `throw(error)` injects an exception into the generator at its current pause point. It's as if the `yield` expression itself threw that error:
+
+```ts
+function* careful(): Generator<number> {
+  try {
+    yield 1;
+    yield 2;
+  } catch (e) {
+    console.log("Caught:", e);
+  }
+  yield 3;
+}
+
+const gen = careful();
+console.log(gen.next()); // { value: 1, done: false }
+console.log(gen.throw("Oops!")); // Logs: "Caught: Oops!" → { value: 3, done: false }
+console.log(gen.next()); // { value: undefined, done: true }
+```
+
+If the generator doesn't catch the error, it propagates out:
+
+```ts
+function* noCatch(): Generator<number> {
+  yield 1;
+  yield 2;
+}
+
+const gen = noCatch();
+console.log(gen.next()); // { value: 1, done: false }
+
+try {
+  gen.throw(new Error("Unhandled!"));
+} catch (e) {
+  console.log("Error escaped:", e);
+}
+```
+
+## Async Generators
+
+Async generators combine generators with `async`/`await`, allowing you to yield values and pause for asynchronous operations.
+
+### Syntax
+
+You define an async generator by combining `async` and `function*`:
+
+```ts
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function* asyncCounter(): AsyncGenerator<number> {
+  yield 1;
+  await delay(1000);
+  yield 2;
+  await delay(1000);
+  yield 3;
+}
+```
+
+### Using async generators
+
+Since `next()` returns a promise, you must `await` it:
+
+```ts
+async function main(): Promise<void> {
+  const counter = asyncCounter();
+
+  console.log(await counter.next()); // { value: 1, done: false }
+  console.log(await counter.next()); // After 1s: { value: 2, done: false }
+  console.log(await counter.next()); // After 1s: { value: 3, done: false }
+  console.log(await counter.next()); // { value: undefined, done: true }
+}
+```
+
+### `for await...of`
+
+Just as `for...of` works with regular iterables, `for await...of` works with async iterables:
+
+```ts
+async function main(): Promise<void> {
+  for await (const num of asyncCounter()) {
+    console.log(num); // 1, then 2, then 3 (each 1 second apart)
+  }
+}
+```
