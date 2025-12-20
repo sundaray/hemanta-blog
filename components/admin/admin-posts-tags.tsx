@@ -86,13 +86,13 @@ export function AdminPostsTags({ tags }: AdminPostsTagsProps) {
                   <Tag
                     key={tag}
                     id={tag}
-                    className="flex items-center justify-between gap-1 bg-sky-200/40 text-neutral-700 hover:bg-sky-200 hover:text-neutral-700"
+                    className="flex items-center justify-between gap-1 bg-neutral-700 text-white hover:bg-neutral-700 hover:text-white"
                   >
                     {tag}
                     <Button
                       slot="remove"
                       aria-label={`Remove ${tag} filter`}
-                      className="-mr-1 size-6 rounded-full transition-colors hover:bg-sky-300/40"
+                      className="-mr-1 size-6 rounded-full transition-colors hover:bg-neutral-700"
                     >
                       <Icons.x className="inline-block size-5" />
                     </Button>

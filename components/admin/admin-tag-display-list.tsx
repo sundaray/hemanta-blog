@@ -21,10 +21,7 @@ export function AdminTagDisplayList({
     <TagGroup aria-label="Admin post tags" className={cn(className)}>
       <TagList className="flex flex-wrap items-center gap-3">
         {tags.map((tag) => (
-          <Tag
-            key={tag}
-            href={`/admin?tab=posts&tag=${encodeURIComponent(tag)}`}
-          >
+          <Tag key={tag} href={`/admin/posts?tag=${encodeURIComponent(tag)}`}>
             {tag}
           </Tag>
         ))}
