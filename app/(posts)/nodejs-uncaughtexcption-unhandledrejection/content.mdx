@@ -1,0 +1,178 @@
+---
+title: "Understanding uncaughtException and unhandledRejection in Node.js"
+description: "Explore how uncaughtException, unhandledRejection, and rejectionHandled events work in Node.js, including the breaking changes introduced in v15."
+author: "Hemanta Sundaray"
+publishedAt: "2025-12-20"
+tags: ["Node.js"]
+isPublished: true
+---
+
+What happens when errors escape all your `try/catch` blocks and `.catch()` handlers?
+
+Node.js provides process-level events as a last line of defense.
+
+## The uncaughtException Event
+
+This event fires when a synchronous error escapes all `try/catch` blocks:
+
+```typescript
+process.on("uncaughtException", function (err, origin) {
+  console.error("=================================");
+  console.error("UNCAUGHT EXCEPTION!");
+  console.error("Error:", err.message);
+  console.error("Origin:", origin);
+  console.error("Stack:", err.stack);
+  console.error("=================================");
+
+  // Perform synchronous cleanup here
+  // ...
+
+  // Then exit - continuing is NOT safe!
+  process.exit(1);
+});
+
+// This error will trigger the handler
+setTimeout(function () {
+  throw new Error("Unhandled error in callback");
+}, 1000);
+```
+
+The correct use of `uncaughtException` is to perform synchronous cleanup of allocated resources before shutting down the process. It is not safe to resume normal operation after an uncaught exception.
+
+Why? After an uncaught exception, your process may be in an undefined state:
+
+- Variables could be corrupted
+- Resources could be half-allocated
+- Invariants could be broken
+- Database transactions could be incomplete
+
+Continuing execution risks data corruption and cascading failures.
+
+## The `unhandledRejection` Event
+
+This event fires when a promise is rejected and there's no `.catch()` handler:
+
+```typescript
+process.on("unhandledRejection", function (reason, promise) {
+  console.error("=================================");
+  console.error("UNHANDLED REJECTION!");
+  console.error("Reason:", reason);
+  console.error("=================================");
+});
+
+// This rejection will trigger the handler
+Promise.reject(new Error("Nobody caught me"));
+
+// So will this
+async function doSomething() {
+  throw new Error("Async error");
+}
+doSomething(); // Called without .catch() or try/await
+```
+
+## The `rejectionHandled` Event
+
+This event fires when a promise rejection is handled after it was initially detected as unhandled:
+
+```typescript
+process.on("unhandledRejection", function (reason, promise) {
+  console.log("2. Rejection detected as unhandled");
+});
+
+process.on("rejectionHandled", function (promise) {
+  console.log("3. Rejection was handled late");
+});
+
+// Create a rejected promise without handling it
+const rejected = Promise.reject(new Error("Test"));
+
+console.log("1. Setting up delayed handler...");
+
+// Handle it later
+setTimeout(function () {
+  rejected.catch(function (err) {
+    console.log("4. Finally caught:", err.message);
+  });
+}, 1000);
+```
+
+Output:
+
+```
+1. Setting up delayed handler...
+2. Rejection detected as unhandled
+4. Finally caught: Test
+3. Rejection was handled late
+```
+
+These two events together let you track "potentially unhandled" rejections:
+
+```typescript
+const pendingRejections = new Map<Promise<unknown>, unknown>();
+
+process.on("unhandledRejection", function (reason, promise) {
+  pendingRejections.set(promise, reason);
+});
+
+process.on("rejectionHandled", function (promise) {
+  pendingRejections.delete(promise);
+});
+
+// Periodically check for truly unhandled rejections
+setInterval(function () {
+  if (pendingRejections.size > 0) {
+    console.error("TRULY UNHANDLED REJECTIONS:");
+    pendingRejections.forEach(function (reason) {
+      console.error("-", reason);
+    });
+    pendingRejections.clear();
+  }
+}, 5000);
+```
+
+## Modern Node.js Behavior (v15+)
+
+Before Node.js 15, unhandled promise rejections only printed a warning but didn't crash the process. This was problematic because:
+
+- Errors could go unnoticed in production
+- Promise rejections were treated differently than exceptions
+- Code could silently fail
+
+Since Node.js 15, unhandled rejections crash the process by default, matching the behavior of uncaught exceptions:
+
+```typescript
+// In Node.js 14 and earlier: Prints warning, continues running
+// In Node.js 15+: Crashes the process
+Promise.reject(new Error("This now crashes"));
+```
+
+### The --unhandled-rejections flag
+
+You can control this behavior with a command-line flag:
+
+```bash
+# Default in Node.js 15+ - crash on unhandled rejection
+node --unhandled-rejections=throw app.js
+
+# Strict mode - crash immediately (no grace period)
+node --unhandled-rejections=strict app.js
+
+# Old behavior - warn but don't crash
+node --unhandled-rejections=warn app.js
+
+# Silent - no warnings, no crash (dangerous!)
+node --unhandled-rejections=none app.js
+```
+
+The difference between `throw` and `strict`:
+
+```typescript
+// With --unhandled-rejections=throw (default)
+const p = Promise.reject(new Error("test"));
+// Node.js waits until the next tick...
+p.catch(function () {}); // Handler attached in time! No crash.
+
+// With --unhandled-rejections=strict
+const p = Promise.reject(new Error("test")); // IMMEDIATE crash
+p.catch(function () {}); // Too late, never runs
+```

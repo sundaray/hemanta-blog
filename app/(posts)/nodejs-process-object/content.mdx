@@ -1,0 +1,248 @@
+---
+title: "The Process Object in Node.js"
+description: "Learn how the Node.js process object provides access to environment variables, system information, I/O streams, and lifecycle events."
+author: "Hemanta Sundaray"
+publishedAt: "2025-12-20"
+tags: ["Node.js"]
+isPublished: true
+---
+
+import { Note } from "@/components/blog/note";
+
+When you run a Node.js application, the operating system creates a [process](/blog/nodejs-worker-threads-child-processes#process-vs-thread): an instance of your program in execution. Node.js gives you programmatic access to this process through the global `process` object.
+
+## The `process` Object is Global
+
+The `process` object is globally available in Node.js, meaning you can access it from anywhere in your code without requiring or importing anything:
+
+```typescript
+// No import needed - process is globally available
+console.log(process.version); // v24.2.0
+console.log(process.platform); // darwin
+console.log(process.pid); // 1724
+```
+
+This object serves as your application's bridge to the underlying operating system and the Node.js runtime itself.
+
+## Key Properties and Methods
+
+The `process` object provides extensive information about your application and environment. Let's explore them by category.
+
+### Environment and System Information
+
+| Property/Method    | Description                                                                               |
+| ------------------ | ----------------------------------------------------------------------------------------- |
+| `process.env`      | Returns an object containing environment name/value pairs                                 |
+| `process.argv`     | Array of command-line arguments (first element is node executable, second is script path) |
+| `process.cwd()`    | Returns the current working directory                                                     |
+| `process.platform` | Returns a string identifying the operating system                                         |
+| `process.version`  | Returns the Node.js version string                                                        |
+| `process.versions` | Object containing versions of Node.js and its dependencies                                |
+
+Here's how you might use these in practice:
+
+```typescript
+// Access environment variables
+const nodeEnv = process.env.NODE_ENV ?? "development";
+const apiKey = process.env.API_KEY;
+
+// Parse command-line arguments
+// Running: node app.js --port 3000 --verbose
+const args = process.argv.slice(2); // ['--port', '3000', '--verbose']
+
+// Check the platform for OS-specific logic
+if (process.platform === "win32") {
+  console.log("Running on Windows");
+} else if (process.platform === "darwin") {
+  console.log("Running on macOS");
+} else {
+  console.log("Running on", process.platform);
+}
+```
+
+### Process Control and Resource Usage
+
+| Property/Method         | Description                                                                               |
+| ----------------------- | ----------------------------------------------------------------------------------------- |
+| `process.pid`           | Returns the current process ID                                                            |
+| `process.uptime()`      | Returns the number of seconds the Node.js process has been running                        |
+| `process.exit(code)`    | Exits the current application. Use `0` for success or an appropriate error code otherwise |
+| `process.cpuUsage()`    | Returns the user and system CPU time usage of the current process in microseconds         |
+| `process.memoryUsage()` | Returns an object describing memory usage in bytes                                        |
+| `process.report`        | Generates a diagnostic report for debugging                                               |
+
+```typescript
+// Check how long the server has been running
+console.log(`Server uptime: ${process.uptime().toFixed(2)} seconds`);
+
+// Monitor memory usage
+const memory = process.memoryUsage();
+console.log(`Heap used: ${Math.round(memory.heapUsed / 1024 / 1024)} MB`);
+
+// Exit with appropriate codes
+function shutdown(success: boolean) {
+  process.exit(success ? 0 : 1);
+}
+```
+
+### Standard I/O Streams
+
+The `process` object provides access to the three standard I/O [streams](/blog/nodejs-streams) that connect your application to the terminal:
+
+| Stream           | Description                                          | Type            |
+| ---------------- | ---------------------------------------------------- | --------------- |
+| `process.stdin`  | Standard input stream for reading user input         | Readable Stream |
+| `process.stdout` | Standard output stream (where `console.log` writes)  | Writable Stream |
+| `process.stderr` | Standard error stream (where `console.error` writes) | Writable Stream |
+
+```typescript
+// Write directly to stdout (what console.log uses internally)
+process.stdout.write("Hello without a newline");
+
+// Write to stderr for error messages
+process.stderr.write("Error: Something went wrong\n");
+
+// Read from stdin
+process.stdin.on("data", function (data) {
+  const input = data.toString().trim();
+  console.log(`You typed: ${input}`);
+});
+```
+
+## The `process` Object as an EventEmitter
+
+The `process` object extends [EventEmitter](/blog/nodejs-eventemitter), which means it can emit and listen for events. This is particularly useful for handling **application lifecycle events**: significant moments in your application's existence from startup to shutdown.
+
+### What are lifecycle events?
+
+Lifecycle events are signals that fire at critical moments during your application's execution. They allow you to hook into these moments and run code in response, such as cleaning up resources before the process exits or handling unexpected errors gracefully.
+
+### The `exit` event
+
+This event fires when the Node.js process is about to exit. It's your last chance to perform synchronous cleanup work. Once this event fires, the event loop is already being torn down, so asynchronous operations will not execute:
+
+```typescript
+process.on("exit", function (code) {
+  console.log(`Process exiting with code: ${code}`);
+  // Only synchronous code works here
+  // setTimeout, fs.writeFile, etc. will NOT execute
+});
+```
+
+### The `beforeExit` event
+
+This fires when Node.js empties its event loop and has nothing more to schedule. Unlike `exit`, you can schedule asynchronous work here, which will keep the process alive. This event does not fire if the process is terminated explicitly via `process.exit()` or due to an uncaught exception:
+
+```typescript
+process.on("beforeExit", function (code) {
+  console.log("Event loop is empty, process would exit soon");
+  // You could schedule more async work here if needed
+});
+```
+
+### Signal events
+
+Your process can receive signals from the operating system. These are external lifecycle events—something outside your application telling it to take action:
+
+```typescript
+// SIGINT is sent when you press Ctrl+C in the terminal
+process.on("SIGINT", function () {
+  console.log("Received SIGINT (Ctrl+C). Cleaning up...");
+  // Close database connections, finish writing files, etc.
+  process.exit(0);
+});
+
+// SIGTERM is the standard "please terminate gracefully" signal
+// Often sent by process managers like PM2, Docker, or Kubernetes
+process.on("SIGTERM", function () {
+  console.log("Received SIGTERM. Graceful shutdown initiated...");
+  process.exit(0);
+});
+```
+
+### The `uncaughtException` event
+
+When a synchronous error escapes all `try/catch` blocks, the [uncaughtException](/blog/nodejs-uncaughtexcption-unhandledrejection#the-uncaughtexception-event) event fires as a last line of defense:
+
+```typescript
+process.on("uncaughtException", function (err, origin) {
+  console.error("Uncaught exception:", err.message);
+  console.error("Origin:", origin);
+  // Perform synchronous cleanup, then exit
+  process.exit(1);
+});
+```
+
+### The `unhandledRejection` event
+
+The [unhandledRejection](/blog/nodejs-uncaughtexcption-unhandledrejection#the-unhandledrejection-event) event fires when a Promise is rejected without a `.catch()` handler:
+
+```typescript
+process.on("unhandledRejection", function (reason, promise) {
+  console.error("Unhandled rejection:", reason);
+});
+```
+
+<Note>
+  Since Node.js 15, unhandled promise rejections crash the process by default,
+  matching the behavior of uncaught exceptions. In earlier versions, they only
+  printed a warning.
+</Note>
+
+## Practical Example: Graceful Shutdown
+
+Understanding lifecycle events is essential for building robust applications. Here's a practical example of implementing graceful shutdown for a web server:
+
+```typescript
+import { createServer } from "http";
+
+const server = createServer(function (req, res) {
+  res.end("Hello World");
+});
+
+// Simulated database connection
+const dbConnection = {
+  close: function () {
+    console.log("Database connection closed");
+  },
+};
+
+function gracefulShutdown(signal: string) {
+  console.log(`Received ${signal}. Starting graceful shutdown...`);
+
+  // Stop accepting new connections
+  server.close(function () {
+    console.log("HTTP server closed");
+
+    // Close database connections
+    dbConnection.close();
+
+    console.log("Cleanup complete. Exiting.");
+    process.exit(0);
+  });
+
+  // Force exit if cleanup takes too long
+  setTimeout(function () {
+    console.error("Forced exit after timeout");
+    process.exit(1);
+  }, 10000);
+}
+
+process.on("SIGTERM", function () {
+  gracefulShutdown("SIGTERM");
+});
+
+process.on("SIGINT", function () {
+  gracefulShutdown("SIGINT");
+});
+
+server.listen(3000, function () {
+  console.log(`Server running on port 3000 (PID: ${process.pid})`);
+});
+```
+
+Without handling these lifecycle events, stopping your server would terminate it immediately, potentially mid-request, with database connections left open and files half-written. By listening to these events, you ensure a clean shutdown every time.
+
+## Summary
+
+The `process` object is your window into the Node.js runtime and the operating system. Understanding this object is fundamental to building robust Node.js applications that behave correctly in production environments.

@@ -44,16 +44,38 @@ function CustomLink(props: CustomLinkProps) {
   return null;
 }
 
+function getTextFromChildren(children: React.ReactNode): string {
+  return React.Children.toArray(children)
+    .map((child) => {
+      if (typeof child === "string") {
+        return child;
+      }
+      if (typeof child === "number") {
+        return child.toString();
+      }
+      if (React.isValidElement(child)) {
+        // Recursively dig into the children of the React Element (e.g. the <code> tag)
+        return getTextFromChildren(
+          (child.props as { children?: React.ReactNode }).children,
+        );
+      }
+      return "";
+    })
+    .join("");
+}
+
 function createHeading(level: 1 | 2 | 3 | 4 | 5 | 6) {
   const Heading = ({ children }: { children: React.ReactNode }) => {
-    const contentString = React.Children.toArray(children)
-      .map((child) => {
-        if (typeof child === "string") {
-          return child;
-        }
-        return "";
-      })
-      .join("");
+    // const contentString = React.Children.toArray(children)
+    //   .map((child) => {
+    //     if (typeof child === "string") {
+    //       return child;
+    //     }
+    //     return "";
+    //   })
+    //   .join("");
+
+    const contentString = getTextFromChildren(children);
 
     const slug = slugify(contentString);
 

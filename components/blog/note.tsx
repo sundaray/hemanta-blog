@@ -4,12 +4,12 @@ import { IoInformationCircle } from "react-icons/io5";
 
 export function Note({ children }: { children: React.ReactNode }) {
   return (
-    <div className="border-input relative my-6 rounded-lg border p-4">
+    <div className="border-input bg-accent relative my-6 rounded-lg border p-4">
       <div className="absolute bottom-4 left-2 top-4 w-0.5 rounded-full bg-sky-700" />
 
       <div className="mb-4 flex items-center gap-x-2 pl-4">
-        <IoInformationCircle className="text-muted-foreground size-5" />
-        <span className="text-foreground text-sm font-semibold">Note</span>
+        <IoInformationCircle className="size-5 text-sky-700" />
+        <span className="text-sm font-semibold text-sky-700">Note</span>
       </div>
 
       <div className="pl-4 text-neutral-700 [&>p:first-child]:mt-0 [&>p:last-child]:mb-0">
