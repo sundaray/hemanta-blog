@@ -1,0 +1,88 @@
+---
+title: "How to Ignore TypeScript Errors"
+description: "Learn how to suppress TypeScript errors using @ts-ignore, @ts-expect-error, and @ts-nocheck directives."
+author: "Hemanta Sundaray"
+publishedAt: "2025-12-20"
+tags: ["TypeScript"]
+isPublished: true
+---
+
+TypeScript's type checker is incredibly helpful—until it isn't. Sometimes you know better than the compiler. Maybe you're migrating a large JavaScript codebase, working around a bug in a library's type definitions, or writing tests that intentionally pass invalid types.
+
+For these situations, TypeScript provides **comment directives** that let you suppress errors at the line level or file level. Let's look at each one and when to use them.
+
+## Line-Level Directives
+
+### `@ts-ignore`
+
+This directive tells TypeScript to ignore any errors on the next line:
+
+```typescript
+// @ts-ignore
+const result: number = "this is clearly wrong";
+```
+
+The problem with `@ts-ignore` is that it's silent. If the error goes away—maybe you fixed the underlying issue, or a library updated its types—TypeScript won't tell you. The directive just sits there doing nothing, and you have no way of knowing it's now unnecessary.
+
+### `@ts-expect-error`
+
+This works similarly but with an important difference:
+
+```typescript
+// @ts-expect-error - intentionally passing wrong type for testing
+const result: number = "this is clearly wrong";
+```
+
+If the error on the next line disappears, TypeScript will report a new error:
+
+```
+Unused '@ts-expect-error' directive.
+```
+
+This is valuable because it keeps your codebase clean. You'll know exactly when a suppression is no longer needed.
+
+### When is `@ts-expect-error` particularly useful?
+
+**Testing error conditions.** When you're writing tests that intentionally pass invalid types to verify runtime behavior:
+
+```typescript
+function add(a: number, b: number): number {
+  return a + b;
+}
+
+// In a test file
+// @ts-expect-error - testing runtime behavior with wrong types
+expect(() => add("foo", "bar")).toThrow();
+```
+
+**Migrating from JavaScript to TypeScript.** During migration, you might have code that's technically correct at runtime but TypeScript can't verify yet. As you add better types, the errors resolve, and TypeScript will flag the now-unnecessary directives for removal.
+
+**Working around library type bugs.** Sometimes a library's types are incorrect. When the library fixes their types, you'll be notified to remove your workaround.
+
+## File-Level Directive
+
+### `@ts-nocheck`
+
+This disables type checking for the entire file. You place it at the top:
+
+```typescript
+// @ts-nocheck
+
+// Everything in this file is now unchecked
+const x: number = "no error reported";
+const y: string = 42; // also no error
+```
+
+This is a fairly heavy-handed approach, but it's useful during incremental migrations when you want to convert files to `.ts` without immediately fixing every type error.
+
+## Summary
+
+| Directive          | Scope       | Behavior when error disappears   |
+| ------------------ | ----------- | -------------------------------- |
+| `@ts-ignore`       | Next line   | Silent (stays forever)           |
+| `@ts-expect-error` | Next line   | Reports "unused directive" error |
+| `@ts-nocheck`      | Entire file | N/A (disables all checking)      |
+
+## Conclusion
+
+Remember—these directives are escape hatches, not everyday tools. If you find yourself using them frequently, it might be worth investigating the root cause of the type errors instead.
