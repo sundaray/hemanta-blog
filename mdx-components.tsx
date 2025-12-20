@@ -6,6 +6,7 @@ import type { Route } from "next";
 
 import { slugify } from "@/lib/utils";
 
+import { CollapsibleCode } from "@/components/blog/collapsible-code";
 import { Icons } from "@/components/icons";
 
 type CustomLinkProps = React.HTMLAttributes<HTMLAnchorElement> &
@@ -113,6 +114,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ...components,
     ...headingComponents,
     a: CustomLink,
+    CollapsibleCode: CollapsibleCode,
     table: ({ children, ...props }: React.HTMLAttributes<HTMLTableElement>) => (
       <div className="my-6 w-full overflow-x-auto">
         <table className="w-full border-collapse text-sm" {...props}>
