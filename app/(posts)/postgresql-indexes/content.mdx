@@ -1,0 +1,596 @@
+---
+title: "PostgreSQL Indexes: A Hands-On Guide for Application Developers"
+description: "Understand PostgreSQL indexes through hands-on examples. Learn to read execution plans, decide what columns to index, and avoid common pitfalls that make PostgreSQL ignore your indexes."
+author: "Hemanta Sundaray"
+publishedAt: "2025-12-25"
+tags: ["PostgreSQL"]
+isPublished: true
+---
+
+If you've ever dealt with a slow database query, chances are someone suggested "just add an index." But what exactly is an index? When should you create one? And why does PostgreSQL sometimes ignore the index you created?
+
+This guide answers these questions through hands-on examples. You'll create a sample database, run queries, observe execution plans, and understand exactly what's happening under the hood. By the end, you'll know how to identify slow queries, decide when an index will help, and avoid common pitfalls.
+
+## Setup: Create the E-commerce Database
+
+Even though you can read through this blog post, I highly recommend running the commands yourself to see the results firsthand. This will help you better retain the concepts and build intuition for query performance.
+
+We'll create a simple e-commerce database with three tables: `customers`, `products`, and `orders`. The `orders` table will contain 100,000 rows — enough data to observe meaningful performance differences between indexed and non-indexed queries.
+
+### Create the schema
+
+```sql
+CREATE SCHEMA IF NOT EXISTS shop;
+
+CREATE TABLE shop.customers (
+    customer_id SERIAL PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE shop.products (
+    product_id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    category VARCHAR(100),
+    price DECIMAL(10, 2) NOT NULL,
+    stock_quantity INTEGER DEFAULT 0
+);
+
+CREATE TABLE shop.orders (
+    order_id SERIAL PRIMARY KEY,
+    customer_id INTEGER REFERENCES shop.customers(customer_id),
+    product_id INTEGER REFERENCES shop.products(product_id),
+    quantity INTEGER NOT NULL,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(20) DEFAULT 'pending',
+    order_date TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### Insert sample data
+
+```sql
+INSERT INTO shop.customers (email, first_name, last_name, created_at)
+SELECT
+    'user' || generate_series || '@example.com',
+    'FirstName' || generate_series,
+    'LastName' || generate_series,
+    NOW() - (random() * INTERVAL '365 days')
+FROM generate_series(1, 1000);
+
+INSERT INTO shop.products (name, category, price, stock_quantity)
+SELECT
+    'Product ' || generate_series,
+    CASE (generate_series % 5)
+        WHEN 0 THEN 'Electronics'
+        WHEN 1 THEN 'Clothing'
+        WHEN 2 THEN 'Books'
+        WHEN 3 THEN 'Home'
+        WHEN 4 THEN 'Sports'
+    END,
+    (random() * 500 + 10)::DECIMAL(10, 2),
+    (random() * 1000)::INTEGER
+FROM generate_series(1, 100);
+
+INSERT INTO shop.orders (customer_id, product_id, quantity, total_amount, status, order_date)
+SELECT
+    (random() * 999 + 1)::INTEGER,
+    (random() * 99 + 1)::INTEGER,
+    (random() * 5 + 1)::INTEGER,
+    (random() * 1000 + 10)::DECIMAL(10, 2),
+    CASE (random() * 4)::INTEGER
+        WHEN 0 THEN 'pending'
+        WHEN 1 THEN 'processing'
+        WHEN 2 THEN 'shipped'
+        WHEN 3 THEN 'delivered'
+        ELSE 'cancelled'
+    END,
+    NOW() - (random() * INTERVAL '365 days')
+FROM generate_series(1, 100000);
+```
+
+### Verify the data
+
+```sql
+SELECT 'customers' AS table_name, COUNT(*) AS row_count FROM shop.customers
+UNION ALL
+SELECT 'products', COUNT(*) FROM shop.products
+UNION ALL
+SELECT 'orders', COUNT(*) FROM shop.orders;
+```
+
+You should see:
+
+```
+ table_name | row_count
+------------+-----------
+ customers  |      1000
+ products   |       100
+ orders     |    100000
+```
+
+With the dataset ready, you can use whatever PostgreSQL client you prefer (psql, pgAdmin, DBeaver, etc.) to run the commands in the upcoming sections.
+
+## Why Indexes Exist
+
+Let's say we want to find all orders for the customer with ID 500:
+
+```sql
+SELECT order_id, total_amount, status, order_date
+FROM shop.orders
+WHERE customer_id = 500;
+```
+
+This returns around 100 rows (the exact number varies due to random data). The query works, but how did PostgreSQL find these rows? To answer that, we need to look at the query's execution plan.
+
+**An execution plan is PostgreSQL's strategy for executing your query**. When you write SQL, you specify _what_ data you want (e.g., "give me all orders for customer 500"), but you don't specify _how_ to retrieve it. Should PostgreSQL scan every row in the table? Use an index? Join tables in a particular order?
+
+PostgreSQL's query planner analyzes your query and decides the most efficient approach. The execution plan is the result. A step-by-step sequence of operations the database will perform to get your data.
+
+PostgreSQL provides two commands to inspect execution plans: `EXPLAIN` and `EXPLAIN ANALYZE`. Both reveal how the database executes a query, but they differ in an important way. Let's look at each.
+
+### Understanding EXPLAIN
+
+The `EXPLAIN` statement shows you how PostgreSQL plans to execute a query without actually running it.
+
+Add `EXPLAIN` before any query to see its execution plan:
+
+```sql
+EXPLAIN
+SELECT order_id, total_amount, status, order_date
+FROM shop.orders
+WHERE customer_id = 500;
+```
+
+Output:
+
+```
+                        QUERY PLAN
+-----------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..2147.00 rows=98 width=27)
+   Filter: (customer_id = 500)
+```
+
+Let's break down this output:
+
+- **Seq Scan on orders**: PostgreSQL will perform a Sequential Scan, meaning it will read every row in the table from start to finish.
+- **cost=0.00..2147.00**: The first number (0.00) is the startup cost: how much work before returning the first row. The second number (2147.00) is the total estimated cost to complete the operation. These costs are in arbitrary units used internally by PostgreSQL's query planner.
+- **rows=98**: PostgreSQL estimates the query will return 98 rows.
+- **width=27**: The average size of each returned row in bytes.
+- **Filter: (customer_id = 500)**: The condition being applied to filter rows.
+
+The key insight here is the **Seq Scan**. PostgreSQL is reading the entire table and checking each row to see if `customer_id = 500`.
+
+### Understanding EXPLAIN ANALYZE
+
+While `EXPLAIN` shows the planned execution, `EXPLAIN ANALYZE` actually runs the query and shows what really happened:
+
+```sql
+EXPLAIN ANALYZE
+SELECT order_id, total_amount, status, order_date
+FROM shop.orders
+WHERE customer_id = 500;
+```
+
+Output:
+
+```
+                                                      QUERY PLAN
+----------------------------------------------------------------------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..2147.00 rows=98 width=27) (actual time=3.022..18.744 rows=85 loops=1)
+   Filter: (customer_id = 500)
+   Rows Removed by Filter: 99915
+ Planning Time: 0.305 ms
+ Execution Time: 18.837 ms
+```
+
+`EXPLAIN ANALYZE` adds several important pieces of information:
+
+- **actual time=3.022..18.744**: The real execution time in milliseconds. The first number is the time to return the first row; the second is the total time.
+- **rows=85**: The actual number of rows returned (compared to the estimated 98).
+- **loops=1**: How many times this operation was executed.
+- **Rows Removed by Filter: 99915**: PostgreSQL checked 99,915 rows that didn't match the condition.
+- **Planning Time**: Time spent deciding how to execute the query.
+- **Execution Time**: Time spent actually running the query.
+
+This reveals the problem clearly: to find 85 matching rows, PostgreSQL had to examine all 100,000 rows in the table (85 returned + 99,915 filtered out = 100,000 total).
+
+### The O(N) problem
+
+When PostgreSQL performs a Sequential Scan, it must check every row in the table. In computer science, we express this as O(N) complexity, where N is the number of rows:
+
+- With 100,000 rows → up to 100,000 checks
+- With 1,000,000 rows → up to 1,000,000 checks
+- With 10,000,000 rows → up to 10,000,000 checks
+
+The time grows linearly with the table size. If your table doubles in size, the query takes roughly twice as long. This is unsustainable for applications with growing data.
+
+This is exactly the problem indexes solve.
+
+## Adding an Index
+
+An index is a separate data structure that stores a **sorted copy** of specific column values along with pointers to where each row lives in the table. Instead of scanning every row, PostgreSQL can quickly locate the rows it needs.
+
+### Creating an Index
+
+The basic syntax for creating an index is:
+
+```sql
+CREATE INDEX index_name ON table_name(column_name);
+```
+
+Let's create an index on the `customer_id` column:
+
+```sql
+CREATE INDEX idx_orders_customer_id ON shop.orders(customer_id);
+```
+
+The naming convention `idx_tablename_columnname` makes it easy to identify what each index is for.
+
+### Observing the difference
+
+Now run the same query with `EXPLAIN ANALYZE`:
+
+```sql
+EXPLAIN ANALYZE
+SELECT order_id, total_amount, status, order_date
+FROM shop.orders
+WHERE customer_id = 500;
+```
+
+Output:
+
+```
+                                                          QUERY PLAN
+------------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=5.05..288.44 rows=98 width=27) (actual time=0.128..0.517 rows=85 loops=1)
+   Recheck Cond: (customer_id = 500)
+   Heap Blocks: exact=84
+   ->  Bitmap Index Scan on idx_orders_customer_id  (cost=0.00..5.03 rows=98 width=0) (actual time=0.091..0.091 rows=85 loops=1)
+         Index Cond: (customer_id = 500)
+ Planning Time: 0.566 ms
+ Execution Time: 0.645 ms
+```
+
+The difference is dramatic:
+
+| Metric         | Before (Seq Scan) | After (Index Scan) |
+| -------------- | ----------------- | ------------------ |
+| Execution Time | ~18.837 ms        | ~0.645 ms          |
+| Rows Examined  | 100,000           | 85                 |
+
+Instead of checking every row, PostgreSQL used the index to find only the rows where `customer_id = 500`. The execution plan shows a **Bitmap Index Scan** followed by a **Bitmap Heap Scan**. Here's what happens:
+
+1. **Bitmap Index Scan**: PostgreSQL scans the index and builds a "bitmap": a map of which rows in the table match the condition.
+2. **Bitmap Heap Scan**: PostgreSQL goes to the table and fetches only the rows marked in the bitmap.
+
+This two-step process is efficient when multiple rows match the condition, as it batches the table access instead of jumping back and forth.
+
+### B-Tree: the default index type
+
+When you create an index without specifying a type, PostgreSQL creates a B-tree index. B-tree stands for "Balanced Tree": a data structure that keeps data sorted and allows searches, insertions, and deletions in logarithmic time.
+
+You can verify this by checking the index definition:
+
+```sql
+SELECT indexdef FROM pg_indexes WHERE indexname = 'idx_orders_customer_id';
+```
+
+Output:
+
+```
+                                    indexdef
+--------------------------------------------------------------------------------
+ CREATE INDEX idx_orders_customer_id ON shop.orders USING btree (customer_id)
+```
+
+The `USING btree` confirms it's a B-tree index. For most application queries involving equality (`=`) and range comparisons (`<`, `>`, `BETWEEN`), B-tree indexes work well.
+
+### Understanding O(log N) complexity
+
+With a B-tree index, PostgreSQL doesn't check every row. Instead, it performs a binary search through a sorted tree structure. The number of comparisons needed is proportional to log₂(N):
+
+| Table Size      | Sequential Scan (O(N)) | Index Lookup (O(log N)) |
+| --------------- | ---------------------- | ----------------------- |
+| 100,000 rows    | 100,000 checks         | ~17 checks              |
+| 1,000,000 rows  | 1,000,000 checks       | ~20 checks              |
+| 10,000,000 rows | 10,000,000 checks      | ~24 checks              |
+
+Notice how the index lookups barely increase even as the table grows 100x. This is why indexes are so powerful for large tables.
+
+### Creating indexes in production
+
+When you create an index, PostgreSQL locks the table for writes until the index is built. For small tables, this takes milliseconds. For tables with millions of rows, it can take minutes, during which your application cannot insert or update data.
+
+To avoid this, use the `CONCURRENTLY` option:
+
+```sql
+CREATE INDEX CONCURRENTLY idx_orders_customer_id ON shop.orders(customer_id);
+```
+
+With `CONCURRENTLY`:
+
+- PostgreSQL builds the index in the background
+- Your application continues reading and writing
+- The operation takes longer but doesn't cause downtime
+
+**Important caveats:**
+
+- `CREATE INDEX CONCURRENTLY` cannot run inside a transaction
+- If it fails, you'll have an invalid index that must be dropped and recreated
+- The same applies to dropping: use `DROP INDEX CONCURRENTLY` in production
+
+**Rule of thumb:**
+
+- Development/testing: Use regular `CREATE INDEX` (faster)
+- Production with live traffic: Always use `CREATE INDEX CONCURRENTLY`
+
+## What Should You Index?
+
+Not every column needs an index. Here's how to decide.
+
+### Primary keys
+
+**Primary keys are indexed automatically**. When you define a column as `PRIMARY KEY`, PostgreSQL creates a unique B-tree index:
+
+```sql
+SELECT indexname, indexdef
+FROM pg_indexes
+WHERE tablename = 'orders' AND indexname LIKE '%pkey%';
+```
+
+Output:
+
+```
+    indexname    |                                indexdef
+-----------------+------------------------------------------------------------------------
+ orders_pkey     | CREATE UNIQUE INDEX orders_pkey ON shop.orders USING btree (order_id)
+```
+
+No action needed here.
+
+### Foreign keys
+
+Unlike primary keys, foreign key columns are not indexed automatically. This is a common source of slow queries.
+
+Check the indexes on the `orders` table:
+
+```sql
+SELECT indexname FROM pg_indexes
+WHERE schemaname = 'shop' AND tablename = 'orders';
+```
+
+You'll see `orders_pkey` and `idx_orders_customer_id` (which we created), but no index on `product_id`. This means JOIN queries involving `product_id` may be slow:
+
+```sql
+EXPLAIN ANALYZE
+SELECT orders.order_id, products.name, orders.total_amount
+FROM shop.orders
+JOIN shop.products ON orders.product_id = products.product_id
+WHERE products.category = 'Electronics';
+```
+
+Create the missing index:
+
+```sql
+CREATE INDEX idx_orders_product_id ON shop.orders(product_id);
+```
+
+**Rule:** Always create indexes on foreign key columns.
+
+### Columns in WHERE clauses
+
+If you frequently filter by a column, it's a candidate for indexing. Look at your application's queries and identify patterns like:
+
+```sql
+WHERE status = 'pending'
+WHERE order_date > '2024-01-01'
+WHERE customer_id = ?
+```
+
+However, not every WHERE column benefits from an index. We'll discuss exceptions in the next section.
+
+### Columns in ORDER BY
+
+If you frequently sort by a column, especially with `LIMIT`, an index can help:
+
+```sql
+EXPLAIN ANALYZE
+SELECT order_id, customer_id, order_date
+FROM shop.orders
+ORDER BY order_date DESC
+LIMIT 10;
+```
+
+Without an index, PostgreSQL must scan all rows and sort them. With an index:
+
+```sql
+CREATE INDEX idx_orders_order_date ON shop.orders(order_date DESC);
+```
+
+PostgreSQL can read the first 10 entries directly from the index since it's already sorted.
+
+### Composite indexes (multi-column queries)
+
+When queries filter on multiple columns, a composite index can be more efficient than separate single-column indexes:
+
+```sql
+SELECT order_id, total_amount, order_date
+FROM shop.orders
+WHERE customer_id = 500 AND status = 'pending';
+```
+
+Create a composite index:
+
+```sql
+CREATE INDEX idx_orders_customer_status ON shop.orders(customer_id, status);
+```
+
+**Column order matters.** The first column is the "leading" column. PostgreSQL can use this index for:
+
+```sql
+WHERE customer_id = 500                           -- ✓ Uses index
+WHERE customer_id = 500 AND status = 'pending'    -- ✓ Uses index
+WHERE status = 'pending'                          -- ✗ Cannot use index efficiently
+```
+
+The index is sorted first by `customer_id`, then by `status` within each `customer_id`. If your query doesn't include the leading column, PostgreSQL can't use the index efficiently. It would have to scan the entire index anyway.
+
+**Rule:** Put the most selective column (the one that filters out the most rows) first in composite indexes.
+
+## When PostgreSQL Ignores Your Index
+
+Sometimes you create an index and PostgreSQL doesn't use it. Here's why.
+
+### Functions on indexed columns
+
+```sql
+EXPLAIN ANALYZE
+SELECT * FROM shop.customers
+WHERE LOWER(email) = 'user500@example.com';
+```
+
+Even if there's an index on `email`, PostgreSQL performs a Sequential Scan. The index stores actual email values, but the query is searching for `LOWER(email)`, a transformed value that doesn't exist in the index.
+
+**Solution:** Create a functional index:
+
+```sql
+CREATE INDEX idx_customers_email_lower ON shop.customers(LOWER(email));
+```
+
+Now queries using `LOWER(email)` will use the index.
+
+### Low cardinality columns
+
+Cardinality refers to the number of unique values in a column. Check the `status` column:
+
+```sql
+SELECT status, COUNT(*) FROM shop.orders GROUP BY status;
+```
+
+Output:
+
+```
+   status   | count
+------------+-------
+ cancelled  | 12788
+ delivered  | 25025
+ pending    | 12371
+ processing | 25155
+ shipped    | 24661
+```
+
+Each status represents about 20% of the table. If you query `WHERE status = 'pending'`, you're asking for 20,000 rows out of 100,000.
+
+PostgreSQL reasons: "Using an index means reading 20,000 index entries, then fetching 20,000 rows from the table in random locations. It's faster to just scan the whole table sequentially."
+
+**Rule of thumb:** If a query returns more than 10-15% of the table, PostgreSQL often prefers a Sequential Scan.
+
+### Small tables
+
+For tables with few rows, the overhead of using an index isn't worth it:
+
+```sql
+EXPLAIN ANALYZE
+SELECT * FROM shop.products WHERE category = 'Electronics';
+```
+
+With only 100 products, PostgreSQL may ignore any index and just scan the table. This is correct behavior. Don't worry about indexing small tables.
+
+### Outdated statistics
+
+PostgreSQL decides which execution plan to use based on statistics about your data. If these statistics are stale, PostgreSQL may make poor decisions.
+
+Update statistics manually with:
+
+```sql
+ANALYZE shop.orders;
+```
+
+Run this after:
+
+- Bulk inserts or deletes
+- Significant data changes
+- Creating new indexes
+
+PostgreSQL also runs `ANALYZE` automatically through the autovacuum process, but manual runs can help after large data changes.
+
+## Finding Unused Indexes
+
+Indexes consume disk space and slow down writes. Every `INSERT`, `UPDATE`, or `DELETE` must also update all relevant indexes. So it's important to identify and remove indexes that aren't being used.
+
+PostgreSQL tracks index usage in the `pg_stat_user_indexes` view:
+
+```sql
+SELECT
+    indexrelname AS index_name,
+    idx_scan AS times_used,
+    idx_tup_read AS rows_read
+FROM pg_stat_user_indexes
+WHERE schemaname = 'shop'
+ORDER BY idx_scan ASC;
+```
+
+Output:
+
+```
+       index_name        | times_used | rows_read
+-------------------------+------------+-----------
+ customers_pkey          |          0 |         0
+ customers_email_key     |          0 |         0
+ products_pkey           |          0 |         0
+ orders_pkey             |          2 |         2
+ idx_orders_customer_id  |          1 |        85
+ idx_orders_product_id   |          0 |         0
+```
+
+If `times_used` is 0, the index has never been used. Before dropping it:
+
+1. **Wait long enough**: check after a week or month of production traffic
+2. **Consider rare queries**: some queries run infrequently but are critical (monthly reports, audits)
+3. **Check for UNIQUE constraints**: these enforce data integrity, not just performance
+
+To drop an unused index:
+
+```sql
+-- Development
+DROP INDEX shop.idx_orders_order_date;
+
+-- Production (doesn't lock the table)
+DROP INDEX CONCURRENTLY shop.idx_orders_order_date;
+```
+
+## Conclusion
+
+Indexes are one of the most effective tools for improving database query performance, but they're not magic. Here's what to remember:
+
+1. **Understand the problem first.** Use `EXPLAIN ANALYZE` to see how PostgreSQL executes your queries. Look for `Seq Scan` on large tables with small result sets. That's usually where an index will help.
+
+2. **Know what to index:**
+   - Primary keys are indexed automatically
+   - Foreign keys are not. Always index these yourself
+   - Columns in frequently-used `WHERE` and `ORDER BY` clauses
+   - Use composite indexes for multi-column queries
+
+3. **Know when indexes don't help:**
+   - Functions on columns (use functional indexes instead)
+   - Low cardinality columns (too many rows match)
+   - Small tables (Sequential Scan is fine)
+
+4. **Indexes have costs:**
+   - Disk space
+   - Slower writes (every write must update all indexes)
+   - Maintenance overhead
+
+5. **In production, use CONCURRENTLY:**
+   - `CREATE INDEX CONCURRENTLY` to avoid locking tables
+   - `DROP INDEX CONCURRENTLY` when removing indexes
+
+6. **Monitor and maintain:**
+   - Check `pg_stat_user_indexes` for unused indexes
+   - Run `ANALYZE` after significant data changes
+   - Regularly review your indexing strategy as query patterns evolve
+
+The golden rule: don't guess — measure. Run `EXPLAIN ANALYZE`, observe the execution plan, and make informed decisions about where indexes will actually help.

@@ -1,0 +1,373 @@
+---
+title: "Spy vs Stub vs Mock"
+description: "Learn the differences between spies, stubs, and mocks — the three types of test doubles that help you write isolated, reliable tests"
+author: "Hemanta Sundaray"
+publishedAt: "2025-12-27"
+tags: ["Testing"]
+isPublished: true
+---
+
+In testing, we use **test doubles**: objects that stand in for real dependencies during tests. But why do we need them?
+
+Consider a function that fetches user data from an API. When testing a component that uses this function, you don't want to make actual network requests. Real API calls are slow, unreliable, and can have side effects. You want your tests to be fast, deterministic, and isolated.
+
+Test doubles solve this problem by replacing real dependencies with controlled substitutes. They let you:
+
+- **Isolate** the unit under test from external systems
+- **Control** the test environment by providing predictable inputs
+- **Verify** that your code interacts correctly with its dependencies
+- **Speed up** tests by avoiding slow operations like network calls or database queries
+
+So what exactly is a test double?
+
+It's a generic term for any object that substitutes a real dependency in a test. Think of it like a stunt double in movies. They stand in for the real actor during dangerous scenes. Similarly, a test double stands in for a real dependency during testing.
+
+There are several types of test doubles, including dummies, fakes, spies, stubs, and mocks. Each serves a different purpose and has different characteristics.
+
+Below, we will understand what spies, stubs, and mocks are, along with the nuances that distinguish them. Note that in books and testing literature, you might come across these terms used loosely or even interchangeably. However, there are meaningful differences between them, and understanding these distinctions will help you grasp essential testing concepts more deeply and write better, more intentional tests.
+
+## Spy
+
+A spy wraps a real function with an invisible tracking layer, recording information about how the function is called, without changing the underlying functionality. The real implementation still executes; you're simply observing it.
+
+Think of a spy as a surveillance camera pointed at a function. The function behaves exactly as it normally would, but now you have a record of everything that happened: what arguments were passed in, what values were returned, how many times it was called, and in what order.
+
+### What Does a Spy Track?
+
+A spy typically records:
+
+- **Arguments**: What inputs was the function called with?
+- **Return values**: What did the function return?
+- **Call count**: How many times was the function invoked?
+- **Call order**: If multiple spies exist, in what sequence were they called?
+
+### Creating a Spy with Vitest
+
+In Vitest (and Jest), you create a spy using `vi.spyOn()`:
+
+```typescript
+import { vi, expect, it } from "vitest";
+import { userService } from "./userService";
+
+it("calls the real fetchUser and tracks the call", async function () {
+  // Create a spy on the real method
+  const spy = vi.spyOn(userService, "fetchUser");
+
+  // Call the real implementation
+  const user = await userService.fetchUser(42);
+
+  // The real function executed — we got actual data
+  console.log(user); // Real user data from the service
+
+  // But we can also verify how it was called
+  expect(spy).toHaveBeenCalledWith(42);
+  expect(spy).toHaveBeenCalledTimes(1);
+});
+```
+
+Notice that `userService.fetchUser` actually runs. If it makes an API call, that API call happens. The spy is purely observational.
+
+### When to Use Spies
+
+Spies are useful when:
+
+- You want to verify that a function was called without replacing its behavior
+- You're testing integration between real components
+- You need to track calls to a method while keeping the real logic intact
+
+For example, you might spy on `console.error` to verify that your error handling code logs errors correctly, while still allowing the real logging to happen:
+
+```typescript
+it("logs an error when the API fails", async function () {
+  const consoleSpy = vi.spyOn(console, "error");
+
+  await processUserData(invalidData);
+
+  expect(consoleSpy).toHaveBeenCalledWith("Failed to process user data");
+});
+```
+
+### Cleaning Up Spies with `mockRestore()`
+
+When you create a spy with `vi.spyOn()`, you're modifying the original object — you're wrapping its method with tracking logic. After your test runs, you should clean this up to avoid affecting other tests.
+
+Calling `spy.mockRestore()` removes the spy wrapper and restores the original implementation:
+
+```typescript
+it("demonstrates mockRestore", function () {
+  const spy = vi.spyOn(userService, "fetchUser");
+
+  // userService.fetchUser is now wrapped with spy logic
+
+  spy.mockRestore();
+
+  // userService.fetchUser is back to its original, unwrapped state
+});
+```
+
+This is particularly important when running multiple tests. If you don't restore the original implementation, your spy might leak into other tests, causing unexpected behavior or false positives.
+
+You can also use `vi.restoreAllMocks()` in a `beforeEach` or `afterEach` hook to automatically restore all spies:
+
+```typescript
+afterEach(function () {
+  vi.restoreAllMocks();
+});
+```
+
+### When Spies Become Something Else
+
+Here's where it gets nuanced. You can modify a spy's behavior, effectively transforming it into something else:
+
+```typescript
+const spy = vi.spyOn(userService, "fetchUser").mockResolvedValue(fakeUser);
+```
+
+Now the spy no longer calls the real implementation. It returns `fakeUser` instead. At this point, it's functionally behaving as a **stub** (which we'll discuss next), even though the Vitest API still calls it a spy. The tracking capabilities remain, but the original functionality has been replaced.
+
+This is one reason why the terminology gets confusing in practice. Testing libraries often combine capabilities, blurring the classical distinctions.
+
+## Stub
+
+A stub is a test double that replaces a real function with a fake implementation that returns predetermined data. Unlike a spy, a stub does **not** execute the real code. It completely replaces the behavior.
+
+The primary purpose of a stub is to **set up the test scenario**. It answers the question: "What should this dependency return so I can test my code?" Stubs enable what's called **state-based testing**. You verify the final state or output of your system, not how it got there.
+
+### Stubs in the Arrange Phase
+
+Stubs are fundamentally about the **Arrange** phase of a test. They create the conditions necessary for your test to run:
+
+```typescript
+it("displays the user's name after fetching", async function () {
+  // ARRANGE: Create a stub that provides fake data
+  const fakeUser = { id: 1, name: "Hemanta", email: "hemanta@gmail.com" };
+  const fetchUser = vi.fn().mockResolvedValue(fakeUser);
+
+  // ACT: Render the component with the stubbed dependency
+  render(<UserProfile userId={1} fetchUser={fetchUser} />);
+
+  // ASSERT: Verify the output (state-based testing)
+  expect(await screen.findByText("Hemanta")).toBeInTheDocument();
+});
+```
+
+Notice what we're asserting here. We're checking the **output** (the rendered text), not how `fetchUser` was called. The stub's job was simply to provide the data the component needed. We don't care about the interaction; we care about the result.
+
+### Stubs Don't Fail Tests (Directly)
+
+An important characteristic of stubs: they don't directly cause tests to fail. A stub just provides data. If your test fails, it's because the code under test produced the wrong output given that data, not because the stub itself detected a problem.
+
+Consider this analogy: if you're testing a calculator's addition function, you might stub the input as `2` and `3`. The stub doesn't fail the test. It just provides values. The test fails if the calculator returns something other than `5`.
+
+### Creating Stubs in Vitest
+
+In Vitest, you typically create stubs using `vi.fn()` combined with methods like `mockReturnValue()` or `mockResolvedValue()`:
+
+```typescript
+// Stub that returns a synchronous value
+const getConfig = vi.fn().mockReturnValue({ apiUrl: "https://test.api.com" });
+
+// Stub that returns a resolved promise
+const fetchUser = vi.fn().mockResolvedValue({ id: 1, name: "Hemanta" });
+
+// Stub that returns a rejected promise
+const fetchUser = vi.fn().mockRejectedValue(new Error("Network error"));
+
+// Stub with different return values on successive calls
+const getNextItem = vi
+  .fn()
+  .mockReturnValueOnce("first")
+  .mockReturnValueOnce("second")
+  .mockReturnValue("default");
+```
+
+### Stubs for Testing Edge Cases
+
+Stubs are particularly valuable for testing scenarios that are hard to reproduce with real dependencies:
+
+```typescript
+it("displays an error message when the API fails", async function () {
+  // Stub that simulates an API failure
+  const fetchUser = vi.fn().mockRejectedValue(new Error("Server unavailable"));
+
+  render(<UserProfile userId={1} fetchUser={fetchUser} />);
+
+  expect(await screen.findByText("Failed to load user")).toBeInTheDocument();
+});
+
+it("handles empty user data gracefully", async function () {
+  // Stub that returns empty data
+  const fetchUser = vi.fn().mockResolvedValue(null);
+
+  render(<UserProfile userId={1} fetchUser={fetchUser} />);
+
+  expect(await screen.findByText("User not found")).toBeInTheDocument();
+});
+```
+
+With real dependencies, simulating a server failure or empty response might be difficult or impossible. Stubs make these scenarios trivial to test.
+
+### Stubs vs Spies: The Key Difference
+
+The fundamental difference is whether the real implementation runs:
+
+```typescript
+// SPY: Real implementation runs, calls are tracked
+const spy = vi.spyOn(userService, "fetchUser");
+await userService.fetchUser(1); // Real API call happens!
+
+// STUB: Real implementation is replaced entirely
+const stub = vi.fn().mockResolvedValue(fakeUser);
+await stub(1); // No real API call — just returns fakeUser
+```
+
+Spies observe. Stubs replace.
+
+## Mock
+
+A mock is a test double that verifies interactions. It checks that your code calls its dependencies correctly. While stubs are about providing data, mocks are about **asserting behavior**.
+
+The key characteristic of mocks: they can **fail your test**. If the expected interaction doesn't happen, or happens incorrectly, the mock-based assertion fails.
+
+### Mocks in the Assert Phase
+
+While stubs are primarily about the Arrange phase, mocks are primarily about the **Assert** phase:
+
+```typescript
+it("calls onSubmit with form data when submitted", async function () {
+  // ARRANGE: Create a mock to verify interactions
+  const onSubmit = vi.fn();
+
+  render(<ContactForm onSubmit={onSubmit} />);
+
+  // ACT: Fill out and submit the form
+  await userEvent.type(screen.getByLabelText("Name"), "Hemanta");
+  await userEvent.type(screen.getByLabelText("Email"), "hemanta@gmail.com");
+  await userEvent.click(screen.getByRole("button", { name: /submit/i }));
+
+  // ASSERT: Verify the interaction (behavior-based testing)
+  expect(onSubmit).toHaveBeenCalledWith({
+    name: "Hemanta",
+    email: "hemanta@gmail.com",
+  });
+  expect(onSubmit).toHaveBeenCalledTimes(1);
+});
+```
+
+Here, we're not checking what the form displays (state). We're checking how it interacts with its `onSubmit` callback (behavior). This is **behavior-based testing**.
+
+### What Makes Something a Mock?
+
+The defining feature of a mock is **verification of interactions**. Common mock assertions include:
+
+```typescript
+// Was the function called at all?
+expect(mockFn).toHaveBeenCalled();
+
+// Was it called with specific arguments?
+expect(mockFn).toHaveBeenCalledWith(42, "test");
+
+// How many times was it called?
+expect(mockFn).toHaveBeenCalledTimes(3);
+
+// Was it called with arguments matching a pattern?
+expect(mockFn).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
+
+// What was the last call's arguments?
+expect(mockFn).toHaveBeenLastCalledWith("final");
+```
+
+### Mocks Can Fail Tests
+
+Unlike stubs, mocks actively participate in test assertions. If your code doesn't call the mock as expected, the test fails:
+
+```typescript
+it("saves the user when the save button is clicked", async function () {
+  const saveUser = vi.fn();
+
+  render(<UserEditor user={testUser} onSave={saveUser} />);
+
+  await userEvent.click(screen.getByRole("button", { name: /save/i }));
+
+  // This assertion will FAIL if saveUser wasn't called
+  expect(saveUser).toHaveBeenCalled();
+});
+```
+
+If there's a bug and clicking "Save" doesn't trigger `saveUser`, the mock assertion fails, and you catch the bug.
+
+### When to Use Mocks
+
+Mocks are appropriate when:
+
+- The interaction itself is what you're testing (e.g., "does clicking submit call the handler?")
+- Side effects matter more than return values (e.g., "does this function trigger an analytics event?")
+- You need to verify the contract between components
+
+```typescript
+it("tracks a page view when the component mounts", function () {
+  const trackPageView = vi.fn();
+
+  render(<Dashboard analytics={{ trackPageView }} />);
+
+  expect(trackPageView).toHaveBeenCalledWith("dashboard");
+});
+```
+
+Here, `trackPageView` doesn't return anything meaningful. Its purpose is purely to cause a side effect (recording analytics). A mock is the right tool because we care about whether the interaction happened.
+
+### The Dual Nature: Stub + Mock
+
+Here's where things get interesting — and where your earlier example comes in. A test double can serve as **both a stub and a mock** simultaneously:
+
+```typescript
+it("calls fetchUser with the correct id", async function () {
+  // This is BOTH a stub AND a mock
+  const mockUser = { id: 40, name: "Hemanta", email: "hemanta@gmail.com" };
+  const fetchUser = vi.fn().mockResolvedValue(mockUser);
+
+  render(<UserProfile userId={40} fetchUser={fetchUser} />);
+
+  // Mock assertion: verify the interaction
+  expect(fetchUser).toHaveBeenCalledWith(40);
+});
+```
+
+In this test, `fetchUser` is:
+
+1. **A stub** because it provides fake data (`mockUser`) so the component can render
+2. **A mock** because you're asserting that it was called with the correct argument
+
+This dual nature is extremely common in real-world tests. The test double sets up the scenario (stub behavior) and verifies interactions (mock behavior).
+
+### A Note on Terminology in Modern Libraries
+
+Vitest and Jest use `vi.fn()` and `jest.fn()` to create what they call "mock functions." However, these are more accurately described as **multi-purpose test doubles**. They can act as stubs, mocks, or both depending on how you use them.
+
+The same applies to `vi.spyOn()`. While it creates a spy by default, adding `.mockReturnValue()` transforms it into something that can also behave as a stub or mock.
+
+Don't get too hung up on the naming. What matters is understanding the **purpose** each test double serves in your test:
+
+- Is it providing data? (stub behavior)
+- Is it verifying interactions? (mock behavior)
+- Is it observing real code? (spy behavior)
+
+## Conclusion
+
+Understanding the distinctions between spies, stubs, and mocks helps you write more intentional tests. Here's a summary of the key differences:
+
+| Aspect                        | Spy                         | Stub                    | Mock                |
+| ----------------------------- | --------------------------- | ----------------------- | ------------------- |
+| **Purpose**                   | Observe real function calls | Provide fake data       | Verify interactions |
+| **Real implementation runs?** | Yes (by default)            | No                      | No                  |
+| **Returns fake data?**        | No (by default)             | Yes                     | Optional            |
+| **Tracks calls?**             | Yes                         | Sometimes               | Yes                 |
+| **Primary test phase**        | Observe during Act          | Arrange                 | Assert              |
+| **Can fail tests?**           | Only if asserted on         | No (just provides data) | Yes                 |
+| **Testing style**             | Observation                 | State-based             | Behavior-based      |
+
+Remember:
+
+- **Spies** watch real code execute and record what happens
+- **Stubs** replace real code with fake implementations that return controlled data
+- **Mocks** replace real code and verify that interactions happen correctly

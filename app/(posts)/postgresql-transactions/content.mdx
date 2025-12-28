@@ -1,0 +1,343 @@
+---
+title: "How PostgreSQL Transactions Work"
+description: "A deep dive into PostgreSQL transactions covering implicit and explicit transactions, and the four isolation levels: Read Uncommitted, Read Committed, Repeatable Read, and Serializable."
+author: "Hemanta Sundaray"
+publishedAt: "2025-12-23"
+tags: ["PostgreSQL"]
+isPublished: true
+---
+
+If you've ever wondered how databases keep your data safe when multiple users are reading and writing at the same time, or how they ensure that a series of operations either all succeed or all fail together, the answer lies in **transactions**.
+
+Transactions are one of the most fundamental concepts in database systems, and PostgreSQL has a particularly robust implementation. In this post, we'll explore what transactions are, how PostgreSQL handles them automatically behind the scenes, how you can take explicit control when needed, and how isolation levels let you fine-tune the balance between data consistency and performance.
+
+## What is a Transaction?
+
+A transaction is an **atomic unit of work**—a sequence of one or more database operations that are treated as a single, indivisible operation. The defining characteristic is the **all-or-nothing guarantee**: either every operation in the transaction succeeds and the changes become permanent, or if any operation fails, the entire transaction is rolled back as if nothing ever happened.
+
+Consider a user authentication system. When a user logs in for the first time, you need to create a record in the `users` table and another in the `accounts` table. If you don't put both insertions in a transaction and the user insertion succeeds but the account insertion fails, you've left the database in an inconsistent state: a user exists but has no way to log in, and they can't sign up again because their email already exists. Transactions prevent this by ensuring both records are created together or neither is created at all.
+
+Transactions are what enable databases to implement the **ACID properties**:
+
+- **Atomicity**: The transaction is indivisible. All operations complete successfully, or none of them take effect.
+- **Consistency**: A transaction brings the database from one valid state to another valid state, respecting all defined constraints (primary keys, foreign keys, check constraints, etc.).
+- **Isolation**: Concurrent transactions don't interfere with each other in unexpected ways. Each transaction sees a consistent view of the data.
+- **Durability**: Once a transaction is committed, the changes are permanent and will survive system crashes.
+
+Now let's look at how PostgreSQL actually implements transactions in practice.
+
+### Implicit Transactions
+
+Here's something that might surprise you: **every single SQL statement you execute in PostgreSQL runs inside a transaction**, even if you never explicitly ask for one.
+
+When you run a simple `INSERT`, `UPDATE`, or `SELECT`, PostgreSQL automatically wraps it in what's called an **implicit transaction**. The database decides where the transaction starts (right before your statement) and where it ends (immediately after your statement completes). If the statement succeeds, it's automatically committed. If it fails, it's automatically rolled back.
+
+Let's see this in action. PostgreSQL assigns a unique **transaction identifier (xid)** to each transaction, and we can inspect it using the `txid_current()` function:
+
+```sql
+SELECT current_time, txid_current();
+--     current_time    | txid_current
+-- --------------------+--------------
+--  16:51:35.042584+01 |         1001
+
+SELECT current_time, txid_current();
+--     current_time    | txid_current
+-- --------------------+--------------
+--  16:52:23.028124+01 |         1002
+```
+
+Notice that each `SELECT` statement got a different transaction ID (1001 and 1002). This confirms that PostgreSQL treated each statement as its own separate transaction.
+
+We can also see evidence of this in the data itself. PostgreSQL stores the creating transaction's ID in a hidden column called `xmin` on every row:
+
+```sql
+INSERT INTO products(name, price, stock) VALUES('Laptop', 999.99, 50);
+INSERT INTO products(name, price, stock) VALUES('Mouse', 29.99, 200);
+INSERT INTO products(name, price, stock) VALUES('Keyboard', 79.99, 150);
+
+SELECT xmin, name, price FROM products;
+--  xmin | name     | price
+-- ------+----------+--------
+--  1003 | Laptop   | 999.99
+--  1004 | Mouse    |  29.99
+--  1005 | Keyboard |  79.99
+```
+
+Each row has a different `xmin` value because each `INSERT` ran in its own implicit transaction.
+
+This automatic wrapping is useful because it means individual statements are always atomic. A single `UPDATE` that affects 1000 rows will either update all of them or none of them. But what if you need multiple statements to succeed or fail together?
+
+### Explicit Transactions
+
+When you need to group multiple statements into a single atomic unit, you use an **explicit transaction**. You control the boundaries yourself using three commands:
+
+- `BEGIN` (or `START TRANSACTION`): Marks the start of the transaction
+- `COMMIT`: Marks successful completion—all changes become permanent
+- `ROLLBACK`: Aborts the transaction—all changes are discarded
+
+Here's a simple example—creating an order with multiple line items:
+
+```sql
+BEGIN;
+
+INSERT INTO orders(customer_id, total) VALUES(42, 1059.97);
+INSERT INTO order_items(order_id, product_id, quantity, price) VALUES(1, 1, 1, 999.99);  -- 1x Laptop
+INSERT INTO order_items(order_id, product_id, quantity, price) VALUES(1, 2, 2, 29.99);   -- 2x Mouse
+
+COMMIT;
+```
+
+Now let's check our data:
+
+```sql
+SELECT xmin, order_id, product_id, quantity FROM order_items WHERE order_id = 1;
+--  xmin | order_id | product_id | quantity
+-- ------+----------+------------+----------
+--  1006 |        1 |          1 |        1
+--  1006 |        1 |          2 |        2
+```
+
+Both rows have the **same** `xmin` value. PostgreSQL treated all the `INSERT` statements as part of a single transaction.
+
+#### Rolling Back Changes
+
+The real power of explicit transactions becomes clear when something goes wrong. You can choose to abort and undo all your changes:
+
+```sql
+BEGIN;
+
+-- Apply holiday discount to all electronics
+UPDATE products SET price = price * 0.8 WHERE category = 'electronics';
+-- UPDATE 5000
+
+-- Check how many products were affected
+-- Expected: ~50 electronics items
+-- Actual: 5000 rows updated!
+
+-- Something's wrong (maybe category data is bad), abort everything
+ROLLBACK;
+```
+
+After the `ROLLBACK`, all 5000 price changes are undone. The `UPDATE` might as well have never happened.
+
+#### Automatic Rollback on Errors
+
+PostgreSQL is strict about errors within transactions. If any statement fails, the entire transaction enters an **aborted state**. From that point on, PostgreSQL refuses to execute any more commands and will automatically roll back when you try to commit:
+
+```sql
+BEGIN;
+
+INSERT INTO products(name, price, stock) VALUES('Monitor', 299.99, 75);
+
+-- Typo in function name
+UPDATE products SET price = apply_discount(price);
+-- ERROR: function apply_discount(numeric) does not exist
+
+-- Try to continue anyway
+INSERT INTO products(name, price, stock) VALUES('Webcam', 89.99, 100);
+-- ERROR: current transaction is aborted, commands ignored until end of transaction block
+
+-- Even COMMIT won't help
+COMMIT;
+-- ROLLBACK
+```
+
+PostgreSQL rolled back the entire transaction, including the successful `INSERT` of 'Monitor'. This behavior ensures you can't accidentally commit a half-completed unit of work.
+
+#### When Should You Use Explicit Transactions?
+
+Use explicit transactions whenever you have operations that **must succeed or fail together**. Common scenarios include:
+
+- **Financial operations**: Transferring money between accounts (debit one, credit another)
+- **E-commerce checkout**: Updating inventory, creating order records, processing payment
+- **Data migrations**: Moving data between tables where partial completion would leave things in an inconsistent state
+- **Batch operations**: Inserting related records across multiple tables
+
+The rule of thumb: if leaving the operation half-done would corrupt your data or violate business rules, wrap it in an explicit transaction.
+
+---
+
+## Transactions and Isolation Levels
+
+So far, we've talked about transactions as if they run in complete isolation. But in a real database, multiple transactions run **concurrently**. Imagine thousands of users browsing and buying products on an e-commerce site at the same time. What happens when two transactions try to read or modify the same data at the same time?
+
+This is where **isolation levels** come in. They control how and when changes made by one transaction become visible to other concurrent transactions.
+
+### The problems of concurrency
+
+Without proper isolation, concurrent transactions can experience several anomalies:
+
+**Dirty Reads**: Transaction A sees uncommitted changes from Transaction B. If B rolls back, A has made decisions based on data that never actually existed.
+
+**Non-Repeatable Reads**: Transaction A reads a row, Transaction B modifies and commits it, then A reads the same row again and gets different values. The same query, run twice in the same transaction, returns different results.
+
+**Phantom Reads**: Transaction A runs a query and gets a set of rows. Transaction B inserts new rows that match A's query criteria and commits. A runs the same query again and gets additional "phantom" rows that weren't there before.
+
+The SQL standard defines four isolation levels that provide increasing protection against these anomalies:
+
+| Isolation Level  | Dirty Reads | Non-Repeatable Reads | Phantom Reads |
+| ---------------- | ----------- | -------------------- | ------------- |
+| Read Uncommitted | Possible    | Possible             | Possible      |
+| Read Committed   | Prevented   | Possible             | Possible      |
+| Repeatable Read  | Prevented   | Prevented            | Possible\*    |
+| Serializable     | Prevented   | Prevented            | Prevented     |
+
+\*PostgreSQL's implementation actually prevents phantom reads at the Repeatable Read level too.
+
+Let's examine each level in detail.
+
+### Read Uncommitted
+
+This is the lowest isolation level. It allows **dirty reads**—a transaction can see uncommitted changes from other transactions.
+
+However, **PostgreSQL doesn't actually support Read Uncommitted**. If you try to set it, PostgreSQL silently upgrades you to Read Committed:
+
+```sql
+BEGIN TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+-- PostgreSQL will actually use Read Committed
+```
+
+This makes sense. Dirty reads are dangerous. You could make decisions based on data that gets rolled back and never actually existed. PostgreSQL simply doesn't allow this.
+
+### Read Committed
+
+This is **PostgreSQL's default isolation level**. Every statement within a transaction sees a **snapshot** of the database as it existed at the moment that specific statement began executing. It sees all data that was committed before the statement started, but not uncommitted changes from other transactions.
+
+The key insight is that the snapshot is taken **per statement**, not per transaction. Let's see what this means in practice:
+
+```text showLineNumbers=false
+TIME    TRANSACTION A                         TRANSACTION B
+────────────────────────────────────────────────────────────────────────
+T1      BEGIN;
+        SELECT price FROM products
+        WHERE name = 'Laptop';
+        -- Returns: 999.99
+
+T2                                            BEGIN;
+                                              UPDATE products
+                                              SET price = 899.99
+                                              WHERE name = 'Laptop';
+                                              COMMIT;
+
+T3      SELECT price FROM products
+        WHERE name = 'Laptop';
+        -- Returns: 899.99 ← Different value!
+
+T4      COMMIT;
+```
+
+Transaction A ran the same query twice and got different results. This is a **non-repeatable read**. It happened because each `SELECT` took a fresh snapshot, and by the time of the second `SELECT`, Transaction B had committed its change.
+
+For many applications, Read Committed is perfectly fine. Each statement sees a consistent view, and you never see uncommitted data. But if you need the same query to return the same results throughout your transaction, you need a higher isolation level.
+
+### Repeatable Read
+
+At the Repeatable Read level, the snapshot is taken **once, at the start of the transaction**, and every statement within that transaction sees that same snapshot throughout.
+
+```text showLineNumbers=false
+TIME    TRANSACTION A                         TRANSACTION B
+────────────────────────────────────────────────────────────────────────
+T1      BEGIN ISOLATION LEVEL
+        REPEATABLE READ;
+
+        SELECT price FROM products
+        WHERE name = 'Laptop';
+        -- Returns: 999.99
+        -- Snapshot frozen here
+
+T2                                            BEGIN;
+                                              UPDATE products
+                                              SET price = 899.99
+                                              WHERE name = 'Laptop';
+                                              COMMIT;
+
+T3      SELECT price FROM products
+        WHERE name = 'Laptop';
+        -- Returns: 999.99 ← Same value!
+        -- Still seeing the original snapshot
+
+T4      COMMIT;
+```
+
+Transaction A sees the same value both times, even though Transaction B modified and committed the change in between. Transaction A is essentially working with a frozen-in-time view of the database.
+
+This is invaluable for operations like generating reports. Imagine a daily sales report that runs multiple queries. With Read Committed, another transaction could insert new orders between your queries, giving you inconsistent numbers that don't add up. With Repeatable Read, all your queries see the same consistent snapshot.
+
+```sql
+BEGIN ISOLATION LEVEL REPEATABLE READ;
+
+-- Daily sales report - all queries see the same snapshot
+SELECT SUM(total) AS daily_revenue FROM orders WHERE created_at = CURRENT_DATE;
+SELECT COUNT(*) AS order_count FROM orders WHERE created_at = CURRENT_DATE;
+SELECT AVG(total) AS average_order_value FROM orders WHERE created_at = CURRENT_DATE;
+
+COMMIT;
+```
+
+### Serializable
+
+Serializable is the **strictest isolation level**. It guarantees that concurrent transactions will produce the same result as if they had run one after another in some sequential order.
+
+But here's the crucial part: Serializable doesn't actually force transactions to run sequentially (that would destroy performance). Instead, PostgreSQL lets them run concurrently but monitors for conflicts. If it detects that the concurrent execution could produce a result that wouldn't be possible under any sequential ordering, it **aborts one of the transactions**.
+
+Let's look at an example: a promotional code with a usage limit.
+
+Your e-commerce store has a promo code `FLASH50` that can only be used 100 times. Currently, it has been used 99 times.
+
+```text showLineNumbers=false
+TIME    CUSTOMER A                            CUSTOMER B
+────────────────────────────────────────────────────────────────────────
+T1      BEGIN ISOLATION LEVEL                 BEGIN ISOLATION LEVEL
+        SERIALIZABLE;                         SERIALIZABLE;
+
+T2      -- Can I use this promo?
+        SELECT COUNT(*) FROM orders
+        WHERE promo_code = 'FLASH50';
+        -- Returns: 99
+        -- "Promo is still valid!"
+
+T3                                            -- Can I use this promo?
+                                              SELECT COUNT(*) FROM orders
+                                              WHERE promo_code = 'FLASH50';
+                                              -- Returns: 99
+                                              -- "Promo is still valid!"
+
+T4      INSERT INTO orders
+        (customer_id, total, promo_code)
+        VALUES (1, 50.00, 'FLASH50');
+
+T5                                            INSERT INTO orders
+                                              (customer_id, total, promo_code)
+                                              VALUES (2, 75.00, 'FLASH50');
+
+T6      COMMIT; -- Succeeds
+
+T7                                            COMMIT;
+                                              -- ERROR: could not serialize access
+                                              -- due to read/write dependencies
+```
+
+With Repeatable Read, both transactions would succeed, resulting in 101 uses of a 100-use promo code—violating the business rule. Each transaction made a valid decision based on its snapshot, but the combined result is invalid.
+
+With Serializable, PostgreSQL detects this conflict. It asks: "Could these transactions have run sequentially and produced this result?"
+
+- **If Customer A went first**: A uses the promo (100 uses now) → B checks, sees 100 → B's promo is rejected
+- **If Customer B went first**: B uses the promo (100 uses now) → A checks, sees 100 → A's promo is rejected
+
+The actual result (both using the promo, 101 total uses) doesn't match any valid sequential ordering, so PostgreSQL aborts one transaction. The application must catch this error and retry.
+
+#### The trade-off
+
+Serializable provides the strongest guarantees, but it comes with costs:
+
+1. **Transactions may be aborted and need retry logic**: Your application must be prepared to catch serialization failures and retry the transaction.
+
+2. **Performance overhead**: PostgreSQL must track read and write dependencies to detect conflicts.
+
+Use Serializable when correctness is critical and you cannot tolerate the subtle anomalies that other levels might allow—inventory management, booking systems, promo code limits, or anywhere logical consistency between concurrent transactions matters.
+
+## Conclusion
+
+Transactions are the foundation of reliable database operations. They give you the all-or-nothing guarantee that keeps your data consistent even when things go wrong.
+
+Understanding these concepts deeply will help you write applications that are both correct and performant. The key is matching the isolation level to your actual requirements.

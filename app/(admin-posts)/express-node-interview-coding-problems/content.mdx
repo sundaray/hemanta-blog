@@ -14,7 +14,8 @@ isPublished: true
 **Question:** Create an Express server that listens on port 3000 and responds with "Hello, World!" on the root route.
 
 ```typescript
-import express, { Request, Response } from "express";
+import express from "express";
+import type { Request, Response } from "express";
 
 const app = express();
 
@@ -37,7 +38,8 @@ app.listen(3000, function (error?: Error) {
 **Question:** Create a `/resource` endpoint that handles GET, POST, PUT, and DELETE methods using route chaining.
 
 ```typescript
-import express, { Request, Response } from "express";
+import express from "express";
+import type { Request, Response } from "express";
 
 const app = express();
 app.use(express.json());
@@ -63,7 +65,8 @@ app
 **Question:** Create an endpoint that extracts `userId` and `postId` from the URL `/users/:userId/posts/:postId`.
 
 ```typescript
-import express, { Request, Response } from "express";
+import express from "express";
+import type { Request, Response } from "express";
 
 const app = express();
 
@@ -90,7 +93,8 @@ app.get("/flights/:from-:to", function (req: Request, res: Response) {
 **Question:** Create a `/search` endpoint that accepts `q`, `page`, and `limit` query parameters with defaults.
 
 ```typescript
-import express, { Request, Response } from "express";
+import express from "express";
+import type { Request, Response } from "express";
 
 const app = express();
 
@@ -126,7 +130,8 @@ app.get(
 **Question:** Create a POST `/users` endpoint that accepts a JSON body with `name` and `email`, validates them, and returns the created user.
 
 ```typescript
-import express, { Request, Response } from "express";
+import express from "express";
+import type { Request, Response } from "express";
 
 const app = express();
 app.use(express.json());
@@ -171,7 +176,8 @@ app.post(
 **Question:** Create a middleware that logs the HTTP method, URL, and response time for every request.
 
 ```typescript
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
+import type { Request, Response, NextFunction } from "express";
 
 const app = express();
 
@@ -201,7 +207,8 @@ app.get("/", function (req: Request, res: Response) {
 **Question:** Create a middleware that checks for a valid Bearer token in the Authorization header.
 
 ```typescript
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
+import type { Request, Response, NextFunction } from "express";
 
 const app = express();
 
@@ -253,7 +260,8 @@ app.get(
 **Question:** Create a middleware that assigns a unique request ID to each request for tracing.
 
 ```typescript
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
+import type { Request, Response, NextFunction } from "express";
 import { randomUUID } from "crypto";
 
 const app = express();
@@ -288,7 +296,8 @@ app.get("/", function (req: TracedRequest, res: Response) {
 **Question:** Create a middleware that only runs on routes starting with `/api/v1`.
 
 ```typescript
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
+import type { Request, Response, NextFunction } from "express";
 
 const app = express();
 
@@ -319,7 +328,8 @@ app.get("/api/v2/users", function (req: Request, res: Response) {
 **Question:** Create a route with multiple middleware: validate input, check permissions, then handle the request.
 
 ```typescript
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
+import type { Request, Response, NextFunction } from "express";
 
 const app = express();
 app.use(express.json());
@@ -371,7 +381,8 @@ app.post("/posts", [validateBody, checkPermission], createPost);
 **Question:** Create a rate-limiting middleware factory that accepts `maxRequests` and `windowMs` options.
 
 ```typescript
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
+import type { Request, Response, NextFunction } from "express";
 
 const app = express();
 
@@ -432,7 +443,8 @@ app.get("/", function (req: Request, res: Response) {
 **Question:** Create a global error handling middleware that handles different error types.
 
 ```typescript
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
+import type { Request, Response, NextFunction } from "express";
 
 const app = express();
 app.use(express.json());
@@ -506,7 +518,8 @@ app.use(errorHandler);
 **Question:** Create an endpoint that reads a file asynchronously and returns its contents.
 
 ```typescript
-import express, { Request, Response } from "express";
+import express from "express";
+import type { Request, Response, NextFunction } from "express";
 import { readFile } from "fs/promises";
 import path from "path";
 
@@ -538,7 +551,8 @@ app.get("/files/:filename", async function (req: Request, res: Response) {
 **Question:** Create a POST endpoint that saves request body to a JSON file.
 
 ```typescript
-import express, { Request, Response } from "express";
+import express from "express";
+import type { Request, Response } from "express";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
@@ -580,7 +594,8 @@ app.post("/save", async function (req: Request, res: Response) {
 **Question:** Create an endpoint that fetches data from an external API using the native fetch.
 
 ```typescript
-import express, { Request, Response } from "express";
+import express from "express";
+import type { Request, Response } from "express";
 
 const app = express();
 
@@ -632,7 +647,8 @@ app.get("/github/:username", async function (req: Request, res: Response) {
 **Question:** Create an endpoint that performs sequential database-like operations (fetch user, then fetch their orders).
 
 ```typescript
-import express, { Request, Response } from "express";
+import express from "express";
+import type { Request, Response } from "express";
 
 const app = express();
 
@@ -681,7 +697,8 @@ app.get("/users/:id/orders", async function (req: Request, res: Response) {
 **Question:** Create an endpoint that fetches data from multiple sources in parallel.
 
 ```typescript
-import express, { Request, Response } from "express";
+import express from "express";
+import type { Request, Response } from "express";
 
 const app = express();
 
@@ -750,7 +767,8 @@ app.get(
 **Question:** Create a middleware that aborts requests taking longer than a specified timeout.
 
 ```typescript
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
+import type { Request, Response, NextFunction } from "express";
 
 const app = express();
 
@@ -858,7 +876,8 @@ app.use("/api/users", usersRouter);
 **Question:** Create nested routers where child router accesses parent route params.
 
 ```typescript
-import express, { Router, Request, Response } from "express";
+import express from "express";
+import type { Router, Request, Response, NextFunction } from "express";
 
 const app = express();
 app.use(express.json());
@@ -906,7 +925,8 @@ app.use("/users", usersRouter);
 **Question:** Create a route that handles optional file extension in the URL.
 
 ```typescript
-import express, { Request, Response } from "express";
+import express from "express";
+import type { Request, Response } from "express";
 
 const app = express();
 
@@ -942,7 +962,8 @@ app.get("/static/{*filepath}", function (req: Request, res: Response) {
 **Question:** Implement route handlers that can skip to the next matching route using `next('route')`.
 
 ```typescript
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
+import type { Request, Response, NextFunction } from "express";
 
 const app = express();
 
@@ -981,7 +1002,8 @@ app.get("/users/:id", function (req: Request, res: Response) {
 **Question:** Create a generic validation middleware factory.
 
 ```typescript
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
+import type { Request, Response, NextFunction } from "express";
 
 const app = express();
 app.use(express.json());
@@ -1122,7 +1144,8 @@ app.post("/comments", function (req: Request, res: Response) {
 **Question:** Implement a CORS middleware that handles preflight requests.
 
 ```typescript
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
+import type { Request, Response, NextFunction } from "express";
 
 const app = express();
 
@@ -1192,7 +1215,8 @@ app.get("/api/data", function (req: Request, res: Response) {
 **Question:** Create middleware that limits request body size.
 
 ```typescript
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
+import type { Request, Response, NextFunction } from "express";
 
 const app = express();
 
@@ -1240,7 +1264,8 @@ app.post("/upload", function (req: Request, res: Response) {
 **Question:** Implement a complete CRUD API for a "todos" resource with in-memory storage.
 
 ```typescript
-import express, { Request, Response } from "express";
+import express from "express";
+import type { Request, Response } from "express";
 
 const app = express();
 app.use(express.json());
@@ -1340,7 +1365,8 @@ app.delete("/todos/:id", function (req: Request, res: Response) {
 **Question:** Create a health check endpoint that verifies database and external service connections.
 
 ```typescript
-import express, { Request, Response } from "express";
+import express from "express";
+import type { Request, Response } from "express";
 
 const app = express();
 
@@ -1443,7 +1469,8 @@ app.get("/health/ready", async function (req: Request, res: Response) {
 **Question:** Implement an endpoint that streams data to the client.
 
 ```typescript
-import express, { Request, Response } from "express";
+import express from "express";
+import type { Request, Response } from "express";
 import { Readable } from "stream";
 
 const app = express();
@@ -1549,7 +1576,8 @@ app.get("/stream/file", async function (req: Request, res: Response) {
 **Question:** Implement graceful shutdown that waits for ongoing requests to complete.
 
 ```typescript
-import express, { Request, Response } from "express";
+import express from "express";
+import type { Request, Response } from "express";
 import { createServer, Server } from "http";
 
 const app = express();
@@ -1673,7 +1701,8 @@ app.listen(3000, function (error?: Error) {
 **Question:** Implement login and protected routes using JWT tokens.
 
 ```typescript
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
+import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
 const app = express();
@@ -1854,7 +1883,8 @@ app.post("/auth/refresh", function (req: Request, res: Response) {
 **Question:** Implement both offset-based and cursor-based pagination for a list endpoint.
 
 ```typescript
-import express, { Request, Response } from "express";
+import express from "express";
+import type { Request, Response } from "express";
 
 const app = express();
 
@@ -2030,7 +2060,8 @@ app.get("/items/keyset", function (req: Request, res: Response) {
 **Question:** Handle file uploads with size limits, type validation, and storage.
 
 ```typescript
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
+import type { Request, Response, NextFunction } from "express";
 import { mkdir, writeFile, unlink } from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
@@ -2252,7 +2283,8 @@ app.delete("/files/:filename", async function (req: Request, res: Response) {
 **Question:** Implement ETag-based caching with conditional GET requests.
 
 ```typescript
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
+import type { Request, Response, NextFunction } from "express";
 import { createHash } from "crypto";
 
 const app = express();
@@ -2409,7 +2441,8 @@ app.get("/api/user/session", function (req: Request, res: Response) {
 **Question:** Demonstrate safe database queries using parameterized statements.
 
 ```typescript
-import express, { Request, Response } from "express";
+import express from "express";
+import type { Request, Response } from "express";
 // Using pg (node-postgres) as example - patterns apply to any SQL library
 import { Pool } from "pg";
 
@@ -2642,7 +2675,8 @@ app.get("/users/:id/fields", async function (req: Request, res: Response) {
 
 ```typescript
 // app.ts - Export app without listening
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
+import type { Request, Response, NextFunction } from "express";
 
 export const app = express();
 app.use(express.json());
