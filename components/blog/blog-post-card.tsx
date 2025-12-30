@@ -27,7 +27,7 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
           day: "numeric",
         })}
       </p>
-      <h2 className="mt-2 group-hover:text-sky-700">
+      <h2 className="mt-2 font-serif group-hover:text-sky-700">
         <a
           href={`/blog/${post.slug}`}
           className={cn(

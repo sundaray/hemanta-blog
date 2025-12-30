@@ -28,9 +28,9 @@ export function BlogPostLayout({
   return (
     <div className="lg:grid-cols-16 mx-auto max-w-6xl px-4 sm:px-6 lg:grid lg:gap-x-8">
       <article className="lg:contents">
-        <header className="border-input lg:col-span-16 w-full border-b pb-12 text-center">
-          <h1 className="mt-6 text-balance">{title}</h1>
-          <div className="mt-12 flex w-full items-center justify-center space-x-4">
+        <header className="border-input lg:col-span-16 w-full border-b pb-12">
+          <h1 className="mt-6 text-balance font-serif">{title}</h1>
+          <div className="mt-12 flex w-full items-center space-x-4">
             <Image
               src="/images/blog/hemanta.jpg"
               alt={`Avatar of ${author}`}

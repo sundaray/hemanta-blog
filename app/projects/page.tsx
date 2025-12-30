@@ -13,7 +13,7 @@ export default function ProjectsPage() {
   return (
     <div className="container mx-auto max-w-4xl px-4 sm:px-6">
       <div className="text-center">
-        <h1>Projects</h1>
+        <h1 className="font-serif">Projects</h1>
         <p className="mx-auto mt-4 text-lg text-neutral-700">
           A showcase of my personal projects.
         </p>

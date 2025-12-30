@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono, Merriweather } from "next/font/google";
+import { Geist_Mono, Inter, Noto_Serif } from "next/font/google";
 
 import type { Metadata } from "next";
 import NextTopLoader from "nextjs-toploader";
@@ -10,21 +10,21 @@ import "@/app/styles/globals.css";
 
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const notoSerif = Noto_Serif({
+  variable: "--font-noto-serif",
+  subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
-});
-
-const merriweather = Merriweather({
-  variable: "--font-merriweather",
-  subsets: ["latin"],
-  style: ["italic", "normal"],
-  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -76,7 +76,7 @@ export default function RootLayout(props: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${merriweather.variable} flex min-h-screen flex-col antialiased`}
+        className={`${inter.variable} ${geistMono.variable} ${notoSerif.variable} flex min-h-screen flex-col antialiased`}
       >
         <NextTopLoader showSpinner={false} color="#0284c7" shadow={false} />
         <RouterProvider>

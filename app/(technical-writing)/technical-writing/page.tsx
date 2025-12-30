@@ -46,7 +46,7 @@ export default async function TechnicalWritingPage(
   return (
     <div className="container mx-auto max-w-6xl px-4 sm:px-6">
       <div className="text-center">
-        <h1>Technical Writing</h1>
+        <h1 className="font-serif">Technical Writing</h1>
         <p className="mx-auto mt-6 max-w-3xl text-pretty text-center text-lg text-neutral-700">
           From November 2022 to September 2024, I worked as a Freelance
           Technical Writer for{" "}

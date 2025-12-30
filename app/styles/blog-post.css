@@ -4,23 +4,23 @@
   }
 
   .blog-post h2 {
-    @apply mb-4 mt-12 text-2xl;
+    @apply mb-4 mt-12 font-serif text-3xl;
   }
 
   .blog-post h3 {
-    @apply mb-4 mt-12 text-xl;
+    @apply mb-4 mt-12 font-serif text-xl;
   }
 
   .blog-post h4 {
-    @apply mb-4 mt-12 text-lg;
+    @apply mb-4 mt-12 font-serif text-lg;
   }
 
   .blog-post p {
-    @apply mb-6 leading-7 text-neutral-700 last:mb-0;
+    @apply mb-6 text-lg leading-relaxed text-neutral-700 last:mb-0;
   }
 
   .blog-post blockquote {
-    @apply font-merriweather my-6 px-6 leading-7 text-neutral-700;
+    @apply my-6 px-6 font-serif leading-7 text-neutral-700;
   }
 
   .blog-post li:has(> ul) > p {
@@ -28,7 +28,7 @@
   }
 
   .blog-post p a {
-    @apply focus-visible:ring-ring text-sky-700 outline-none hover:underline hover:underline-offset-4 focus-visible:ring-2 focus-visible:ring-offset-2;
+    @apply focus-visible:ring-ring text-sky-700 underline underline-offset-2 outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
   }
 
   .blog-post ul,
