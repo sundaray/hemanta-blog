@@ -143,14 +143,17 @@ export function TableOfContents({ toc }: TocProps) {
     <div className="space-y-4">
       <p className="flex items-center gap-2">
         <Icons.toc className="text-muted-foreground size-4" />
-        <span className="text-foreground">ON THIS PAGE</span>
+        <span className="text-taupe-900 text-sm">ON THIS PAGE</span>
       </p>
 
-      <div ref={containerRef} className="border-input relative border-l pl-4">
+      <div
+        ref={containerRef}
+        className="border-taupe-200 relative border-l pl-4"
+      >
         {indicator.visible && (
           <motion.span
             aria-hidden
-            className="pointer-events-none absolute bg-sky-700 transition-all duration-200"
+            className="pointer-events-none absolute bg-sky-700 transition-all"
             style={{
               left: `-${indicator.borderWidth}px`,
               top: `${indicator.top}px`,
@@ -171,10 +174,10 @@ export function TableOfContents({ toc }: TocProps) {
                   <a
                     href={h2.url}
                     className={cn(
-                      "focus-ring inline-block text-sm transition-colors",
+                      "focus-ring inline-block text-base transition-colors",
                       isActiveGroup
                         ? "font-semibold text-sky-700"
-                        : "text-neutral-600",
+                        : "text-taupe-500",
                     )}
                   >
                     {h2.title}
@@ -189,10 +192,10 @@ export function TableOfContents({ toc }: TocProps) {
                           <a
                             href={h3.url}
                             className={cn(
-                              "focus-ring inline-block text-sm transition-colors",
+                              "focus-ring inline-block text-base transition-colors",
                               activeHeading === h3.url?.split("#")[1]
                                 ? "text-sky-700"
-                                : "text-neutral-600",
+                                : "text-taupe-500",
                             )}
                           >
                             {h3.title}

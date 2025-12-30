@@ -8,15 +8,15 @@
   }
 
   .blog-post h3 {
-    @apply mb-4 mt-12 font-serif text-xl;
+    @apply mb-4 mt-12 font-serif text-2xl;
   }
 
   .blog-post h4 {
-    @apply mb-4 mt-12 font-serif text-lg;
+    @apply mb-4 mt-12 font-serif text-xl;
   }
 
   .blog-post p {
-    @apply mb-6 text-lg leading-relaxed text-neutral-700 last:mb-0;
+    @apply text-taupe-700 mb-6 text-lg leading-relaxed last:mb-0;
   }
 
   .blog-post blockquote {
@@ -38,18 +38,18 @@
 
   .blog-post ol ul,
   .blog-post ul ul {
-    @apply pl-4 text-neutral-700;
+    @apply pl-4 text-lg text-neutral-700;
   }
 
   .blog-post ul {
-    @apply list-disc;
+    @apply list-disc text-lg;
   }
   .blog-post ol {
-    @apply list-decimal;
+    @apply list-decimal text-lg;
   }
 
   .blog-post :not(pre) > code {
-    @apply border-input text-foreground rounded-sm border bg-neutral-200/40 px-1 py-0.5 font-mono text-sm dark:bg-neutral-800;
+    @apply border-taupe-200 text-taupe-700 bg-taupe-100 rounded-sm border px-1 py-0.5 font-mono text-[15px];
   }
 
   .blog-post strong {

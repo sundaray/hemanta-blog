@@ -13,9 +13,9 @@ Transactions are one of the most fundamental concepts in database systems, and P
 
 ## What is a Transaction?
 
-A transaction is an **atomic unit of work**—a sequence of one or more database operations that are treated as a single, indivisible operation. The defining characteristic is the **all-or-nothing guarantee**: either every operation in the transaction succeeds and the changes become permanent, or if any operation fails, the entire transaction is rolled back as if nothing ever happened.
+A transaction is an **atomic unit of work**: a sequence of one or more database operations that are treated as a single, indivisible operation. The defining characteristic is the **all-or-nothing guarantee**: either every operation in the transaction succeeds and the changes become permanent, or if any operation fails, the entire transaction is rolled back as if nothing ever happened.
 
-Consider a user authentication system. When a user logs in for the first time, you need to create a record in the `users` table and another in the `accounts` table. If you don't put both insertions in a transaction and the user insertion succeeds but the account insertion fails, you've left the database in an inconsistent state: a user exists but has no way to log in, and they can't sign up again because their email already exists. Transactions prevent this by ensuring both records are created together or neither is created at all.
+Consider a user authentication system. When a user logs in for the first time, you need to create a record in the `users` table and another in the `accounts` table. If you don't put both insertions in a transaction and the user insertion succeeds but the account insertion fails, you've left the database in an inconsistent state. A user exists but has no way to log in, and they can't sign up again because their email already exists. Transactions prevent this by ensuring both records are created together or neither is created at all.
 
 Transactions are what enable databases to implement the **ACID properties**:
 
@@ -155,8 +155,6 @@ Use explicit transactions whenever you have operations that **must succeed or fa
 
 The rule of thumb: if leaving the operation half-done would corrupt your data or violate business rules, wrap it in an explicit transaction.
 
----
-
 ## Transactions and Isolation Levels
 
 So far, we've talked about transactions as if they run in complete isolation. But in a real database, multiple transactions run **concurrently**. Imagine thousands of users browsing and buying products on an e-commerce site at the same time. What happens when two transactions try to read or modify the same data at the same time?
@@ -167,11 +165,11 @@ This is where **isolation levels** come in. They control how and when changes ma
 
 Without proper isolation, concurrent transactions can experience several anomalies:
 
-**Dirty Reads**: Transaction A sees uncommitted changes from Transaction B. If B rolls back, A has made decisions based on data that never actually existed.
+- **Dirty Reads**: Transaction A sees uncommitted changes from Transaction B. If B rolls back, A has made decisions based on data that never actually existed.
 
-**Non-Repeatable Reads**: Transaction A reads a row, Transaction B modifies and commits it, then A reads the same row again and gets different values. The same query, run twice in the same transaction, returns different results.
+- **Non-Repeatable Reads**: Transaction A reads a row, Transaction B modifies and commits it, then A reads the same row again and gets different values. The same query, run twice in the same transaction, returns different results.
 
-**Phantom Reads**: Transaction A runs a query and gets a set of rows. Transaction B inserts new rows that match A's query criteria and commits. A runs the same query again and gets additional "phantom" rows that weren't there before.
+- **Phantom Reads**: Transaction A runs a query and gets a set of rows. Transaction B inserts new rows that match A's query criteria and commits. A runs the same query again and gets additional "phantom" rows that weren't there before.
 
 The SQL standard defines four isolation levels that provide increasing protection against these anomalies:
 

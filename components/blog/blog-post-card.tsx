@@ -14,13 +14,13 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
   return (
     <article
       className={cn(
-        "group relative rounded-lg hover:bg-neutral-200/40",
+        "hover:bg-taupe-100 group relative rounded-lg",
         "-mx-4 px-4 py-4 sm:-mx-6 sm:px-6",
         "has-[a:focus-visible]:ring-ring has-[a:focus-visible]:ring-2",
         "has-[a:focus-visible]:[&_a:focus-visible]:outline-none",
       )}
     >
-      <p className="text-muted-foreground font-mono text-sm">
+      <p className="text-taupe-700 font-mono text-sm">
         {new Date(post.publishedAt).toLocaleDateString("en-US", {
           year: "numeric",
           month: "long",

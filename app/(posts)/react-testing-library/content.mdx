@@ -7,7 +7,9 @@ tags: ["Testing"]
 isPublished: true
 ---
 
-If you're getting started with testing React applications, you've probably encountered terms like "React Testing Library," "DOM Testing Library," "Jest," and "jest-dom." It can be confusing to understand what each of these tools does and how they fit together. In this post, I'll break down the entire ecosystem so you understand exactly what React Testing Library is, what it's made of, and how all the pieces work together.
+If you're getting started with testing React applications, you've probably encountered terms like **React Testing Library**, **DOM Testing Library**, **Jest**, and **jest-dom**. It can be confusing to understand what each of these tools does and how they fit together.
+
+In this post, I'll break down the entire ecosystem so you understand exactly what React Testing Library is, what it's made of, and how all the pieces work together.
 
 ## The Core Philosophy: Testing Like a User
 
@@ -27,7 +29,7 @@ Let's explore each one.
 
 The DOM Testing Library is the foundation of everything. It provides a set of utilities for querying and interacting with DOM nodes.
 
-**What does it actually do?**
+What does it actually do?
 
 The DOM Testing Library gives you methods to find elements in the DOM the same way users would find them. Instead of selecting elements by their CSS class names or test IDs (which users can't see), it encourages you to select elements by:
 
@@ -50,19 +52,19 @@ screen.getByRole("button", { name: /submit/i });
 
 This query finds an element with the role of "button" that has the accessible name "Submit." This is exactly how a user (or a screen reader) would identify this element.
 
-**The `screen` Object**
+**The `screen` object**
 
 The `screen` object is your window into the DOM. It provides all the query methods you need to find elements. Think of it as representing what's currently rendered on the screen.
 
-### 2. What About Accessibility and Screen Readers?
+**What about accessibility and screen readers?**
 
 This is where the DOM Testing Library's philosophy really shines, and it's worth explaining in detail since the concept can be confusing at first.
 
-**What are Screen Readers?**
+**What are screen readers?**
 
 Screen readers are software applications that help people with visual impairments use computers. They read out the content of the screen and allow users to navigate using keyboard commands.
 
-**What are ARIA Roles?**
+**What are ARIA roles?**
 
 ARIA (Accessible Rich Internet Applications) is a set of attributes that define ways to make web content more accessible. Every HTML element has an implicit "role" that tells assistive technologies what kind of element it is:
 
@@ -73,7 +75,7 @@ ARIA (Accessible Rich Internet Applications) is a set of attributes that define 
 
 When a screen reader encounters an element, it announces this role to the user. For example, it might say "Submit, button" when it reaches a submit button.
 
-**Why Does This Matter for Testing?**
+**Why does this matter for testing?**
 
 Here's the key insight: if you write tests that query elements by their accessible roles and names, you're simultaneously verifying that your application is accessible. If your test can find the button using `getByRole('button', { name: /submit/i })`, then a screen reader user can find that button too.
 
@@ -89,23 +91,23 @@ Consider this example:
 
 If you try to use `getByRole('button', { name: /submit/i })` on the first example, it will fail because a `<div>` doesn't have the role of "button." This failing test tells you that your "button" isn't actually accessible to screen reader users. The DOM Testing Library's query methods essentially enforce accessibility best practices.
 
-**The Query Priority**
+**The query priority**
 
 DOM Testing Library recommends using queries in this order of priority:
 
-1. `getByRole` - Queries based on accessibility role (preferred)
-2. `getByLabelText` - Queries form elements by their label
-3. `getByPlaceholderText` - Queries by placeholder attribute
-4. `getByText` - Queries by visible text content
-5. `getByTestId` - Queries by data-testid attribute (last resort)
+1. `getByRole`: Queries based on accessibility role (preferred)
+2. `getByLabelText`: Queries form elements by their label
+3. `getByPlaceholderText`: Queries by placeholder attribute
+4. `getByText`: Queries by visible text content
+5. `getByTestId`: Queries by data-testid attribute (last resort)
 
 The reason `getByRole` is preferred is because it most closely mirrors how assistive technologies interact with your page.
 
-### 3. React Testing Library: The React Wrapper
+### 2. React Testing Library: The React Wrapper
 
 React Testing Library is essentially the React-specific version of DOM Testing Library. It adds React-specific utilities on top of the core DOM Testing Library.
 
-**What Does It Add?**
+**What does it add?**
 
 The main addition is the `render` function. Without React Testing Library, if you wanted to test a React component, you'd have to manually set up the DOM like this:
 
@@ -127,15 +129,15 @@ The `render` function handles all the boilerplate of mounting your component int
 
 In addition to `render`, React Testing Library also provides other React-specific utilities.
 
-### 4. Jest: The Test Runner
+### 3. Jest: The Test Runner
 
 Now we need to talk about Jest (or Vitest, which is a newer, faster alternative). Jest is a **test runner** and **testing framework**.
 
-**What is a Test Runner?**
+**What is a test runner?**
 
 A test runner is the program that actually executes your tests and reports the results. When you run `npm test`, Jest (or Vitest) is what finds your test files, runs them, and tells you whether they passed or failed.
 
-**What Jest Provides**
+**What Jest provides**
 
 Jest gives you the fundamental building blocks for writing tests:
 
@@ -159,16 +161,16 @@ expect(someArray).toContain(item);
 expect(someObject).toEqual({ key: "value" });
 ```
 
-**Built-in Matchers**
+**Built-in matchers**
 
 Jest comes with many "matchers": methods that check if a value meets certain conditions:
 
-- `toBe(value)` - Strict equality check
-- `toEqual(value)` - Deep equality check for objects
-- `toBeTruthy()` - Checks if value is truthy
-- `toBeFalsy()` - Checks if value is falsy
-- `toContain(item)` - Checks if array contains item
-- `toThrow()` - Checks if function throws an error
+- `toBe(value)`: Strict equality check
+- `toEqual(value)`: Deep equality check for objects
+- `toBeTruthy()`: Checks if value is truthy
+- `toBeFalsy()`: Checks if value is falsy
+- `toContain(item)`: Checks if array contains item
+- `toThrow()`: Checks if function throws an error
 
 **Mocking**
 
@@ -186,7 +188,7 @@ jest.mock("./api", () => ({
 }));
 ```
 
-### 5. jest-dom: Enhanced DOM Assertions
+### 4. jest-dom: Enhanced DOM Assertions
 
 Here's where many people get confused. Jest comes with general-purpose matchers like `toBe` and `toEqual`, but these aren't specifically designed for testing DOM elements. This is where `jest-dom` comes in.
 
@@ -194,7 +196,7 @@ Here's where many people get confused. Jest comes with general-purpose matchers 
 
 `jest-dom` is a companion library that adds DOM-specific matchers to Jest. It's designed to work perfectly with DOM Testing Library and React Testing Library.
 
-**Why Do You Need It?**
+**Why do you need it?**
 
 Without `jest-dom`, if you want to check whether a button is disabled, you might write:
 
@@ -212,7 +214,7 @@ expect(button).toBeDisabled();
 
 Much clearer! The test reads almost like plain English: "expect button to be disabled."
 
-**Popular jest-dom Matchers**
+**Popular jest-dom matchers**
 
 jest-dom provides many helpful matchers:
 
@@ -246,7 +248,7 @@ expect(form).toHaveFormValues({
 expect(checkbox).toBeChecked();
 ```
 
-**Better Error Messages**
+**Better error messages**
 
 Another advantage of `jest-dom` is that it provides better error messages. If a test fails, `jest-dom` gives you context-specific feedback. For example:
 
@@ -258,7 +260,7 @@ Received element that is not disabled.
 
 This is much more helpful than a generic "expected true but received false" message.
 
-### 6. user-event: Simulating User Interactions
+### 5. user-event: Simulating User Interactions
 
 There's one more piece of the puzzle worth mentioning: `@testing-library/user-event`. While the core DOM Testing Library includes `fireEvent` for triggering DOM events, `user-event` provides a more realistic simulation of user interactions.
 
@@ -350,7 +352,7 @@ describe('LoginForm', () => {
 });
 ```
 
-**The Flow**
+**The flow**
 
 1. **Jest** runs the test file and provides the `describe`, `test`, and `expect` functions
 2. **React Testing Library's `render`** mounts your component into a virtual DOM

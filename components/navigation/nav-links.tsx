@@ -29,7 +29,7 @@ export function NavLinks({
               <Link
                 className={cn(
                   "focus-ring flex h-full items-center transition-colors",
-                  isActive ? "font-semibold text-sky-700" : "text-neutral-600",
+                  isActive ? "font-semibold text-sky-700" : "text-taupe-700",
                 )}
                 href={link.href}
               >
@@ -37,10 +37,10 @@ export function NavLinks({
               </Link>
               <div
                 className={cn(
-                  "pointer-events-none absolute bottom-0 left-0 h-[1.5px] w-full origin-center transition-transform ease-out",
+                  "pointer-events-none absolute bottom-5 left-0 h-[1.5px] w-full origin-center transition-transform ease-out",
                   isActive
                     ? "scale-x-100 bg-sky-700"
-                    : "scale-x-0 bg-neutral-600 group-hover:scale-x-100",
+                    : "bg-taupe-700 scale-x-0 group-hover:scale-x-100",
                 )}
               />
             </li>

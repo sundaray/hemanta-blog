@@ -86,13 +86,13 @@ export function BlogPostsTags({ tags }: BlogTagsProps) {
                   <Tag
                     key={tag}
                     id={tag}
-                    className="flex items-center justify-between gap-1 bg-neutral-700 text-white hover:bg-neutral-700 hover:text-white"
+                    className="bg-taupe-700 hover:bg-taupe-700 flex items-center justify-between gap-1 text-white hover:text-white"
                   >
                     {tag}
                     <Button
                       slot="remove"
                       aria-label={`Remove ${tag} filter`}
-                      className="-mr-1 size-6 rounded-full transition-colors hover:bg-neutral-700"
+                      className="hover:bg-taupe-700 -mr-1 size-6 rounded-full transition-colors"
                     >
                       <Icons.x className="inline-block size-5" />
                     </Button>

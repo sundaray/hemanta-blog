@@ -9,6 +9,7 @@ import { type TableOfContents as TOCType } from "@/lib/toc";
 import { CopyBlogPostButton } from "@/components/blog/copy-blog-post-button";
 import { TagDisplayList } from "@/components/blog/tag-display-list";
 import { TableOfContents } from "@/components/blog/toc";
+import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb";
 
 type BlogPostLayoutProps = {
   frontmatter: Frontmatter;
@@ -28,9 +29,10 @@ export function BlogPostLayout({
   return (
     <div className="lg:grid-cols-16 mx-auto max-w-6xl px-4 sm:px-6 lg:grid lg:gap-x-8">
       <article className="lg:contents">
-        <header className="border-input lg:col-span-16 w-full border-b pb-12">
-          <h1 className="mt-6 text-balance font-serif">{title}</h1>
-          <div className="mt-12 flex w-full items-center space-x-4">
+        <header className="border-taupe-200 lg:col-span-16 w-full border-b pb-12">
+          <DynamicBreadcrumb />
+          <h1 className="my-12 text-balance font-serif">{title}</h1>
+          <div className="flex w-full items-center space-x-4">
             <Image
               src="/images/blog/hemanta.jpg"
               alt={`Avatar of ${author}`}
@@ -40,14 +42,14 @@ export function BlogPostLayout({
             />
             <div className="flex flex-col items-start">
               <p className="text-sm font-medium">{author}</p>
-              <p className="text-sm text-neutral-600">
+              <p className="text-taupe-700 text-sm">
                 Published{" "}
                 <time dateTime={publishedAt}>
                   {format(new Date(publishedAt), "LLL d, yyyy")}
                 </time>
               </p>
               {updatedAt && (
-                <p className="text-sm text-neutral-600">
+                <p className="text-taupe-700 text-sm">
                   Updated{" "}
                   <time dateTime={updatedAt}>
                     {format(new Date(updatedAt), "LLL d, yyyy")}

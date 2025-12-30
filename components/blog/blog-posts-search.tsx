@@ -56,7 +56,7 @@ export function BlogPostsSearch({ className }: { className?: string }) {
           onKeyDown={handleKeyDown}
         />
         <div className="pointer-events-none col-start-1 row-start-1 pl-4">
-          <Icons.search className="text-muted-foreground size-5" />
+          <Icons.search className="text-taupe-500 size-5" />
         </div>
         {values.query && (
           <div className="pointer-events-none col-start-1 row-start-1 flex items-center justify-end pr-4">

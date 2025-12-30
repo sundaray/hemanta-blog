@@ -24,7 +24,8 @@ const rehypeExpressiveCodeOptions: RehypeExpressiveCodeOptions = {
   themes: ["github-light"],
   plugins: [ecTwoSlash(), pluginLineNumbers(), pluginRemoveLastBlankLine()],
   styleOverrides: {
-    borderColor: "var(--input)",
+    codeBackground: "var(--color-taupe-100)",
+    borderColor: "var(--color-taupe-200)",
     borderRadius: "8px",
     borderWidth: "1px",
     uiPaddingBlock: "0.75rem",

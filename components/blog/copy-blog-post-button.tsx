@@ -23,7 +23,7 @@ export function CopyBlogPostButton({
       size="sm"
       onClick={() => copyToClipboard(content)}
       className={cn(
-        "gap-2 bg-white text-sm font-medium text-neutral-700 shadow-sm transition-all hover:bg-neutral-50",
+        "bg-taupe-100 text-taupe-700 border-taupe-200 hover:bg-taupe-100 gap-2 text-sm font-medium transition-all",
         className,
       )}
     >
@@ -35,7 +35,7 @@ export function CopyBlogPostButton({
       ) : (
         <>
           <Icons.copy className="size-3.5" />
-          <span>Copy Page</span>
+          <span>Copy page as markdown</span>
         </>
       )}
     </Button>
