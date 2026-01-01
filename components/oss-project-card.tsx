@@ -28,13 +28,13 @@ export function OssProjectCard({ project, className }: OssProjectCardProps) {
   return (
     <div
       className={cn(
-        "group relative flex flex-col rounded-lg p-4 transition-all",
-        "bg-linear-to-bl from-neutral-100 to-neutral-50",
-        "shadow-[inset_-2px_2px_#fff,-4px_4px_10px_rgb(0_0_0/0.1)]",
-        "hover:scale-[1.02]",
-        "has-[.main-link:focus-visible]:-translate-y-1",
-        "has-[.main-link:focus-visible]:ring-ring has-[.main-link:focus-visible]:ring-2",
-        "has-[.main-link:focus-visible]:[&_.main-link:focus-visible]:outline-none",
+        "bg-accent group relative flex flex-col rounded-sm border border-neutral-200 p-4 transition-all hover:scale-[1.02]",
+        // "bg-linear-to-bl from-neutral-100 to-neutral-50",
+        // "shadow-[inset_-2px_2px_#fff,-4px_4px_10px_rgb(0_0_0/0.1)]",
+        // "hover:scale-[1.02]",
+        // "has-[.main-link:focus-visible]:-translate-y-1",
+        // "has-[.main-link:focus-visible]:ring-ring has-[.main-link:focus-visible]:ring-2",
+        // "has-[.main-link:focus-visible]:[&_.main-link:focus-visible]:outline-none",
         className,
       )}
     >
