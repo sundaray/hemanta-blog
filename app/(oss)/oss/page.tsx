@@ -70,7 +70,7 @@ export default async function OssPage(props: PageProps<"/oss">) {
   return (
     <div className="container mx-auto max-w-7xl px-4 sm:px-6">
       <div className="text-center">
-        <h1>Open Source Software</h1>
+        <h1 className="font-heading">Open Source Software</h1>
         <p className="mx-auto mt-8 max-w-3xl text-balance text-lg text-neutral-600">
           Every time I come across interesting open-source projects, I add them
           here. Search around; you might find something useful.

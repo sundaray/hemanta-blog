@@ -16,7 +16,7 @@
   }
 
   .blog-post p {
-    @apply mb-6 leading-7 text-neutral-700 last:mb-0;
+    @apply mb-6 text-[17px] leading-7 text-neutral-800 last:mb-0;
   }
 
   .blog-post blockquote {

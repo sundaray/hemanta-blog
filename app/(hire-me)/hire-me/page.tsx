@@ -2,7 +2,7 @@ export default function HireMePage() {
   return (
     <div className="container mx-auto max-w-2xl px-4 xl:px-0">
       <div>
-        <h1 className="text-center">Hire Me</h1>
+        <h1 className="font-heading text-center">Hire Me</h1>
         <div className="mt-8 space-y-6 text-lg leading-relaxed text-neutral-700">
           <p>
             I am looking for my first professional role in the software
