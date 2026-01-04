@@ -7,7 +7,7 @@ import { rethrowIfRedirect } from "@/lib/auth/next-redirect";
 
 export async function signInWithGoogle(redirectTo: string = "/admin") {
   try {
-    await signIn("google", { redirectTo: redirectTo as `/${string}` });
+    await signIn("google", { redirectTo: redirectTo });
   } catch (error) {
     rethrowIfRedirect(error);
 

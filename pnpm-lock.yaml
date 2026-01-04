@@ -81,8 +81,8 @@ importers:
         specifier: ^4.0.3
         version: 4.0.3
       lucidauth:
-        specifier: 1.0.0-beta.4
-        version: 1.0.0-beta.4(next@16.0.8(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
+        specifier: 1.0.0-beta.5
+        version: 1.0.0-beta.5(next@16.0.8(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
       lucide-react:
         specifier: ^0.544.0
         version: 0.544.0(react@19.1.0)
@@ -3394,8 +3394,8 @@ packages:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
     hasBin: true
 
-  lucidauth@1.0.0-beta.4:
-    resolution: {integrity: sha512-FD1We/Rnb3pmTSnNrTBvpxFxVk3wioNX5BoXPVP9LgpmRLqQ/ajHPQj2RXuq/UE5bjHYezWL8Tdyoe39ez1rHg==}
+  lucidauth@1.0.0-beta.5:
+    resolution: {integrity: sha512-wGAtwGYhDlO1UGfZF8T9rlm3V1sJMvZYBn3uBcoUX1Jn9EZv1Kg8a1xyjcd66PdygKcuGWz3ADOqgIREZo0hlg==}
     peerDependencies:
       next: ^16.0.1
       react: ^19.2.0
@@ -8092,7 +8092,7 @@ snapshots:
     dependencies:
       js-tokens: 4.0.0
 
-  lucidauth@1.0.0-beta.4(next@16.0.8(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0):
+  lucidauth@1.0.0-beta.5(next@16.0.8(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0):
     dependencies:
       '@noble/hashes': 2.0.1
       jose: 6.1.3
