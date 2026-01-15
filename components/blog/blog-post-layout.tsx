@@ -58,7 +58,7 @@ export function BlogPostLayout({
           </div>
         </header>
 
-        <div className="mt-12 lg:col-start-1 lg:col-end-13">
+        <div className="mt-12 lg:col-start-1 lg:col-end-12">
           <div className="blog-post">{children}</div>
           {tags && tags.length > 0 && (
             <footer className="border-input mt-12 flex items-center gap-x-3 border-t py-6">
@@ -69,7 +69,7 @@ export function BlogPostLayout({
         </div>
       </article>
 
-      <aside className="lg:col-start-14 lg:col-end-17 mt-12 hidden lg:block">
+      <aside className="lg:col-end-17 mt-12 hidden lg:col-start-13 lg:block">
         <div className="sticky top-32 space-y-6">
           <CopyBlogPostButton content={rawContent} />
           <TableOfContents toc={toc} />
